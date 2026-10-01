@@ -44,10 +44,9 @@ export function biomeAt(x, y) {
   return BIOMES.plains;
 }
 
-// Ground color as [r, g, b], with a little small-scale variation inside a biome.
-export function groundColorAt(x, y) {
-  const shade = 1 + DETAIL_STRENGTH * noise(x * DETAIL_FREQUENCY, y * DETAIL_FREQUENCY);
-  return biomeAt(x, y).color.map((channel) => Math.min(255, channel * shade));
+// Brightness factor around 1, for a little small-scale variation inside a biome.
+export function groundShadeAt(x, y) {
+  return 1 + DETAIL_STRENGTH * noise(x * DETAIL_FREQUENCY, y * DETAIL_FREQUENCY);
 }
 
 // Icons are drawn with their base at (x, y), extending upward, `size` pixels tall.

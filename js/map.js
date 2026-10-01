@@ -13,20 +13,29 @@ const TAP_TOLERANCE_PX = 10;
 // Time per frame spent rendering missing tiles; the rest is drawn in later frames.
 const TILE_RENDER_BUDGET_MS = 12;
 const SCALE_BAR_LENGTHS = [50, 100, 200, 500, 1000, 2000, 5000];
+const MAX_SCALE_BAR_PX = 110;
+const HATCH_SPACING_PX = 7;
+const LABEL_FONT = '800 17px "Big Shoulders Stencil", Impact, sans-serif';
+// The shelter icon from the SVG sprite, in its 24x24 box.
+const HUT_ICON = new Path2D('M3 11.5 12 4l9 7.5M5.5 10v10.5h13V10M10 20.5V15h4v5.5');
 
+// Kept in sync with the palette in style.css.
 const COLORS = {
-  ground: '#d8ccb0',
-  player: '#d42a1c',
-  playerOutline: '#ffffff',
-  accuracy: 'rgba(212, 42, 28, 0.15)',
-  accuracyOutline: 'rgba(212, 42, 28, 0.5)',
-  scaleBar: '#3b3226',
-  shelter: 'rgba(58, 110, 64, 0.28)',
-  shelterOutline: '#2f5c35',
-  shelterLabel: '#1f3d23',
-  labelHalo: 'rgba(255, 255, 255, 0.8)',
-  searched: 'rgba(60, 40, 20, 0.22)',
-  searchedOutline: 'rgba(50, 32, 15, 0.9)',
+  paper: '#ece0c0',
+  ink: '#33281c',
+  paint: '#b4432b',
+  paintLight: '#d9654a',
+  paintDark: '#82301c',
+  grey: '#a39d90',
+  greyDark: '#6b665c',
+  tape: 'rgba(236, 226, 190, 0.94)',
+  shadow: 'rgba(40, 28, 15, 0.35)',
+  accuracy: 'rgba(180, 67, 43, 0.12)',
+  accuracyOutline: 'rgba(180, 67, 43, 0.45)',
+  shelterFill: 'rgba(51, 40, 28, 0.1)',
+  searchedFill: 'rgba(180, 60, 35, 0.07)',
+  pencil: 'rgba(170, 45, 25, 0.85)',
+  pencilFaint: 'rgba(170, 45, 25, 0.3)',
 };
 
 export class MapView {
@@ -38,6 +47,8 @@ export class MapView {
     this.viewWidthMeters = DEFAULT_VIEW_WIDTH_METERS;
     this.pendingFrame = null;
     this.onTap = null; // (point: { lat, lon }) => void
+    this.onScaleChange = null; // (meters, pixels) => void
+    this.scale = null;
     this.resize();
     this.setUpGestures();
     window.addEventListener('resize', () => {
@@ -131,8 +142,9 @@ export class MapView {
   render(scene) {
     this.scene = scene;
     const { ctx } = this;
-    ctx.fillStyle = COLORS.ground;
+    ctx.fillStyle = COLORS.paper;
     ctx.fillRect(0, 0, this.width, this.height);
+    this.updateScale();
     if (!scene.center) return;
 
     const complete = this.drawTerrain(scene.center);
@@ -145,7 +157,6 @@ export class MapView {
     for (const area of scene.searchedAreas) this.drawSearchedArea(scene.center, area);
     if (scene.shelter) this.drawShelter(scene.center, scene.shelter);
     if (scene.player) this.drawPlayer(scene.center, scene.player);
-    this.drawScaleBar();
   }
 
   // Mercator units per screen pixel around the given center.
@@ -187,116 +198,215 @@ export class MapView {
     const deadline = performance.now() + TILE_RENDER_BUDGET_MS;
     let complete = true;
 
-    for (let ty = Math.floor(top / tileWorld); ty >= Math.floor((top - height * units) / tileWorld); ty--) {
-      for (let tx = Math.floor(left / tileWorld); tx <= Math.floor((left + width * units) / tileWorld); tx++) {
-        let tile = this.tiles.get(level, tx, ty);
-        if (!tile) {
-          if (performance.now() > deadline) {
-            complete = false;
-            continue;
-          }
-          tile = this.tiles.render(level, tx, ty);
-        }
+    const minX = Math.floor(left / tileWorld);
+    const maxX = Math.floor((left + width * units) / tileWorld);
+    const minY = Math.floor((top - height * units) / tileWorld);
+    const maxY = Math.floor(top / tileWorld);
+    this.tiles.setVisibleCount((maxX - minX + 1) * (maxY - minY + 1));
+
+    for (let ty = maxY; ty >= minY; ty--) {
+      for (let tx = minX; tx <= maxX; tx++) {
         // Rounded edges, so neighboring tiles meet without hairline gaps.
         const x0 = Math.round((tx * tileWorld - left) / units);
         const x1 = Math.round(((tx + 1) * tileWorld - left) / units);
         const y0 = Math.round((top - (ty + 1) * tileWorld) / units);
         const y1 = Math.round((top - ty * tileWorld) / units);
-        ctx.drawImage(tile, x0, y0, x1 - x0, y1 - y0);
+        let tile = this.tiles.get(level, tx, ty);
+        if (!tile && performance.now() < deadline) tile = this.tiles.render(level, tx, ty);
+        if (tile) {
+          ctx.drawImage(tile, x0, y0, x1 - x0, y1 - y0);
+        } else {
+          complete = false;
+          this.drawTileFallback(level, tx, ty, x0, y0, x1 - x0, y1 - y0);
+        }
       }
     }
     return complete;
   }
 
+  // Until a tile is rendered, stretches what's cached on the neighboring zoom
+  // levels over its place, so zooming doesn't flash empty squares.
+  drawTileFallback(level, tx, ty, x, y, width, height) {
+    const { ctx } = this;
+    const parent = this.tiles.get(level + 1, Math.floor(tx / 2), Math.floor(ty / 2));
+    if (parent) {
+      const half = parent.width / 2;
+      // Tile y grows to the north, canvas y grows downward.
+      const sx = (tx - 2 * Math.floor(tx / 2)) * half;
+      const sy = (1 - (ty - 2 * Math.floor(ty / 2))) * half;
+      ctx.drawImage(parent, sx, sy, half, half, x, y, width, height);
+      return;
+    }
+    for (let dy = 0; dy < 2; dy++) {
+      for (let dx = 0; dx < 2; dx++) {
+        const child = this.tiles.get(level - 1, 2 * tx + dx, 2 * ty + dy);
+        if (child) ctx.drawImage(child, x + (dx * width) / 2, y + ((1 - dy) * height) / 2, width / 2, height / 2);
+      }
+    }
+  }
+
+  // Searched areas are crossed out in red pencil: a wobbly outline, hatching and an X.
   drawSearchedArea(center, area) {
     const { ctx } = this;
     const { x, y } = this.toScreen(center, area);
+    const radius = area.radius / this.metersPerPixel;
+    // Each area gets its own wobble, stable between frames.
+    const phase = (area.searchedAt % 1000) / 159;
+
+    ctx.save();
     ctx.beginPath();
-    ctx.arc(x, y, area.radius / this.metersPerPixel, 0, Math.PI * 2);
-    ctx.fillStyle = COLORS.searched;
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = COLORS.searchedFill;
     ctx.fill();
-    ctx.setLineDash([6, 5]);
-    ctx.strokeStyle = COLORS.searchedOutline;
-    ctx.lineWidth = 2;
+    ctx.clip();
+    ctx.strokeStyle = COLORS.pencilFaint;
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    for (let offset = -radius * 2; offset < radius * 2; offset += HATCH_SPACING_PX) {
+      ctx.moveTo(x + offset - radius, y + radius);
+      ctx.lineTo(x + offset + radius, y - radius);
+    }
     ctx.stroke();
-    ctx.setLineDash([]);
+    ctx.restore();
+
+    ctx.strokeStyle = COLORS.pencil;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    for (const [pass, width] of [[0, 2.2], [1, 1.2]]) {
+      ctx.lineWidth = width;
+      ctx.beginPath();
+      for (let step = 0; step <= 48; step++) {
+        const angle = (step / 48) * Math.PI * 2 + pass * 0.4;
+        const r = radius + 1.4 * Math.sin(3 * angle + phase + pass) + pass * 1.5;
+        const px = x + Math.cos(angle) * r;
+        const py = y + Math.sin(angle) * r;
+        if (step === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+    }
+
+    const arm = Math.min(9, radius * 0.35);
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(x - arm, y - arm);
+    ctx.lineTo(x + arm, y + arm);
+    ctx.moveTo(x + arm, y - arm);
+    ctx.lineTo(x - arm, y + arm);
+    ctx.stroke();
   }
 
+  // The shelter: a double ink ring, a stamped hut and its name on a strip of tape.
   drawShelter(center, shelter) {
     const { ctx } = this;
     const { x, y } = this.toScreen(center, shelter);
     const radius = shelter.radius / this.metersPerPixel;
+
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, Math.PI * 2);
-    ctx.fillStyle = COLORS.shelter;
+    ctx.fillStyle = COLORS.shelterFill;
     ctx.fill();
-    ctx.strokeStyle = COLORS.shelterOutline;
+    ctx.strokeStyle = COLORS.ink;
     ctx.lineWidth = 2.5;
     ctx.stroke();
+    if (radius > 12) {
+      ctx.beginPath();
+      ctx.arc(x, y, radius - 4, 0, Math.PI * 2);
+      ctx.setLineDash([3, 4]);
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
 
-    ctx.font = 'bold 14px system-ui, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'bottom';
+    // Stamp
+    ctx.beginPath();
+    ctx.arc(x, y, 15, 0, Math.PI * 2);
+    ctx.fillStyle = COLORS.paper;
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = COLORS.paint;
+    ctx.stroke();
+    ctx.save();
+    ctx.translate(x - 10, y - 10.5);
+    ctx.scale(20 / 24, 20 / 24);
+    ctx.lineWidth = 2.6;
+    ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    // Above the circle, so it doesn't cover the player standing inside.
-    const labelY = y - radius - 4;
-    ctx.strokeStyle = COLORS.labelHalo;
-    ctx.lineWidth = 4;
-    ctx.strokeText(shelter.name, x, labelY);
-    ctx.fillStyle = COLORS.shelterLabel;
-    ctx.fillText(shelter.name, x, labelY);
-    ctx.textAlign = 'start';
-    ctx.textBaseline = 'alphabetic';
+    ctx.stroke(HUT_ICON);
+    ctx.restore();
+
+    // Name on tape, above the circle so it doesn't cover the player standing inside.
+    const label = shelter.name.toUpperCase();
+    ctx.font = LABEL_FONT;
+    const textWidth = ctx.measureText(label).width;
+    const labelY = y - Math.max(radius, 18) - 18;
+    ctx.save();
+    ctx.translate(x, labelY);
+    ctx.rotate(-0.03);
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.25)';
+    ctx.shadowBlur = 3;
+    ctx.shadowOffsetY = 1;
+    ctx.fillStyle = COLORS.tape;
+    ctx.fillRect(-textWidth / 2 - 10, -13, textWidth + 20, 26);
+    ctx.shadowColor = 'transparent';
+    ctx.fillStyle = COLORS.ink;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, 0, 1);
+    ctx.restore();
   }
 
+  // The player: a red pin stuck into the map, with the GPS accuracy around it.
   drawPlayer(center, { position, good }) {
     const { ctx } = this;
     const { x, y } = this.toScreen(center, position);
-    ctx.globalAlpha = good ? 1 : 0.45;
+    ctx.globalAlpha = good ? 1 : 0.5;
+
+    const accuracy = position.accuracy / this.metersPerPixel;
+    if (accuracy > 8) {
+      ctx.beginPath();
+      ctx.arc(x, y, accuracy, 0, Math.PI * 2);
+      ctx.fillStyle = COLORS.accuracy;
+      ctx.fill();
+      ctx.strokeStyle = COLORS.accuracyOutline;
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+    }
 
     ctx.beginPath();
-    ctx.arc(x, y, position.accuracy / this.metersPerPixel, 0, Math.PI * 2);
-    ctx.fillStyle = COLORS.accuracy;
+    ctx.ellipse(x + 2, y, 7, 3, 0, 0, Math.PI * 2);
+    ctx.fillStyle = COLORS.shadow;
     ctx.fill();
-    ctx.strokeStyle = COLORS.accuracyOutline;
-    ctx.lineWidth = 1;
+
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.bezierCurveTo(x - 3, y - 7, x - 11, y - 14, x - 11, y - 23);
+    ctx.arc(x, y - 23, 11, Math.PI, 0);
+    ctx.bezierCurveTo(x + 11, y - 14, x + 3, y - 7, x, y);
+    const gradient = ctx.createLinearGradient(x - 11, y - 34, x + 11, y);
+    gradient.addColorStop(0, good ? COLORS.paintLight : COLORS.grey);
+    gradient.addColorStop(1, good ? COLORS.paintDark : COLORS.greyDark);
+    ctx.fillStyle = gradient;
+    ctx.fill();
+    ctx.strokeStyle = COLORS.ink;
+    ctx.lineWidth = 1.5;
     ctx.stroke();
 
     ctx.beginPath();
-    ctx.arc(x, y, 7, 0, Math.PI * 2);
-    ctx.fillStyle = COLORS.player;
+    ctx.arc(x, y - 23, 4.2, 0, Math.PI * 2);
+    ctx.fillStyle = COLORS.paper;
     ctx.fill();
-    ctx.strokeStyle = COLORS.playerOutline;
-    ctx.lineWidth = 2.5;
-    ctx.stroke();
 
     ctx.globalAlpha = 1;
   }
 
-  drawScaleBar() {
-    const { ctx } = this;
-    const maxMeters = this.width * 0.3 * this.metersPerPixel;
+  // Picks a round scale bar length and reports it when it changes.
+  updateScale() {
+    const maxMeters = MAX_SCALE_BAR_PX * this.metersPerPixel;
     const meters = SCALE_BAR_LENGTHS.filter((length) => length <= maxMeters).at(-1) ?? SCALE_BAR_LENGTHS[0];
-    const length = meters / this.metersPerPixel;
-    const x = 16;
-    const y = this.height - 24;
-
-    ctx.strokeStyle = COLORS.scaleBar;
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(x, y - 5);
-    ctx.lineTo(x, y);
-    ctx.lineTo(x + length, y);
-    ctx.lineTo(x + length, y - 5);
-    ctx.stroke();
-
-    const label = meters >= 1000 ? `${meters / 1000} km` : `${meters} m`;
-    ctx.font = '12px system-ui, sans-serif';
-    ctx.lineJoin = 'round';
-    ctx.strokeStyle = COLORS.labelHalo;
-    ctx.lineWidth = 3;
-    ctx.strokeText(label, x, y - 8);
-    ctx.fillStyle = COLORS.scaleBar;
-    ctx.fillText(label, x, y - 8);
+    const pixels = Math.round(meters / this.metersPerPixel);
+    if (meters === this.scale?.meters && pixels === this.scale?.pixels) return;
+    this.scale = { meters, pixels };
+    this.onScaleChange?.(meters, pixels);
   }
 }

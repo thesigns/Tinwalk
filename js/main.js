@@ -64,6 +64,8 @@ const ui = {
   shelterSurvivorCount: $('shelter-survivor-count'),
   shelterSurvivorNames: $('shelter-survivor-names'),
   shelterNoSurvivors: $('shelter-no-survivors'),
+  scaleLabel: $('scale-label'),
+  scaleLine: $('scale-line'),
   welcomeScreen: $('welcome-screen'),
   menuDialog: $('menu-dialog'),
   importInput: $('import-input'),
@@ -376,6 +378,12 @@ ui.shelterButton.addEventListener('click', openShelterPanel);
 $('retry-location').addEventListener('click', () => tracker.start());
 $('zoom-in').addEventListener('click', () => mapView.zoomBy(1 / ZOOM_STEP));
 $('zoom-out').addEventListener('click', () => mapView.zoomBy(ZOOM_STEP));
+mapView.onScaleChange = (meters, pixels) => {
+  ui.scaleLabel.textContent = meters >= 1000 ? `${meters / 1000} km` : `${meters} m`;
+  ui.scaleLine.style.width = `${pixels}px`;
+};
+// Map labels are drawn with the web fonts, so redraw once they have loaded.
+document.fonts?.ready.then(update);
 
 $('start-button').addEventListener('click', () => {
   try {

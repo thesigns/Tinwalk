@@ -5,17 +5,22 @@
 // current scale and stretches the tiles slightly to fit.
 
 import { hash } from './noise.js';
-import { biomeAt, groundColorAt } from './terrain.js';
+import { biomeAt, groundShadeAt } from './terrain.js';
 
 export const TILE_SIZE = 256;
 const GROUND_STEP = 4; // tile pixels between ground color samples
 const ICON_CELL = 22; // tile pixels between possible icon positions
-const MAX_CACHED_TILES = 48;
+// Ground along biome borders is darkened, like a hand-tinted map.
+const BORDER_SHADE = 0.84;
+const MIN_CACHED_TILES = 48;
+// The cache holds several screens of tiles, so zooming back and forth doesn't re-render them.
+const CACHED_SCREENS = 3;
 const MAX_PIXEL_RATIO = 2;
 
 export class TerrainTiles {
   constructor() {
     this.cache = new Map(); // key -> canvas, oldest first
+    this.capacity = MIN_CACHED_TILES;
     this.pixelRatio = 1;
     const samples = TILE_SIZE / GROUND_STEP + 1;
     this.groundCanvas = document.createElement('canvas');
@@ -37,6 +42,12 @@ export class TerrainTiles {
     if (clamped === this.pixelRatio) return;
     this.pixelRatio = clamped;
     this.cache.clear();
+  }
+
+  // A cache smaller than the screen would evict tiles that are still visible
+  // and re-render them every frame.
+  setVisibleCount(count) {
+    this.capacity = Math.max(MIN_CACHED_TILES, count * CACHED_SCREENS);
   }
 
   // Returns the cached tile, or null if it hasn't been rendered yet.
@@ -63,7 +74,7 @@ export class TerrainTiles {
     this.drawIcons(ctx, level, left, top, unitsPerPixel);
 
     this.cache.set(`${level}/${tx}/${ty}`, canvas);
-    if (this.cache.size > MAX_CACHED_TILES) this.cache.delete(this.cache.keys().next().value);
+    while (this.cache.size > this.capacity) this.cache.delete(this.cache.keys().next().value);
     return canvas;
   }
 
@@ -73,13 +84,31 @@ export class TerrainTiles {
     const samples = this.groundCanvas.width;
     const image = this.groundCtx.createImageData(samples, samples);
     const step = GROUND_STEP * unitsPerPixel;
+
+    // Biomes on a grid one sample larger on each side, so samples on the tile
+    // edge know their outside neighbors and borders match across tiles.
+    const span = samples + 2;
+    const biomes = new Array(span * span);
+    for (let row = 0; row < span; row++) {
+      for (let col = 0; col < span; col++) {
+        biomes[row * span + col] = biomeAt(left + (col - 1) * step, top - (row - 1) * step);
+      }
+    }
+
     for (let row = 0; row < samples; row++) {
       for (let col = 0; col < samples; col++) {
-        const [r, g, b] = groundColorAt(left + col * step, top - row * step);
+        const center = (row + 1) * span + col + 1;
+        const biome = biomes[center];
+        const onBorder =
+          biomes[center - 1] !== biome ||
+          biomes[center + 1] !== biome ||
+          biomes[center - span] !== biome ||
+          biomes[center + span] !== biome;
+        const shade = groundShadeAt(left + col * step, top - row * step) * (onBorder ? BORDER_SHADE : 1);
         const i = (row * samples + col) * 4;
-        image.data[i] = r;
-        image.data[i + 1] = g;
-        image.data[i + 2] = b;
+        image.data[i] = Math.min(255, biome.color[0] * shade);
+        image.data[i + 1] = Math.min(255, biome.color[1] * shade);
+        image.data[i + 2] = Math.min(255, biome.color[2] * shade);
         image.data[i + 3] = 255;
       }
     }
