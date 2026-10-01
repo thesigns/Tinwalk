@@ -49,6 +49,7 @@ export class MapView {
     this.onTap = null; // (point: { lat, lon }) => void
     this.onScaleChange = null; // (meters, pixels) => void
     this.scale = null;
+    this.effects = []; // short animations drawn over the map
     this.resize();
     this.setUpGestures();
     window.addEventListener('resize', () => {
@@ -145,18 +146,99 @@ export class MapView {
     ctx.fillStyle = COLORS.paper;
     ctx.fillRect(0, 0, this.width, this.height);
     this.updateScale();
-    if (!scene.center) return;
+    if (!scene.center) {
+      // Nothing to animate over; let anyone waiting for an effect carry on.
+      for (const effect of this.effects) effect.resolve();
+      this.effects = [];
+      return;
+    }
 
     const complete = this.drawTerrain(scene.center);
-    if (!complete && !this.pendingFrame) {
-      this.pendingFrame = requestAnimationFrame(() => {
-        this.pendingFrame = null;
-        this.render(this.scene);
-      });
-    }
+    if (!complete) this.requestFrame();
     for (const area of scene.searchedAreas) this.drawSearchedArea(scene.center, area);
     if (scene.shelter) this.drawShelter(scene.center, scene.shelter);
+    this.drawEffects();
     if (scene.player) this.drawPlayer(scene.center, scene.player);
+  }
+
+  requestFrame() {
+    if (this.pendingFrame) return;
+    this.pendingFrame = requestAnimationFrame(() => {
+      this.pendingFrame = null;
+      this.render(this.scene);
+    });
+  }
+
+  // Plays a short animation on the map and resolves when it ends.
+  // draw(progress) is called every frame, with progress going from 0 to 1.
+  animate(duration, draw) {
+    return new Promise((resolve) => {
+      this.effects.push({ start: performance.now(), duration, draw, resolve });
+      this.requestFrame();
+    });
+  }
+
+  drawEffects() {
+    const time = performance.now();
+    this.effects = this.effects.filter((effect) => {
+      const progress = Math.min(1, (time - effect.start) / effect.duration);
+      effect.draw(progress);
+      if (progress < 1) return true;
+      effect.resolve();
+      return false;
+    });
+    if (this.effects.length > 0) this.requestFrame();
+  }
+
+  // A red pencil circling the area being searched.
+  playSweep(point, radiusMeters, duration) {
+    return this.animate(duration, (progress) => {
+      const { ctx } = this;
+      const { x, y } = this.toScreen(this.scene.center, point);
+      const radius = radiusMeters / this.metersPerPixel;
+      const eased = progress < 0.5 ? 2 * progress ** 2 : 1 - (-2 * progress + 2) ** 2 / 2;
+      const start = -Math.PI / 2;
+      const end = start + eased * Math.PI * 2;
+
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.arc(x, y, radius, start, end);
+      ctx.closePath();
+      ctx.fillStyle = COLORS.searchedFill;
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(x, y, radius, start, end);
+      ctx.strokeStyle = COLORS.pencil;
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(x + Math.cos(end) * radius, y + Math.sin(end) * radius, 4, 0, Math.PI * 2);
+      ctx.fillStyle = COLORS.pencil;
+      ctx.fill();
+    });
+  }
+
+  // Ink rings spreading out from a point, e.g. when the shelter is stamped onto the map.
+  playRipple(point, radiusMeters, duration) {
+    return this.animate(duration, (progress) => {
+      const { ctx } = this;
+      const { x, y } = this.toScreen(this.scene.center, point);
+      const radius = Math.max(radiusMeters / this.metersPerPixel, 20);
+      for (const delay of [0, 0.25]) {
+        const ring = Math.max(0, (progress - delay) / (1 - delay));
+        if (ring <= 0 || ring >= 1) continue;
+        ctx.beginPath();
+        ctx.arc(x, y, radius * (1 + 0.6 * (1 - (1 - ring) ** 3)), 0, Math.PI * 2);
+        ctx.globalAlpha = 1 - ring;
+        ctx.strokeStyle = COLORS.ink;
+        ctx.lineWidth = 1 + 3 * (1 - ring);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    });
   }
 
   // Mercator units per screen pixel around the given center.

@@ -25,6 +25,8 @@
     <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></symbol>
     <symbol id="i-export" viewBox="0 0 24 24"><path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></symbol>
     <symbol id="i-import" viewBox="0 0 24 24"><path d="M12 15V4"/><path d="m7 9 5-5 5 5"/><path d="M5 20h14"/></symbol>
+    <symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a7.5 7.5 0 0 1 0 11"/></symbol>
+    <symbol id="i-vibrate" viewBox="0 0 24 24"><rect x="8" y="4" width="8" height="16" rx="1.5"/><path d="M4.5 9v6M19.5 9v6M2 10.5v3M22 10.5v3"/></symbol>
     <symbol id="i-junk" viewBox="0 0 24 24"><path d="M12 3.5 19.4 7.75v8.5L12 20.5l-7.4-4.25v-8.5z"/><circle cx="12" cy="12" r="3.2"/></symbol>
     <symbol id="i-food" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="6" ry="2.2"/><path d="M6 6v12c0 1.2 2.7 2.2 6 2.2s6-1 6-2.2V6"/><path d="M6 10.5c0 1.2 2.7 2.2 6 2.2s6-1 6-2.2"/></symbol>
     <symbol id="i-ammo" viewBox="0 0 24 24"><path d="M6 21v-9c0-2.6 1-5.2 2.5-7 1.5 1.8 2.5 4.4 2.5 7v9z"/><path d="M6 16.5h5"/><path d="M13 21v-9c0-2.6 1-5.2 2.5-7 1.5 1.8 2.5 4.4 2.5 7v9z"/><path d="M13 16.5h5"/></symbol>
@@ -35,6 +37,8 @@
   <canvas id="map"></canvas>
   <!-- Paper grain, folds and darkened edges over the map. -->
   <div id="map-paper"></div>
+  <!-- Pulses under the player's pin, which is always in the middle of the map. -->
+  <div id="player-pulse" hidden></div>
 
   <div id="side-controls">
     <button id="menu-button" class="btn btn-tin btn-square" type="button" aria-label="Menu"><svg class="icon"><use href="#i-menu"/></svg></button>
@@ -44,8 +48,8 @@
 
   <div id="top">
     <header id="status-bar" class="tin rivets">
-      <div class="hud-item" aria-label="Backpack">
-        <svg class="icon"><use href="#i-backpack"/></svg>
+      <div id="backpack-hud" class="hud-item" aria-label="Backpack">
+        <svg id="backpack-icon" class="icon"><use href="#i-backpack"/></svg>
         <div class="gauge"><div id="backpack-gauge" class="gauge-fill"></div></div>
         <span id="backpack-status" class="hud-value"></span>
       </div>
@@ -96,7 +100,7 @@
   </div>
 
   <div id="bottom">
-    <div id="toast" class="note paper" hidden>
+    <div id="toast" class="note paper" role="status" hidden>
       <svg id="toast-icon" class="icon"><use href=""/></svg>
       <span id="toast-text"></span>
     </div>
@@ -111,6 +115,13 @@
         <span id="action-label"></span>
       </button>
     </div>
+  </div>
+
+  <!-- Pops up after a search or unload, then flies into the backpack. -->
+  <div id="reward-card" class="paper taped" role="status" hidden>
+    <div id="reward-medal"><svg class="icon"><use id="reward-icon" href="#i-junk"/></svg></div>
+    <div class="reward-title"><span id="reward-amount"></span> <span id="reward-name"></span></div>
+    <p id="reward-note"></p>
   </div>
 
   <section id="welcome-screen" class="overlay" hidden>
@@ -182,6 +193,15 @@
 
   <dialog id="menu-dialog" class="paper taped">
     <h2>Menu</h2>
+    <div class="menu-toggles">
+      <button id="sound-toggle" class="toggle" type="button" role="switch" aria-checked="true">
+        <svg class="icon"><use href="#i-sound"/></svg><span>Sound</span><span class="switch"></span>
+      </button>
+      <button id="vibration-toggle" class="toggle" type="button" role="switch" aria-checked="true">
+        <svg class="icon"><use href="#i-vibrate"/></svg><span>Vibration</span><span class="switch"></span>
+      </button>
+    </div>
+    <h3>Your save</h3>
     <p class="muted">Your game is saved only in this browser. Export it now and then, so you can bring it back if the browser loses it.</p>
     <div class="menu-buttons">
       <button id="export-button" class="btn btn-ink" type="button"><svg class="icon"><use href="#i-export"/></svg><span>Export save</span></button>

@@ -16,12 +16,18 @@ import {
   totalResources,
   unload,
 } from './game.js';
+import { flyIcon, iconElement, replayAnimation, wait } from './fx.js';
 import { averagePosition, distanceMeters } from './geo.js';
 import { LocationTracker } from './gps.js';
+import { Haptics, canVibrate } from './haptics.js';
 import { MapView } from './map.js';
+import { SoundEffects } from './sound.js';
 import { exportState, loadState, parseSave, requestPersistentStorage, saveState } from './state.js';
 
 const SHELTER_LOCATING_MS = 10_000;
+const SEARCH_ANIMATION_MS = 1_400;
+const REWARD_CARD_MS = 1_300;
+const RIPPLE_MS = 900;
 const ZOOM_STEP = 1.5;
 const TOAST_DURATION_MS = 4_000;
 // Frequent enough for searched areas to expire smoothly when debug time runs fast.
@@ -29,8 +35,7 @@ const TICK_MS = 1_000;
 const WELCOMED_KEY = 'tinwalk.welcomed';
 
 const POOR_SIGNAL_HINT = 'Waiting for a better GPS signal…';
-const ACTION_ICONS = { locating: 'locate', create: 'shelter', search: 'search', unload: 'unload' };
-const SVG_NS = 'http://www.w3.org/2000/svg';
+const ACTION_ICONS = { locating: 'locate', create: 'shelter', search: 'search', searching: 'search', unload: 'unload' };
 const SEARCH_BLOCKER_HINTS = {
   shelter: 'Too close to your shelter',
   searched: 'This area has already been searched',
@@ -38,6 +43,8 @@ const SEARCH_BLOCKER_HINTS = {
 
 const $ = (id) => document.getElementById(id);
 const ui = {
+  backpackHud: $('backpack-hud'),
+  backpackIcon: $('backpack-icon'),
   backpack: $('backpack-status'),
   backpackGauge: $('backpack-gauge'),
   companion: $('companion-status'),
@@ -70,17 +77,37 @@ const ui = {
   menuDialog: $('menu-dialog'),
   importInput: $('import-input'),
   importDialog: $('import-dialog'),
+  rewardCard: $('reward-card'),
+  rewardMedalIcon: document.querySelector('#reward-medal .icon'),
+  rewardIcon: $('reward-icon'),
+  rewardAmount: $('reward-amount'),
+  rewardName: $('reward-name'),
+  rewardNote: $('reward-note'),
+  playerPulse: $('player-pulse'),
+  soundToggle: $('sound-toggle'),
+  vibrationToggle: $('vibration-toggle'),
 };
 
 const state = loadState();
 const tracker = new LocationTracker();
 const mapView = new MapView($('map'));
 const debugPanel = isDebug ? new DebugPanel($('debug-panel'), tracker, describeGame, tick) : null;
+const sound = new SoundEffects();
+const haptics = new Haptics();
 
 let started = false; // location tracking starts only after the welcome screen
 let inShelter = false;
 let locatingShelter = false;
+let searching = false;
+// While loot flies into the backpack, the status bar keeps showing the old load.
+let holdBackpack = false;
 let toastTimer = null;
+
+// A game event the player should hear and feel, e.g. 'found'.
+function feedback(name) {
+  sound.play(name);
+  haptics.play(name);
+}
 
 function update() {
   inShelter = isInShelter(state.shelter, tracker.position, inShelter);
@@ -104,11 +131,13 @@ function saveAndUpdate() {
 }
 
 function renderStatus() {
-  const load = totalResources(state.backpack);
-  const capacity = backpackCapacity(state);
-  ui.backpack.textContent = `${load}/${capacity}`;
-  ui.backpackGauge.style.width = `${(100 * load) / capacity}%`;
-  ui.backpackGauge.classList.toggle('full', load >= capacity);
+  if (!holdBackpack) {
+    const load = totalResources(state.backpack);
+    const capacity = backpackCapacity(state);
+    ui.backpack.textContent = `${load}/${capacity}`;
+    ui.backpackGauge.style.width = `${(100 * load) / capacity}%`;
+    ui.backpackGauge.classList.toggle('full', load >= capacity);
+  }
 
   ui.companion.hidden = !state.companion;
   ui.companionName.textContent = state.companion?.name ?? '';
@@ -153,6 +182,9 @@ function currentAction() {
     const accuracy = tracker.position ? ` ±${Math.round(tracker.position.accuracy)} m` : '';
     return { id: 'locating', label: 'Locating…', enabled: false, hint: `Locating your shelter…${accuracy}` };
   }
+  if (searching) {
+    return { id: 'searching', label: 'Searching…', enabled: false, hint: null };
+  }
   if (!state.shelter) {
     return { id: 'create', label: 'Create a Shelter', enabled: good, hint: signalHint };
   }
@@ -179,6 +211,7 @@ function renderActions() {
   ui.actionLabel.textContent = action.label;
   ui.actionIcon.setAttribute('href', `#i-${ACTION_ICONS[action.id]}`);
   ui.actionButton.classList.toggle('locating', action.id === 'locating');
+  ui.actionButton.classList.toggle('searching', action.id === 'searching');
   ui.actionButton.disabled = !action.enabled;
   ui.actionButton.dataset.action = action.id;
   ui.actionHint.textContent = action.hint ?? '';
@@ -194,16 +227,23 @@ function renderMap() {
     shelter: state.shelter && { ...state.shelter, radius: SHELTER_RADIUS },
     searchedAreas: activeSearchedAreas(state, now()).map((area) => ({ ...area, radius: SEARCH_RADIUS })),
   });
+  // The map is centered on the player, so the pulse can stay in the middle of the screen.
+  ui.playerPulse.hidden = !(position && tracker.hasGoodSignal);
 }
 
-function iconElement(name) {
-  const svg = document.createElementNS(SVG_NS, 'svg');
-  svg.setAttribute('class', 'icon');
-  svg.setAttribute('aria-hidden', 'true');
-  const use = document.createElementNS(SVG_NS, 'use');
-  use.setAttribute('href', `#i-${name}`);
-  svg.append(use);
-  return svg;
+// Pops up a card for a reward. With flyToBackpack, its icon then flies into the status bar.
+async function showReward({ icon, amount, name, note, empty = false, flyToBackpack = false }) {
+  ui.rewardIcon.setAttribute('href', `#i-${icon}`);
+  ui.rewardAmount.textContent = amount;
+  ui.rewardName.textContent = name;
+  ui.rewardNote.textContent = note;
+  ui.rewardCard.classList.toggle('empty', empty);
+  ui.rewardCard.classList.remove('leaving');
+  ui.rewardCard.hidden = false;
+  await wait(REWARD_CARD_MS);
+  ui.rewardCard.classList.add('leaving');
+  await Promise.all([flyToBackpack && flyIcon(icon, ui.rewardMedalIcon, ui.backpackIcon), wait(300)]);
+  ui.rewardCard.hidden = true;
 }
 
 // Shows a short note above the actions, optionally with an icon name (e.g. 'food').
@@ -259,36 +299,71 @@ async function createShelterAction() {
   if ((await ask(ui.nameDialog)) !== 'create') return;
   createShelter(state, position, ui.shelterName.value, now());
   saveAndUpdate();
+  feedback('stamp');
+  mapView.playRipple(state.shelter, SHELTER_RADIUS, RIPPLE_MS);
   showToast(`${state.shelter.name} is your shelter now`, 'shelter');
 }
 
 async function searchAction() {
-  const { resource, found, carried, survivor } = search(state, tracker.position, now());
+  // The search happens where the player pressed the button, even if they walk on meanwhile.
+  const position = tracker.position;
+  searching = true;
+  update();
+  sound.play('search');
+  await mapView.playSweep(position, SEARCH_RADIUS, SEARCH_ANIMATION_MS);
+  searching = false;
+
+  holdBackpack = true;
+  const { resource, found, carried, survivor } = search(state, position, now());
   saveAndUpdate();
 
   let message = `You've found ${found} ${resource.label}`;
   if (carried === 0) message += ', but your backpack is full';
   else if (carried < found) message += `, but could only carry ${carried}`;
-  showToast(message, resource.id);
+  feedback(carried > 0 ? 'found' : 'full');
+  await showReward({
+    icon: resource.id,
+    amount: carried > 0 ? `+${carried}` : '0',
+    name: resource.label,
+    note: message,
+    empty: carried === 0,
+    flyToBackpack: carried > 0,
+  });
+  holdBackpack = false;
+  update();
+  if (carried > 0) {
+    replayAnimation(ui.backpackHud, 'bump');
+    feedback('land');
+  }
 
   if (!survivor) return;
   ui.survivorName.textContent = survivor;
+  feedback('survivor');
   if ((await ask(ui.survivorDialog)) === 'take') {
     takeSurvivor(state, survivor);
     saveAndUpdate();
+    replayAnimation(ui.companion, 'bump');
+    feedback('land');
     showToast(`${survivor} is coming with you`, 'survivor');
   } else {
     showToast(`You left ${survivor} behind`, 'survivor');
   }
 }
 
-function unloadAction() {
+async function unloadAction() {
   const { items, survivor } = unload(state);
   saveAndUpdate();
+  feedback('unload');
+  mapView.playRipple(state.shelter, SHELTER_RADIUS, RIPPLE_MS);
+
   const messages = [];
   if (items > 0) messages.push(`Unloaded ${plural(items, 'item')}`);
   if (survivor) messages.push(`${survivor} moved into ${state.shelter.name}`);
-  showToast(messages.join('. '), 'unload');
+  await showReward(
+    items > 0
+      ? { icon: 'unload', amount: `+${items}`, name: 'Stored', note: messages.join('. ') }
+      : { icon: 'survivor', amount: '', name: survivor, note: messages.join('. ') },
+  );
 }
 
 function openShelterPanel() {
@@ -410,6 +485,23 @@ ui.importInput.addEventListener('change', () => {
   ui.importInput.value = '';
   if (file) importSave(file);
 });
+
+// Sound and vibration switches in the menu.
+function setUpToggle(button, target, preview) {
+  const render = () => button.setAttribute('aria-checked', String(target.enabled));
+  render();
+  button.addEventListener('click', () => {
+    target.setEnabled(!target.enabled);
+    render();
+    if (target.enabled) preview();
+  });
+}
+setUpToggle(ui.soundToggle, sound, () => sound.play('found'));
+setUpToggle(ui.vibrationToggle, haptics, () => haptics.play('found'));
+ui.vibrationToggle.hidden = !canVibrate;
+
+// Browsers only let audio start after the player taps something.
+document.addEventListener('click', () => sound.unlock(), { capture: true });
 
 // Enter in the name field should create the shelter, not hit the first (Cancel) button.
 ui.shelterName.addEventListener('keydown', (event) => {
