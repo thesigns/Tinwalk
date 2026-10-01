@@ -54,7 +54,7 @@ export class DebugPanel {
     this.fields.game.textContent = this.describeGame();
     this.fields.time.textContent = `${timeSpeed()}× speed, ${formatOffset(timeOffset())} ahead`;
     this.useGpsButton.hidden = !manual;
-    for (const button of this.speedButtons) button.classList.toggle('secondary', Number(button.dataset.speed) !== timeSpeed());
+    for (const button of this.speedButtons) button.classList.toggle('active', Number(button.dataset.speed) === timeSpeed());
   }
 }
 

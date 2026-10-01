@@ -29,6 +29,8 @@ const TICK_MS = 1_000;
 const WELCOMED_KEY = 'tinwalk.welcomed';
 
 const POOR_SIGNAL_HINT = 'Waiting for a better GPS signal…';
+const ACTION_ICONS = { locating: 'locate', create: 'shelter', search: 'search', unload: 'unload' };
+const SVG_NS = 'http://www.w3.org/2000/svg';
 const SEARCH_BLOCKER_HINTS = {
   shelter: 'Too close to your shelter',
   searched: 'This area has already been searched',
@@ -37,11 +39,19 @@ const SEARCH_BLOCKER_HINTS = {
 const $ = (id) => document.getElementById(id);
 const ui = {
   backpack: $('backpack-status'),
+  backpackGauge: $('backpack-gauge'),
   companion: $('companion-status'),
+  companionName: $('companion-name'),
+  gpsHud: $('gps-hud'),
   gps: $('gps-status'),
+  signalBars: [...document.querySelectorAll('.signal-bars i')],
   toast: $('toast'),
+  toastIcon: $('toast-icon'),
+  toastText: $('toast-text'),
   actionHint: $('action-hint'),
   actionButton: $('action-button'),
+  actionIcon: $('action-icon'),
+  actionLabel: $('action-label'),
   shelterButton: $('shelter-button'),
   deniedScreen: $('denied-screen'),
   nameDialog: $('name-dialog'),
@@ -53,6 +63,7 @@ const ui = {
   shelterStorage: $('shelter-storage'),
   shelterSurvivorCount: $('shelter-survivor-count'),
   shelterSurvivorNames: $('shelter-survivor-names'),
+  shelterNoSurvivors: $('shelter-no-survivors'),
   welcomeScreen: $('welcome-screen'),
   menuDialog: $('menu-dialog'),
   importInput: $('import-input'),
@@ -91,25 +102,43 @@ function saveAndUpdate() {
 }
 
 function renderStatus() {
-  ui.backpack.textContent = `Backpack ${totalResources(state.backpack)}/${backpackCapacity(state)}`;
+  const load = totalResources(state.backpack);
+  const capacity = backpackCapacity(state);
+  ui.backpack.textContent = `${load}/${capacity}`;
+  ui.backpackGauge.style.width = `${(100 * load) / capacity}%`;
+  ui.backpackGauge.classList.toggle('full', load >= capacity);
+
   ui.companion.hidden = !state.companion;
-  ui.companion.textContent = state.companion ? `Survivor: ${state.companion.name}` : '';
-  ui.gps.textContent = gpsStatusText();
-  ui.gps.className = tracker.hasGoodSignal ? 'good' : 'bad';
+  ui.companionName.textContent = state.companion?.name ?? '';
+
+  const { bars, label, description } = gpsStatus();
+  ui.signalBars.forEach((bar, index) => bar.classList.toggle('on', index < bars));
+  ui.gps.textContent = label;
+  ui.gpsHud.classList.toggle('good', tracker.hasGoodSignal);
+  ui.gpsHud.classList.toggle('bad', !tracker.hasGoodSignal);
+  ui.gpsHud.setAttribute('aria-label', description);
 }
 
-function gpsStatusText() {
+// Signal bars (0-4), a short label for the status bar and a full description.
+function gpsStatus() {
+  const accuracy = (reading) => Math.round(reading.accuracy);
   switch (tracker.signal) {
-    case 'good':
-      return tracker.manual ? 'GPS: manual position' : `GPS: ±${Math.round(tracker.position.accuracy)} m`;
-    case 'poor':
-      return `Waiting for a better GPS signal… (±${Math.round(tracker.lastReading.accuracy)} m)`;
+    case 'good': {
+      if (tracker.manual) return { bars: 4, label: 'Manual', description: 'GPS: manual position' };
+      const meters = accuracy(tracker.position);
+      const bars = meters <= 10 ? 4 : meters <= 20 ? 3 : 2;
+      return { bars, label: `±${meters} m`, description: `GPS signal good, ±${meters} m` };
+    }
+    case 'poor': {
+      const meters = accuracy(tracker.lastReading);
+      return { bars: 1, label: `±${meters} m`, description: `Waiting for a better GPS signal (±${meters} m)` };
+    }
     case 'searching':
-      return 'Waiting for GPS signal…';
+      return { bars: 0, label: 'GPS…', description: 'Waiting for GPS signal' };
     case 'unavailable':
-      return 'No GPS signal';
+      return { bars: 0, label: 'No GPS', description: 'No GPS signal' };
     case 'denied':
-      return 'Location access denied';
+      return { bars: 0, label: 'No GPS', description: 'Location access denied' };
   }
 }
 
@@ -119,8 +148,8 @@ function currentAction() {
   const signalHint = good ? null : POOR_SIGNAL_HINT;
 
   if (locatingShelter) {
-    const accuracy = tracker.position ? `Accuracy ±${Math.round(tracker.position.accuracy)} m` : null;
-    return { id: 'locating', label: 'Locating your shelter…', enabled: false, hint: accuracy };
+    const accuracy = tracker.position ? ` ±${Math.round(tracker.position.accuracy)} m` : '';
+    return { id: 'locating', label: 'Locating…', enabled: false, hint: `Locating your shelter…${accuracy}` };
   }
   if (!state.shelter) {
     return { id: 'create', label: 'Create a Shelter', enabled: good, hint: signalHint };
@@ -145,7 +174,9 @@ function currentAction() {
 
 function renderActions() {
   const action = currentAction();
-  ui.actionButton.textContent = action.label;
+  ui.actionLabel.textContent = action.label;
+  ui.actionIcon.setAttribute('href', `#i-${ACTION_ICONS[action.id]}`);
+  ui.actionButton.classList.toggle('locating', action.id === 'locating');
   ui.actionButton.disabled = !action.enabled;
   ui.actionButton.dataset.action = action.id;
   ui.actionHint.textContent = action.hint ?? '';
@@ -163,8 +194,24 @@ function renderMap() {
   });
 }
 
-function showToast(text) {
-  ui.toast.textContent = text;
+function iconElement(name) {
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('class', 'icon');
+  svg.setAttribute('aria-hidden', 'true');
+  const use = document.createElementNS(SVG_NS, 'use');
+  use.setAttribute('href', `#i-${name}`);
+  svg.append(use);
+  return svg;
+}
+
+// Shows a short note above the actions, optionally with an icon name (e.g. 'food').
+function showToast(text, icon = null) {
+  ui.toastText.textContent = text;
+  ui.toastIcon.hidden = !icon;
+  if (icon) ui.toastIcon.firstElementChild.setAttribute('href', `#i-${icon}`);
+  // Restart the entrance animation when one note replaces another.
+  ui.toast.hidden = true;
+  void ui.toast.offsetWidth;
   ui.toast.hidden = false;
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => (ui.toast.hidden = true), TOAST_DURATION_MS);
@@ -210,7 +257,7 @@ async function createShelterAction() {
   if ((await ask(ui.nameDialog)) !== 'create') return;
   createShelter(state, position, ui.shelterName.value, now());
   saveAndUpdate();
-  showToast(`${state.shelter.name} is your shelter now`);
+  showToast(`${state.shelter.name} is your shelter now`, 'shelter');
 }
 
 async function searchAction() {
@@ -220,16 +267,16 @@ async function searchAction() {
   let message = `You've found ${found} ${resource.label}`;
   if (carried === 0) message += ', but your backpack is full';
   else if (carried < found) message += `, but could only carry ${carried}`;
-  showToast(message);
+  showToast(message, resource.id);
 
   if (!survivor) return;
   ui.survivorName.textContent = survivor;
   if ((await ask(ui.survivorDialog)) === 'take') {
     takeSurvivor(state, survivor);
     saveAndUpdate();
-    showToast(`${survivor} is coming with you`);
+    showToast(`${survivor} is coming with you`, 'survivor');
   } else {
-    showToast(`You left ${survivor} behind`);
+    showToast(`You left ${survivor} behind`, 'survivor');
   }
 }
 
@@ -239,23 +286,34 @@ function unloadAction() {
   const messages = [];
   if (items > 0) messages.push(`Unloaded ${plural(items, 'item')}`);
   if (survivor) messages.push(`${survivor} moved into ${state.shelter.name}`);
-  showToast(messages.join('. '));
+  showToast(messages.join('. '), 'unload');
 }
 
 function openShelterPanel() {
   const { shelter } = state;
   ui.shelterPanelName.textContent = shelter.name;
   ui.shelterStorage.replaceChildren(
-    ...RESOURCES.flatMap(({ id, label }) => {
-      const term = document.createElement('dt');
-      term.textContent = label;
-      const value = document.createElement('dd');
-      value.textContent = shelter.storage[id];
-      return [term, value];
+    ...RESOURCES.map(({ id, label }) => {
+      const tile = document.createElement('li');
+      const count = document.createElement('span');
+      count.className = 'resource-count';
+      count.textContent = shelter.storage[id];
+      const name = document.createElement('span');
+      name.className = 'resource-label';
+      name.textContent = label;
+      tile.append(iconElement(id), count, name);
+      return tile;
     }),
   );
   ui.shelterSurvivorCount.textContent = shelter.survivors.length;
-  ui.shelterSurvivorNames.textContent = shelter.survivors.map(({ name }) => name).join(', ');
+  ui.shelterSurvivorNames.replaceChildren(
+    ...shelter.survivors.map(({ name }) => {
+      const tag = document.createElement('li');
+      tag.textContent = name;
+      return tag;
+    }),
+  );
+  ui.shelterNoSurvivors.hidden = shelter.survivors.length > 0;
   ui.shelterPanel.showModal();
 }
 
@@ -289,7 +347,7 @@ async function importSave(file) {
   Object.assign(state, result.state);
   inShelter = false;
   saveAndUpdate();
-  showToast('Save imported');
+  showToast('Save imported', 'import');
 }
 
 function hasBeenWelcomed() {
