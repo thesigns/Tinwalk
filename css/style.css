@@ -32,6 +32,16 @@ button {
   cursor: pointer;
 }
 
+button.secondary {
+  background: #4a4136;
+}
+
+button:disabled {
+  background: #6b6255;
+  color: #b8ae9b;
+  cursor: default;
+}
+
 [hidden] {
   display: none !important;
 }
@@ -44,13 +54,23 @@ button {
   touch-action: none;
 }
 
-#status-bar {
+#top {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
+}
+
+#status-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 14px;
   padding: calc(env(safe-area-inset-top) + 8px) 12px 8px;
   background: var(--ui-bg);
+}
+
+#gps-status {
+  margin-left: auto;
 }
 
 #gps-status.good {
@@ -83,11 +103,113 @@ button {
   font-size: 20px;
 }
 
-#debug-panel {
+#bottom {
   position: fixed;
-  left: 8px;
-  right: 8px;
-  top: calc(env(safe-area-inset-top) + 48px);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px calc(env(safe-area-inset-bottom) + 16px);
+  pointer-events: none;
+}
+
+#bottom > * {
+  pointer-events: auto;
+}
+
+#bottom p {
+  margin: 0;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: var(--ui-bg);
+  text-align: center;
+}
+
+#action-hint {
+  color: var(--ui-muted);
+  font-size: 14px;
+}
+
+#actions {
+  display: flex;
+  gap: 10px;
+}
+
+#action-button {
+  min-width: 180px;
+  padding: 14px 24px;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+#actions .secondary {
+  padding: 14px 18px;
+}
+
+dialog {
+  width: min(360px, calc(100% - 32px));
+  padding: 20px;
+  border: 0;
+  border-radius: 12px;
+  background: #2b261f;
+  color: var(--ui-text);
+}
+
+dialog::backdrop {
+  background: rgba(20, 17, 13, 0.7);
+}
+
+dialog h2 {
+  margin: 0 0 12px;
+  font-size: 20px;
+}
+
+dialog h3 {
+  margin: 16px 0 6px;
+  font-size: 15px;
+  color: var(--ui-muted);
+}
+
+dialog input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #6b6255;
+  border-radius: 8px;
+  background: #1d1914;
+  color: var(--ui-text);
+  font: inherit;
+}
+
+.dialog-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+#shelter-storage {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 16px;
+  margin: 0;
+}
+
+#shelter-storage dd {
+  margin: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#shelter-survivor-names {
+  margin: 0;
+  color: var(--ui-muted);
+}
+
+#debug-panel {
+  margin: 8px;
   padding: 6px 10px;
   border-radius: 8px;
   background: var(--ui-bg);

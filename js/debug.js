@@ -6,9 +6,11 @@ export const isDebug = new URLSearchParams(location.search).has('debug');
 export const DEBUG_START = { lat: 52.2297, lon: 21.0122 };
 
 export class DebugPanel {
-  constructor(root, tracker) {
+  // describeGame() returns a one-line summary of the game state around the player.
+  constructor(root, tracker, describeGame) {
     this.root = root;
     this.tracker = tracker;
+    this.describeGame = describeGame;
     this.fields = Object.fromEntries(
       [...root.querySelectorAll('[data-field]')].map((element) => [element.dataset.field, element]),
     );
@@ -32,6 +34,7 @@ export class DebugPanel {
       : '—';
     this.fields.stats.textContent =
       `${stats.received} received · ${stats.accepted} accepted · ${stats.poor} poor · ${stats.stale} stale`;
+    this.fields.game.textContent = this.describeGame();
     this.useGpsButton.hidden = !manual;
   }
 }

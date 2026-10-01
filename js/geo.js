@@ -21,6 +21,21 @@ export function distanceMeters(a, b) {
   return 2 * EARTH_RADIUS * Math.asin(Math.sqrt(h));
 }
 
+// Average of { lat, lon, accuracy } readings, weighted so more accurate readings count more.
+// Plain averaging of degrees is fine for points a few dozen meters apart.
+export function averagePosition(readings) {
+  let lat = 0;
+  let lon = 0;
+  let totalWeight = 0;
+  for (const reading of readings) {
+    const weight = 1 / Math.max(reading.accuracy, 1) ** 2;
+    lat += reading.lat * weight;
+    lon += reading.lon * weight;
+    totalWeight += weight;
+  }
+  return { lat: lat / totalWeight, lon: lon / totalWeight };
+}
+
 export function toMercator({ lat, lon }) {
   return {
     x: MERCATOR_RADIUS * toRadians(lon),

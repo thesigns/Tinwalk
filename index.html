@@ -11,9 +11,36 @@
 <body>
   <canvas id="map"></canvas>
 
-  <header id="status-bar">
-    <span id="gps-status">Waiting for GPS signal…</span>
-  </header>
+  <div id="top">
+    <header id="status-bar">
+      <span id="backpack-status"></span>
+      <span id="companion-status" hidden></span>
+      <span id="gps-status">Waiting for GPS signal…</span>
+    </header>
+
+    <details id="debug-panel" open hidden>
+      <summary>Debug</summary>
+      <dl>
+        <dt>Source</dt><dd data-field="source"></dd>
+        <dt>Signal</dt><dd data-field="signal"></dd>
+        <dt>Position</dt><dd data-field="position"></dd>
+        <dt>Last reading</dt><dd data-field="last-reading"></dd>
+        <dt>Readings</dt><dd data-field="stats"></dd>
+        <dt>Game</dt><dd data-field="game"></dd>
+      </dl>
+      <p class="hint">Tap the map to set your position.</p>
+      <button id="use-gps" type="button" hidden>Use GPS</button>
+    </details>
+  </div>
+
+  <div id="bottom">
+    <p id="toast" hidden></p>
+    <p id="action-hint" hidden></p>
+    <div id="actions">
+      <button id="shelter-button" class="secondary" type="button" hidden>Shelter</button>
+      <button id="action-button" type="button"></button>
+    </div>
+  </div>
 
   <section id="denied-screen" class="overlay" hidden>
     <div class="overlay-box">
@@ -24,17 +51,39 @@
     </div>
   </section>
 
-  <details id="debug-panel" open hidden>
-    <summary>Debug</summary>
-    <dl>
-      <dt>Source</dt><dd data-field="source"></dd>
-      <dt>Signal</dt><dd data-field="signal"></dd>
-      <dt>Position</dt><dd data-field="position"></dd>
-      <dt>Last reading</dt><dd data-field="last-reading"></dd>
-      <dt>Readings</dt><dd data-field="stats"></dd>
-    </dl>
-    <p class="hint">Tap the map to set your position.</p>
-    <button id="use-gps" type="button" hidden>Use GPS</button>
-  </details>
+  <dialog id="name-dialog">
+    <form method="dialog">
+      <h2><label for="shelter-name">Name your shelter</label></h2>
+      <input id="shelter-name" name="name" maxlength="24" placeholder="Shelter" autocomplete="off">
+      <div class="dialog-buttons">
+        <button class="secondary" value="cancel">Cancel</button>
+        <button value="create">Create</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="survivor-dialog">
+    <form method="dialog">
+      <h2>You've found a survivor!</h2>
+      <p><strong id="survivor-name"></strong> wants to come with you.</p>
+      <div class="dialog-buttons">
+        <button class="secondary" value="leave">Leave</button>
+        <button value="take">Take with you</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="shelter-panel">
+    <form method="dialog">
+      <h2 id="shelter-panel-name"></h2>
+      <h3>Storage</h3>
+      <dl id="shelter-storage"></dl>
+      <h3>Survivors: <span id="shelter-survivor-count"></span></h3>
+      <p id="shelter-survivor-names"></p>
+      <div class="dialog-buttons">
+        <button value="close">Close</button>
+      </div>
+    </form>
+  </dialog>
 </body>
 </html>

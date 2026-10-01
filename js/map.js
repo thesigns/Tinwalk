@@ -16,6 +16,12 @@ const COLORS = {
   accuracy: 'rgba(212, 42, 28, 0.15)',
   accuracyOutline: 'rgba(212, 42, 28, 0.5)',
   scaleBar: '#3b3226',
+  shelter: 'rgba(58, 110, 64, 0.20)',
+  shelterOutline: '#3a6e40',
+  shelterLabel: '#1f3d23',
+  labelHalo: 'rgba(255, 255, 255, 0.8)',
+  searched: 'rgba(110, 80, 40, 0.12)',
+  searchedOutline: 'rgba(110, 80, 40, 0.55)',
 };
 
 export class MapView {
@@ -43,7 +49,12 @@ export class MapView {
     return VIEW_WIDTH_METERS / Math.min(this.width, this.height);
   }
 
-  // scene: { center: { lat, lon } | null, player: { position, good } | null }
+  // scene: {
+  //   center: { lat, lon } | null,
+  //   player: { position, good } | null,
+  //   shelter: { lat, lon, name, radius } | null,
+  //   searchedAreas: [{ lat, lon, radius }],
+  // }
   render(scene) {
     this.scene = scene;
     const { ctx } = this;
@@ -52,6 +63,8 @@ export class MapView {
     if (!scene.center) return;
 
     this.drawGrid(scene.center);
+    for (const area of scene.searchedAreas) this.drawSearchedArea(scene.center, area);
+    if (scene.shelter) this.drawShelter(scene.center, scene.shelter);
     if (scene.player) this.drawPlayer(scene.center, scene.player);
     this.drawScaleBar();
   }
@@ -108,6 +121,47 @@ export class MapView {
       ctx.lineTo(width, y);
       ctx.stroke();
     }
+  }
+
+  drawSearchedArea(center, area) {
+    const { ctx } = this;
+    const { x, y } = this.toScreen(center, area);
+    ctx.beginPath();
+    ctx.arc(x, y, area.radius / this.metersPerPixel, 0, Math.PI * 2);
+    ctx.fillStyle = COLORS.searched;
+    ctx.fill();
+    ctx.setLineDash([6, 5]);
+    ctx.strokeStyle = COLORS.searchedOutline;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  drawShelter(center, shelter) {
+    const { ctx } = this;
+    const { x, y } = this.toScreen(center, shelter);
+    const radius = shelter.radius / this.metersPerPixel;
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = COLORS.shelter;
+    ctx.fill();
+    ctx.strokeStyle = COLORS.shelterOutline;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.font = 'bold 14px system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.lineJoin = 'round';
+    // Above the circle, so it doesn't cover the player standing inside.
+    const labelY = y - radius - 4;
+    ctx.strokeStyle = COLORS.labelHalo;
+    ctx.lineWidth = 4;
+    ctx.strokeText(shelter.name, x, labelY);
+    ctx.fillStyle = COLORS.shelterLabel;
+    ctx.fillText(shelter.name, x, labelY);
+    ctx.textAlign = 'start';
+    ctx.textBaseline = 'alphabetic';
   }
 
   drawPlayer(center, { position, good }) {

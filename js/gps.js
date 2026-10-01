@@ -1,5 +1,6 @@
 // Tracks the player's location with the Geolocation API and decides whether
 // the signal is good enough for location-dependent actions.
+// Fires 'change' on any update and 'reading' when a new position is accepted.
 
 export const MAX_ACCURACY_METERS = 50;
 export const MAX_READING_AGE_MS = 30_000;
@@ -8,9 +9,9 @@ const MANUAL_ACCURACY_METERS = 5;
 
 const WATCH_OPTIONS = { enableHighAccuracy: true, maximumAge: 0, timeout: 20_000 };
 
-export class LocationTracker {
-  constructor(onChange) {
-    this.onChange = onChange;
+export class LocationTracker extends EventTarget {
+  constructor() {
+    super();
     this.position = null; // last accepted reading: { lat, lon, accuracy, timestamp }
     this.lastReading = null; // last raw reading, accepted or not
     this.signal = 'searching'; // 'searching' | 'good' | 'poor' | 'unavailable' | 'denied'
@@ -55,6 +56,7 @@ export class LocationTracker {
     this.stop();
     this.manual = true;
     this.position = { lat, lon, accuracy: MANUAL_ACCURACY_METERS, timestamp: Date.now() };
+    this.dispatchEvent(new Event('reading'));
     this.setSignal('good');
   }
 
@@ -80,8 +82,9 @@ export class LocationTracker {
       this.stats.accepted++;
       this.position = reading;
       this.signal = 'good';
+      this.dispatchEvent(new Event('reading'));
     }
-    this.onChange();
+    this.notify();
   }
 
   handleError(error) {
@@ -96,6 +99,10 @@ export class LocationTracker {
 
   setSignal(signal) {
     this.signal = signal;
-    this.onChange();
+    this.notify();
+  }
+
+  notify() {
+    this.dispatchEvent(new Event('change'));
   }
 }
