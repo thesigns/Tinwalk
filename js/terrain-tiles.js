@@ -1,0 +1,115 @@
+// Renders terrain into cached square tiles, so the map doesn't redraw every icon each frame.
+//
+// Tiles live on zoom levels: on level L one tile pixel covers 2^L Mercator units
+// and a tile is TILE_SIZE pixels wide. The map picks the level closest to its
+// current scale and stretches the tiles slightly to fit.
+
+import { hash } from './noise.js';
+import { biomeAt, groundColorAt } from './terrain.js';
+
+export const TILE_SIZE = 256;
+const GROUND_STEP = 4; // tile pixels between ground color samples
+const ICON_CELL = 22; // tile pixels between possible icon positions
+const MAX_CACHED_TILES = 48;
+const MAX_PIXEL_RATIO = 2;
+
+export class TerrainTiles {
+  constructor() {
+    this.cache = new Map(); // key -> canvas, oldest first
+    this.pixelRatio = 1;
+    const samples = TILE_SIZE / GROUND_STEP + 1;
+    this.groundCanvas = document.createElement('canvas');
+    this.groundCanvas.width = samples;
+    this.groundCanvas.height = samples;
+    this.groundCtx = this.groundCanvas.getContext('2d');
+  }
+
+  static levelFor(unitsPerPixel) {
+    return Math.round(Math.log2(unitsPerPixel));
+  }
+
+  static worldSize(level) {
+    return TILE_SIZE * 2 ** level;
+  }
+
+  setPixelRatio(ratio) {
+    const clamped = Math.min(ratio, MAX_PIXEL_RATIO);
+    if (clamped === this.pixelRatio) return;
+    this.pixelRatio = clamped;
+    this.cache.clear();
+  }
+
+  // Returns the cached tile, or null if it hasn't been rendered yet.
+  get(level, tx, ty) {
+    const key = `${level}/${tx}/${ty}`;
+    const tile = this.cache.get(key);
+    if (!tile) return null;
+    // Move to the end, so the least recently used tile is evicted first.
+    this.cache.delete(key);
+    this.cache.set(key, tile);
+    return tile;
+  }
+
+  render(level, tx, ty) {
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = TILE_SIZE * this.pixelRatio;
+    const ctx = canvas.getContext('2d');
+    const unitsPerPixel = 2 ** level;
+    const left = tx * TerrainTiles.worldSize(level);
+    const top = (ty + 1) * TerrainTiles.worldSize(level);
+
+    this.drawGround(ctx, left, top, unitsPerPixel);
+    ctx.setTransform(this.pixelRatio, 0, 0, this.pixelRatio, 0, 0);
+    this.drawIcons(ctx, level, left, top, unitsPerPixel);
+
+    this.cache.set(`${level}/${tx}/${ty}`, canvas);
+    if (this.cache.size > MAX_CACHED_TILES) this.cache.delete(this.cache.keys().next().value);
+    return canvas;
+  }
+
+  // Samples ground colors on a coarse grid that includes the tile edges, and
+  // stretches it with smoothing, so neighboring tiles blend without seams.
+  drawGround(ctx, left, top, unitsPerPixel) {
+    const samples = this.groundCanvas.width;
+    const image = this.groundCtx.createImageData(samples, samples);
+    const step = GROUND_STEP * unitsPerPixel;
+    for (let row = 0; row < samples; row++) {
+      for (let col = 0; col < samples; col++) {
+        const [r, g, b] = groundColorAt(left + col * step, top - row * step);
+        const i = (row * samples + col) * 4;
+        image.data[i] = r;
+        image.data[i + 1] = g;
+        image.data[i + 2] = b;
+        image.data[i + 3] = 255;
+      }
+    }
+    this.groundCtx.putImageData(image, 0, 0);
+    ctx.imageSmoothingEnabled = true;
+    // Source offset by half a pixel puts the sample centers exactly on the tile edges.
+    ctx.drawImage(this.groundCanvas, 0.5, 0.5, samples - 1, samples - 1, 0, 0, ctx.canvas.width, ctx.canvas.height);
+  }
+
+  // Icons sit at jittered points of a grid fixed in the world, so an icon near
+  // a tile edge is drawn identically by both tiles it overlaps.
+  drawIcons(ctx, level, left, top, unitsPerPixel) {
+    const cell = ICON_CELL * unitsPerPixel;
+    const size = TerrainTiles.worldSize(level);
+    const salt = level * 16;
+    const minX = Math.floor(left / cell) - 1;
+    const maxX = Math.floor((left + size) / cell) + 1;
+    const minY = Math.floor((top - size) / cell) - 1;
+    const maxY = Math.floor(top / cell) + 1;
+
+    // North to south, so icons further south overlap the ones behind them.
+    for (let cy = maxY; cy >= minY; cy--) {
+      for (let cx = minX; cx <= maxX; cx++) {
+        const x = (cx + hash(cx, cy, salt + 1)) * cell;
+        const y = (cy + hash(cx, cy, salt + 2)) * cell;
+        const biome = biomeAt(x, y);
+        if (hash(cx, cy, salt + 3) >= biome.iconDensity) continue;
+        const iconSize = biome.iconSize * (0.8 + 0.4 * hash(cx, cy, salt + 4));
+        biome.drawIcon(ctx, (x - left) / unitsPerPixel, (top - y) / unitsPerPixel, iconSize, hash(cx, cy, salt + 5));
+      }
+    }
+  }
+}

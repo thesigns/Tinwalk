@@ -1,16 +1,21 @@
 // Draws the map on a canvas: north-up, centered on a given point, in Web Mercator.
+// Handles zooming (pinch, mouse wheel, zoomBy) and reports single taps via onTap.
 
 import { fromMercator, mercatorUnitsPerMeter, toMercator } from './geo.js';
+import { TerrainTiles } from './terrain-tiles.js';
 
-const VIEW_WIDTH_METERS = 1500;
-const GRID_STEP_METERS = 100;
-const GRID_MAJOR_EVERY = 5;
+// How many meters the shorter side of the screen covers.
+const DEFAULT_VIEW_WIDTH_METERS = 1500;
+const MIN_VIEW_WIDTH_METERS = 500;
+const MAX_VIEW_WIDTH_METERS = 5000;
+const WHEEL_ZOOM_SPEED = 0.0015;
+const TAP_TOLERANCE_PX = 10;
+// Time per frame spent rendering missing tiles; the rest is drawn in later frames.
+const TILE_RENDER_BUDGET_MS = 12;
 const SCALE_BAR_LENGTHS = [50, 100, 200, 500, 1000, 2000, 5000];
 
 const COLORS = {
   ground: '#d8ccb0',
-  grid: 'rgba(90, 70, 40, 0.10)',
-  gridMajor: 'rgba(90, 70, 40, 0.22)',
   player: '#d42a1c',
   playerOutline: '#ffffff',
   accuracy: 'rgba(212, 42, 28, 0.15)',
@@ -20,8 +25,8 @@ const COLORS = {
   shelterOutline: '#3a6e40',
   shelterLabel: '#1f3d23',
   labelHalo: 'rgba(255, 255, 255, 0.8)',
-  searched: 'rgba(110, 80, 40, 0.12)',
-  searchedOutline: 'rgba(110, 80, 40, 0.55)',
+  searched: 'rgba(90, 60, 30, 0.16)',
+  searchedOutline: 'rgba(80, 55, 25, 0.75)',
 };
 
 export class MapView {
@@ -29,7 +34,12 @@ export class MapView {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
     this.scene = null;
+    this.tiles = new TerrainTiles();
+    this.viewWidthMeters = DEFAULT_VIEW_WIDTH_METERS;
+    this.pendingFrame = null;
+    this.onTap = null; // (point: { lat, lon }) => void
     this.resize();
+    this.setUpGestures();
     window.addEventListener('resize', () => {
       this.resize();
       if (this.scene) this.render(this.scene);
@@ -43,10 +53,73 @@ export class MapView {
     this.canvas.width = Math.round(this.width * ratio);
     this.canvas.height = Math.round(this.height * ratio);
     this.ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    this.tiles.setPixelRatio(ratio);
   }
 
   get metersPerPixel() {
-    return VIEW_WIDTH_METERS / Math.min(this.width, this.height);
+    return this.viewWidthMeters / Math.min(this.width, this.height);
+  }
+
+  zoomBy(factor) {
+    this.setViewWidth(this.viewWidthMeters * factor);
+  }
+
+  setViewWidth(meters) {
+    this.viewWidthMeters = Math.min(MAX_VIEW_WIDTH_METERS, Math.max(MIN_VIEW_WIDTH_METERS, meters));
+    if (this.scene) this.render(this.scene);
+  }
+
+  setUpGestures() {
+    const { canvas } = this;
+    const pointers = new Map(); // pointerId -> { x, y }
+    let pinch = null; // { distance, viewWidth } when the pinch started
+    let tap = null; // where a single pointer went down, while it may still be a tap
+
+    const positionOf = (event) => {
+      const rect = canvas.getBoundingClientRect();
+      return { x: event.clientX - rect.left, y: event.clientY - rect.top };
+    };
+    const pinchDistance = () => {
+      const [a, b] = pointers.values();
+      return Math.hypot(a.x - b.x, a.y - b.y);
+    };
+
+    canvas.addEventListener('pointerdown', (event) => {
+      canvas.setPointerCapture(event.pointerId);
+      pointers.set(event.pointerId, positionOf(event));
+      tap = pointers.size === 1 ? positionOf(event) : null;
+      if (pointers.size === 2) pinch = { distance: pinchDistance(), viewWidth: this.viewWidthMeters };
+    });
+
+    canvas.addEventListener('pointermove', (event) => {
+      if (!pointers.has(event.pointerId)) return;
+      const point = positionOf(event);
+      pointers.set(event.pointerId, point);
+      if (tap && Math.hypot(point.x - tap.x, point.y - tap.y) > TAP_TOLERANCE_PX) tap = null;
+      const distance = pointers.size === 2 ? pinchDistance() : 0;
+      if (pinch && distance > 0) this.setViewWidth((pinch.viewWidth * pinch.distance) / distance);
+    });
+
+    const release = (event) => {
+      if (!pointers.delete(event.pointerId)) return;
+      if (event.type === 'pointerup' && tap && pointers.size === 0) {
+        const point = this.screenToLatLon(tap.x, tap.y);
+        if (point) this.onTap?.(point);
+      }
+      if (pointers.size < 2) pinch = null;
+      if (pointers.size === 0) tap = null;
+    };
+    canvas.addEventListener('pointerup', release);
+    canvas.addEventListener('pointercancel', release);
+
+    canvas.addEventListener(
+      'wheel',
+      (event) => {
+        event.preventDefault();
+        this.zoomBy(Math.exp(event.deltaY * WHEEL_ZOOM_SPEED));
+      },
+      { passive: false },
+    );
   }
 
   // scene: {
@@ -62,7 +135,13 @@ export class MapView {
     ctx.fillRect(0, 0, this.width, this.height);
     if (!scene.center) return;
 
-    this.drawGrid(scene.center);
+    const complete = this.drawTerrain(scene.center);
+    if (!complete && !this.pendingFrame) {
+      this.pendingFrame = requestAnimationFrame(() => {
+        this.pendingFrame = null;
+        this.render(this.scene);
+      });
+    }
     for (const area of scene.searchedAreas) this.drawSearchedArea(scene.center, area);
     if (scene.shelter) this.drawShelter(scene.center, scene.shelter);
     if (scene.player) this.drawPlayer(scene.center, scene.player);
@@ -95,32 +174,38 @@ export class MapView {
     });
   }
 
-  // The grid is anchored to the world, so it moves as the player walks.
-  drawGrid(center) {
+  // Draws the terrain tiles covering the screen. Returns false if some tiles
+  // weren't rendered yet because the frame's time budget ran out.
+  drawTerrain(center) {
     const { ctx, width, height } = this;
     const c = toMercator(center);
     const units = this.unitsPerPixel(center);
-    const step = GRID_STEP_METERS * mercatorUnitsPerMeter(center.lat);
+    const level = TerrainTiles.levelFor(units);
+    const tileWorld = TerrainTiles.worldSize(level);
     const left = c.x - (width / 2) * units;
     const top = c.y + (height / 2) * units;
+    const deadline = performance.now() + TILE_RENDER_BUDGET_MS;
+    let complete = true;
 
-    ctx.lineWidth = 1;
-    for (let i = Math.ceil(left / step); i * step <= left + width * units; i++) {
-      const x = (i * step - left) / units;
-      ctx.strokeStyle = i % GRID_MAJOR_EVERY === 0 ? COLORS.gridMajor : COLORS.grid;
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, height);
-      ctx.stroke();
+    for (let ty = Math.floor(top / tileWorld); ty >= Math.floor((top - height * units) / tileWorld); ty--) {
+      for (let tx = Math.floor(left / tileWorld); tx <= Math.floor((left + width * units) / tileWorld); tx++) {
+        let tile = this.tiles.get(level, tx, ty);
+        if (!tile) {
+          if (performance.now() > deadline) {
+            complete = false;
+            continue;
+          }
+          tile = this.tiles.render(level, tx, ty);
+        }
+        // Rounded edges, so neighboring tiles meet without hairline gaps.
+        const x0 = Math.round((tx * tileWorld - left) / units);
+        const x1 = Math.round(((tx + 1) * tileWorld - left) / units);
+        const y0 = Math.round((top - (ty + 1) * tileWorld) / units);
+        const y1 = Math.round((top - ty * tileWorld) / units);
+        ctx.drawImage(tile, x0, y0, x1 - x0, y1 - y0);
+      }
     }
-    for (let i = Math.floor(top / step); i * step >= top - height * units; i--) {
-      const y = (top - i * step) / units;
-      ctx.strokeStyle = i % GRID_MAJOR_EVERY === 0 ? COLORS.gridMajor : COLORS.grid;
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(width, y);
-      ctx.stroke();
-    }
+    return complete;
   }
 
   drawSearchedArea(center, area) {
@@ -205,8 +290,13 @@ export class MapView {
     ctx.lineTo(x + length, y - 5);
     ctx.stroke();
 
-    ctx.fillStyle = COLORS.scaleBar;
+    const label = meters >= 1000 ? `${meters / 1000} km` : `${meters} m`;
     ctx.font = '12px system-ui, sans-serif';
-    ctx.fillText(meters >= 1000 ? `${meters / 1000} km` : `${meters} m`, x, y - 8);
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = COLORS.labelHalo;
+    ctx.lineWidth = 3;
+    ctx.strokeText(label, x, y - 8);
+    ctx.fillStyle = COLORS.scaleBar;
+    ctx.fillText(label, x, y - 8);
   }
 }

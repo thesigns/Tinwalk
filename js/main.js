@@ -22,6 +22,7 @@ import { MapView } from './map.js';
 import { loadState, requestPersistentStorage, saveState } from './state.js';
 
 const SHELTER_LOCATING_MS = 10_000;
+const ZOOM_STEP = 1.5;
 const TOAST_DURATION_MS = 4_000;
 const TICK_MS = 5_000;
 
@@ -262,6 +263,8 @@ ui.actionButton.addEventListener('click', () => {
 });
 ui.shelterButton.addEventListener('click', openShelterPanel);
 $('retry-location').addEventListener('click', () => tracker.start());
+$('zoom-in').addEventListener('click', () => mapView.zoomBy(1 / ZOOM_STEP));
+$('zoom-out').addEventListener('click', () => mapView.zoomBy(ZOOM_STEP));
 
 // Enter in the name field should create the shelter, not hit the first (Cancel) button.
 ui.shelterName.addEventListener('keydown', (event) => {
@@ -279,13 +282,7 @@ document.addEventListener('visibilitychange', () => {
   else tracker.resume();
 });
 
-if (isDebug) {
-  mapView.canvas.addEventListener('click', (event) => {
-    const rect = mapView.canvas.getBoundingClientRect();
-    const point = mapView.screenToLatLon(event.clientX - rect.left, event.clientY - rect.top);
-    if (point) tracker.setManualPosition(point);
-  });
-}
+if (isDebug) mapView.onTap = (point) => tracker.setManualPosition(point);
 
 // Searched areas expire over time even when nothing else happens.
 setInterval(() => {
