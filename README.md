@@ -6,6 +6,8 @@ Tinwalk is a survival and scavenging game you play on real walks. Set up a shelt
 
 It runs in the browser, needs no account and no server, and your location never leaves your device.
 
+**[▶ Play Tinwalk](https://thesigns.github.io/Tinwalk/)** (best on a phone, outdoors)
+
 ## How to play
 
 1. **Set up a shelter.** At home, tap **Create a Shelter** and give it a name. Your shelter is a circle with a 100 m radius around that spot.
