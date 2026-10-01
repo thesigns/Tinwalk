@@ -1,9 +1,12 @@
-// Loads and saves the game state in localStorage.
+// Loads, saves, exports and imports the game state.
 
-import { emptyResources } from './game.js';
+import { RESOURCES, emptyResources } from './game.js';
 
 const STORAGE_KEY = 'tinwalk.state';
 export const STATE_VERSION = 1;
+
+const INVALID_SAVE = "This file isn't a valid Tinwalk save";
+const OTHER_VERSION = 'This save comes from a different version of Tinwalk';
 
 export function createInitialState() {
   return {
@@ -21,7 +24,7 @@ export function loadState() {
     raw = localStorage.getItem(STORAGE_KEY);
     if (raw === null) return createInitialState();
     const state = JSON.parse(raw);
-    if (state?.version === STATE_VERSION) return state;
+    if (isValidState(state)) return state;
   } catch (error) {
     console.warn('Could not load the saved game', error);
   }
@@ -47,4 +50,50 @@ export function saveState(state) {
 // Asks the browser not to evict our data (e.g. Safari after days without use).
 export function requestPersistentStorage() {
   navigator.storage?.persist?.().catch(() => {});
+}
+
+export function exportState(state) {
+  return JSON.stringify(state, null, 2);
+}
+
+// Returns { state } for a valid save, or { error } with a message for the player.
+export function parseSave(text) {
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    return { error: INVALID_SAVE };
+  }
+  if (typeof data?.version === 'number' && data.version !== STATE_VERSION) return { error: OTHER_VERSION };
+  return isValidState(data) ? { state: data } : { error: INVALID_SAVE };
+}
+
+const isObject = (value) => value !== null && typeof value === 'object';
+const isNumber = (value) => typeof value === 'number' && Number.isFinite(value);
+const isCount = (value) => Number.isInteger(value) && value >= 0;
+const isPoint = (value) => isObject(value) && isNumber(value.lat) && isNumber(value.lon);
+const isPerson = (value) => isObject(value) && typeof value.name === 'string';
+const isResources = (value) => isObject(value) && RESOURCES.every(({ id }) => isCount(value[id]));
+
+function isValidShelter(shelter) {
+  return (
+    isPoint(shelter) &&
+    typeof shelter.name === 'string' &&
+    isNumber(shelter.createdAt) &&
+    isResources(shelter.storage) &&
+    Array.isArray(shelter.survivors) &&
+    shelter.survivors.every(isPerson)
+  );
+}
+
+function isValidState(state) {
+  return (
+    isObject(state) &&
+    state.version === STATE_VERSION &&
+    (state.shelter === null || isValidShelter(state.shelter)) &&
+    Array.isArray(state.searchedAreas) &&
+    state.searchedAreas.every((area) => isPoint(area) && isNumber(area.searchedAt)) &&
+    isResources(state.backpack) &&
+    (state.companion === null || isPerson(state.companion))
+  );
 }

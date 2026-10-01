@@ -19,12 +19,14 @@ import {
 import { averagePosition, distanceMeters } from './geo.js';
 import { LocationTracker } from './gps.js';
 import { MapView } from './map.js';
-import { loadState, requestPersistentStorage, saveState } from './state.js';
+import { exportState, loadState, parseSave, requestPersistentStorage, saveState } from './state.js';
 
 const SHELTER_LOCATING_MS = 10_000;
 const ZOOM_STEP = 1.5;
 const TOAST_DURATION_MS = 4_000;
-const TICK_MS = 5_000;
+// Frequent enough for searched areas to expire smoothly when debug time runs fast.
+const TICK_MS = 1_000;
+const WELCOMED_KEY = 'tinwalk.welcomed';
 
 const POOR_SIGNAL_HINT = 'Waiting for a better GPS signal…';
 const SEARCH_BLOCKER_HINTS = {
@@ -51,13 +53,18 @@ const ui = {
   shelterStorage: $('shelter-storage'),
   shelterSurvivorCount: $('shelter-survivor-count'),
   shelterSurvivorNames: $('shelter-survivor-names'),
+  welcomeScreen: $('welcome-screen'),
+  menuDialog: $('menu-dialog'),
+  importInput: $('import-input'),
+  importDialog: $('import-dialog'),
 };
 
 const state = loadState();
 const tracker = new LocationTracker();
 const mapView = new MapView($('map'));
-const debugPanel = isDebug ? new DebugPanel($('debug-panel'), tracker, describeGame) : null;
+const debugPanel = isDebug ? new DebugPanel($('debug-panel'), tracker, describeGame, tick) : null;
 
+let started = false; // location tracking starts only after the welcome screen
 let inShelter = false;
 let locatingShelter = false;
 let toastTimer = null;
@@ -70,6 +77,12 @@ function update() {
   // In debug mode the game can be played without GPS.
   ui.deniedScreen.hidden = isDebug || tracker.signal !== 'denied';
   debugPanel?.update();
+}
+
+// Searched areas expire over time even when nothing else happens.
+function tick() {
+  if (pruneSearchedAreas(state, now())) saveState(state);
+  update();
 }
 
 function saveAndUpdate() {
@@ -254,6 +267,46 @@ function describeGame() {
   return `${zone}${distance}, ${plural(activeSearchedAreas(state, now()).length, 'searched area')}`;
 }
 
+function exportSave() {
+  const date = new Date().toLocaleDateString('sv'); // YYYY-MM-DD
+  const blob = new Blob([exportState(state)], { type: 'application/json' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `tinwalk-save-${date}.json`;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+}
+
+async function importSave(file) {
+  const result = parseSave(await file.text());
+  if (result.error) {
+    showToast(result.error);
+    return;
+  }
+  if ((await ask(ui.importDialog)) !== 'import') return;
+  // Other code holds a reference to `state`, so its contents are replaced in place.
+  for (const key of Object.keys(state)) delete state[key];
+  Object.assign(state, result.state);
+  inShelter = false;
+  saveAndUpdate();
+  showToast('Save imported');
+}
+
+function hasBeenWelcomed() {
+  try {
+    return localStorage.getItem(WELCOMED_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+// The browser asks for location permission here, after the player knows why.
+function startTracking() {
+  started = true;
+  ui.welcomeScreen.hidden = true;
+  tracker.start();
+}
+
 const ACTIONS = { create: createShelterAction, search: searchAction, unload: unloadAction };
 
 ui.actionButton.addEventListener('click', () => {
@@ -265,6 +318,32 @@ ui.shelterButton.addEventListener('click', openShelterPanel);
 $('retry-location').addEventListener('click', () => tracker.start());
 $('zoom-in').addEventListener('click', () => mapView.zoomBy(1 / ZOOM_STEP));
 $('zoom-out').addEventListener('click', () => mapView.zoomBy(ZOOM_STEP));
+
+$('start-button').addEventListener('click', () => {
+  try {
+    localStorage.setItem(WELCOMED_KEY, '1');
+  } catch (error) {
+    console.warn('Could not remember the welcome screen', error);
+  }
+  startTracking();
+});
+
+$('menu-button').addEventListener('click', () => ui.menuDialog.showModal());
+$('menu-close').addEventListener('click', () => ui.menuDialog.close());
+$('export-button').addEventListener('click', () => {
+  ui.menuDialog.close();
+  exportSave();
+});
+$('import-button').addEventListener('click', () => {
+  // Open the file picker while still handling the tap, or browsers may block it.
+  ui.importInput.click();
+  ui.menuDialog.close();
+});
+ui.importInput.addEventListener('change', () => {
+  const [file] = ui.importInput.files;
+  ui.importInput.value = '';
+  if (file) importSave(file);
+});
 
 // Enter in the name field should create the shelter, not hit the first (Cancel) button.
 ui.shelterName.addEventListener('keydown', (event) => {
@@ -279,18 +358,14 @@ tracker.addEventListener('change', update);
 
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) tracker.stop();
-  else tracker.resume();
+  else if (started) tracker.resume();
 });
 
 if (isDebug) mapView.onTap = (point) => tracker.setManualPosition(point);
 
-// Searched areas expire over time even when nothing else happens.
-setInterval(() => {
-  if (pruneSearchedAreas(state, now())) saveState(state);
-  update();
-}, TICK_MS);
+setInterval(tick, TICK_MS);
 
-if (pruneSearchedAreas(state, now())) saveState(state);
 requestPersistentStorage();
-update();
-tracker.start();
+tick();
+if (hasBeenWelcomed()) startTracking();
+else ui.welcomeScreen.hidden = false;

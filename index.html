@@ -5,13 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#211d18">
   <title>Tinwalk</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23d6cc9f' stroke='%235b4a35' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23d42a1c' stroke='%23fff' stroke-width='2'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="css/style.css">
   <script type="module" src="js/main.js"></script>
 </head>
 <body>
   <canvas id="map"></canvas>
 
-  <div id="zoom-controls">
+  <div id="side-controls">
+    <button id="menu-button" class="secondary" type="button" aria-label="Menu">☰</button>
     <button id="zoom-in" class="secondary" type="button" aria-label="Zoom in">+</button>
     <button id="zoom-out" class="secondary" type="button" aria-label="Zoom out">−</button>
   </div>
@@ -23,7 +25,7 @@
       <span id="gps-status">Waiting for GPS signal…</span>
     </header>
 
-    <details id="debug-panel" open hidden>
+    <details id="debug-panel" hidden>
       <summary>Debug</summary>
       <dl>
         <dt>Source</dt><dd data-field="source"></dd>
@@ -32,9 +34,16 @@
         <dt>Last reading</dt><dd data-field="last-reading"></dd>
         <dt>Readings</dt><dd data-field="stats"></dd>
         <dt>Game</dt><dd data-field="game"></dd>
+        <dt>Time</dt><dd data-field="time"></dd>
       </dl>
       <p class="hint">Tap the map to set your position.</p>
-      <button id="use-gps" type="button" hidden>Use GPS</button>
+      <div class="debug-buttons">
+        <button id="use-gps" type="button" hidden>Use GPS</button>
+        <button data-speed="1" type="button">1×</button>
+        <button data-speed="60" type="button">60×</button>
+        <button data-speed="3600" type="button">3600×</button>
+        <button id="reset-time" type="button">Reset time</button>
+      </div>
     </details>
   </div>
 
@@ -46,6 +55,20 @@
       <button id="action-button" type="button"></button>
     </div>
   </div>
+
+  <section id="welcome-screen" class="overlay" hidden>
+    <div class="overlay-box">
+      <h1>Tinwalk</h1>
+      <p>Turn your walks into a survival game.</p>
+      <ul>
+        <li>Create a shelter at home.</li>
+        <li>Walk out into the wasteland and search areas for supplies. Each search needs a spot at least 200 m away from your shelter and earlier searches.</li>
+        <li>Bring your loot and any survivors you meet back to the shelter.</li>
+      </ul>
+      <p class="muted">Tinwalk uses your location while the game is open. Your game is saved only on this device.</p>
+      <button id="start-button" type="button">Start</button>
+    </div>
+  </section>
 
   <section id="denied-screen" class="overlay" hidden>
     <div class="overlay-box">
@@ -87,6 +110,30 @@
       <p id="shelter-survivor-names"></p>
       <div class="dialog-buttons">
         <button value="close">Close</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="menu-dialog">
+    <h2>Menu</h2>
+    <p class="muted">Your game is saved only in this browser. Export it now and then, so you can bring it back if the browser loses it.</p>
+    <div class="menu-buttons">
+      <button id="export-button" class="secondary" type="button">Export save</button>
+      <button id="import-button" class="secondary" type="button">Import save</button>
+    </div>
+    <div class="dialog-buttons">
+      <button id="menu-close" type="button">Close</button>
+    </div>
+    <input id="import-input" type="file" accept=".json,application/json" hidden>
+  </dialog>
+
+  <dialog id="import-dialog">
+    <form method="dialog">
+      <h2>Import save?</h2>
+      <p>This replaces your current game, including your shelter and everything in it.</p>
+      <div class="dialog-buttons">
+        <button class="secondary" value="cancel">Cancel</button>
+        <button value="import">Import</button>
       </div>
     </form>
   </dialog>

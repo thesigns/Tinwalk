@@ -21,12 +21,12 @@ const COLORS = {
   accuracy: 'rgba(212, 42, 28, 0.15)',
   accuracyOutline: 'rgba(212, 42, 28, 0.5)',
   scaleBar: '#3b3226',
-  shelter: 'rgba(58, 110, 64, 0.20)',
-  shelterOutline: '#3a6e40',
+  shelter: 'rgba(58, 110, 64, 0.28)',
+  shelterOutline: '#2f5c35',
   shelterLabel: '#1f3d23',
   labelHalo: 'rgba(255, 255, 255, 0.8)',
-  searched: 'rgba(90, 60, 30, 0.16)',
-  searchedOutline: 'rgba(80, 55, 25, 0.75)',
+  searched: 'rgba(60, 40, 20, 0.22)',
+  searchedOutline: 'rgba(50, 32, 15, 0.9)',
 };
 
 export class MapView {
@@ -217,7 +217,7 @@ export class MapView {
     ctx.fill();
     ctx.setLineDash([6, 5]);
     ctx.strokeStyle = COLORS.searchedOutline;
-    ctx.lineWidth = 1.5;
+    ctx.lineWidth = 2;
     ctx.stroke();
     ctx.setLineDash([]);
   }
@@ -231,7 +231,7 @@ export class MapView {
     ctx.fillStyle = COLORS.shelter;
     ctx.fill();
     ctx.strokeStyle = COLORS.shelterOutline;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 2.5;
     ctx.stroke();
 
     ctx.font = 'bold 14px system-ui, sans-serif';
