@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#211d18">
+  <title>Tinwalk</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+  <canvas id="map"></canvas>
+
+  <header id="status-bar">
+    <span id="gps-status">Waiting for GPS signal…</span>
+  </header>
+
+  <section id="denied-screen" class="overlay" hidden>
+    <div class="overlay-box">
+      <h1>Tinwalk needs your location</h1>
+      <p>The game is played on real walks, so it can't work without access to your location.</p>
+      <p>Allow location access for this site in your browser settings, then tap <strong>Try again</strong>.</p>
+      <button id="retry-location" type="button">Try again</button>
+    </div>
+  </section>
+
+  <details id="debug-panel" open hidden>
+    <summary>Debug</summary>
+    <dl>
+      <dt>Source</dt><dd data-field="source"></dd>
+      <dt>Signal</dt><dd data-field="signal"></dd>
+      <dt>Position</dt><dd data-field="position"></dd>
+      <dt>Last reading</dt><dd data-field="last-reading"></dd>
+      <dt>Readings</dt><dd data-field="stats"></dd>
+    </dl>
+    <p class="hint">Tap the map to set your position.</p>
+    <button id="use-gps" type="button" hidden>Use GPS</button>
+  </details>
+</body>
+</html>

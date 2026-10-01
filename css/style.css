@@ -1,0 +1,126 @@
+:root {
+  --ui-bg: rgba(33, 29, 24, 0.92);
+  --ui-text: #efe6d2;
+  --ui-muted: #a89e8a;
+  --good: #8fcf6a;
+  --bad: #e8a23c;
+  --accent: #c8452f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: #d8ccb0;
+  color: var(--ui-text);
+  font: 15px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+button {
+  font: inherit;
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+#map {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+#status-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: calc(env(safe-area-inset-top) + 8px) 12px 8px;
+  background: var(--ui-bg);
+}
+
+#gps-status.good {
+  color: var(--good);
+}
+
+#gps-status.bad {
+  color: var(--bad);
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(20, 17, 13, 0.85);
+}
+
+.overlay-box {
+  max-width: 360px;
+  padding: 20px;
+  border-radius: 12px;
+  background: var(--ui-bg);
+}
+
+.overlay-box h1 {
+  margin-top: 0;
+  font-size: 20px;
+}
+
+#debug-panel {
+  position: fixed;
+  left: 8px;
+  right: 8px;
+  top: calc(env(safe-area-inset-top) + 48px);
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--ui-bg);
+  font-size: 12px;
+}
+
+#debug-panel summary {
+  color: var(--ui-muted);
+  cursor: pointer;
+}
+
+#debug-panel dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 10px;
+  margin: 6px 0;
+}
+
+#debug-panel dt {
+  color: var(--ui-muted);
+}
+
+#debug-panel dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+#debug-panel .hint {
+  margin: 4px 0;
+  color: var(--ui-muted);
+}
+
+#debug-panel button {
+  padding: 6px 12px;
+  font-size: 12px;
+}
