@@ -1,6 +1,7 @@
 import { now } from './clock.js';
 import { DEBUG_START, DebugPanel, isDebug } from './debug.js';
 import {
+  MIN_SEARCH_DISTANCE,
   RESOURCES,
   SEARCH_RADIUS,
   SHELTER_RADIUS,
@@ -35,6 +36,10 @@ const SEARCH_ANIMATION_MS = 1_400;
 const REWARD_CARD_MS = 1_300;
 const RIPPLE_MS = 900;
 const ZOOM_STEP = 1.5;
+// The pulse around the player grows to this radius. Searched areas and the
+// shelter have a 100 m radius and a search must be 200 m from their centers,
+// so the player can search once the full pulse no longer overlaps any of them.
+const PULSE_RADIUS_METERS = MIN_SEARCH_DISTANCE - SEARCH_RADIUS;
 const TOAST_DURATION_MS = 4_000;
 // Holding a +/- button in the backpack keeps stepping after a short pause.
 const STEP_REPEAT_DELAY_MS = 400;
@@ -272,14 +277,17 @@ function worstHunger() {
 
 function renderMap() {
   const { position } = tracker;
+  const action = currentAction();
+  const canSearch = action.id === 'search' && action.enabled;
   mapView.render({
     center: position ?? state.shelter ?? (isDebug ? DEBUG_START : null),
-    player: position ? { position, good: tracker.hasGoodSignal } : null,
+    player: position ? { position, good: tracker.hasGoodSignal, canSearch } : null,
     shelter: state.shelter && { ...state.shelter, radius: SHELTER_RADIUS },
     searchedAreas: activeSearchedAreas(state, now()).map((area) => ({ ...area, radius: SEARCH_RADIUS })),
   });
   // The map is centered on the player, so the pulse can stay in the middle of the screen.
   ui.playerPulse.hidden = !(position && tracker.hasGoodSignal);
+  ui.playerPulse.classList.toggle('can-search', canSearch);
 }
 
 // Pops up a card for a reward. With flyToBackpack, its icon then flies into the status bar.
@@ -628,6 +636,7 @@ $('zoom-out').addEventListener('click', () => mapView.zoomBy(ZOOM_STEP));
 mapView.onScaleChange = (meters, pixels) => {
   ui.scaleLabel.textContent = meters >= 1000 ? `${meters / 1000} km` : `${meters} m`;
   ui.scaleLine.style.width = `${pixels}px`;
+  ui.playerPulse.style.setProperty('--pulse-radius', `${PULSE_RADIUS_METERS / mapView.metersPerPixel}px`);
 };
 // Map labels are drawn with the web fonts, so redraw once they have loaded.
 document.fonts?.ready.then(update);

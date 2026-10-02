@@ -111,7 +111,9 @@ Zasoby, ilość łupu i szansa na ocalałego są opisane w [loot.md](loot.md).
 - Na mapie widoczne są:
   - schron jako okrąg z nazwą,
   - aktywne przeszukane obszary jako okręgi,
-  - pozycja użytkownika jako czerwona kropka (z okręgiem dokładności GPS).
+  - pozycja użytkownika jako pinezka (z okręgiem dokładności GPS),
+  - wokół pozycji użytkownika (przy dobrym sygnale) pulsujące koło, które rośnie do promienia 100 m. Przeszukane obszary i schron mają promień 100 m, a przeszukanie musi być 200 m od ich środków, więc gdy pulsujące koło nie nachodzi na żaden z nich, można przeszukiwać.
+- Pinezka i pulsujące koło są zielone, gdy użytkownik może przeszukać obszar, a czerwone, gdy nie może (np. jest za blisko schronu lub przeszukanego obszaru albo jest w schronie). Przy słabym sygnale pinezka jest szara, a koła nie ma.
 - Domyślny widok obejmuje około 1–2 km wokół użytkownika i jest wycentrowany na użytkowniku.
 - Mapę można przybliżać i oddalać (gest szczypania oraz przyciski +/−) w zakresie od ok. 500 m do ok. 5 km szerokości widoku. W prototypie nie można jej przesuwać: zawsze jest wycentrowana na użytkowniku.
 - Biom w miejscu przeszukania wpływa na to, jaki zasób się znajdzie (zob. [loot.md](loot.md)).

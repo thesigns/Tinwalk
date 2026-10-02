@@ -26,6 +26,8 @@ const COLORS = {
   paint: '#b4432b',
   paintLight: '#d9654a',
   paintDark: '#82301c',
+  greenLight: '#82b453',
+  greenDark: '#3a5f1d',
   grey: '#a39d90',
   greyDark: '#6b665c',
   tape: 'rgba(236, 226, 190, 0.94)',
@@ -136,7 +138,7 @@ export class MapView {
 
   // scene: {
   //   center: { lat, lon } | null,
-  //   player: { position, good } | null,
+  //   player: { position, good, canSearch } | null,
   //   shelter: { lat, lon, name, radius } | null,
   //   searchedAreas: [{ lat, lon, radius }],
   // }
@@ -438,8 +440,9 @@ export class MapView {
     ctx.restore();
   }
 
-  // The player: a red pin stuck into the map, with the GPS accuracy around it.
-  drawPlayer(center, { position, good }) {
+  // The player: a pin stuck into the map, with the GPS accuracy around it.
+  // Green where the player can search, red where they can't, grey without a good signal.
+  drawPlayer(center, { position, good, canSearch }) {
     const { ctx } = this;
     const { x, y } = this.toScreen(center, position);
     ctx.globalAlpha = good ? 1 : 0.5;
@@ -466,8 +469,13 @@ export class MapView {
     ctx.arc(x, y - 23, 11, Math.PI, 0);
     ctx.bezierCurveTo(x + 11, y - 14, x + 3, y - 7, x, y);
     const gradient = ctx.createLinearGradient(x - 11, y - 34, x + 11, y);
-    gradient.addColorStop(0, good ? COLORS.paintLight : COLORS.grey);
-    gradient.addColorStop(1, good ? COLORS.paintDark : COLORS.greyDark);
+    const [light, dark] = !good
+      ? [COLORS.grey, COLORS.greyDark]
+      : canSearch
+        ? [COLORS.greenLight, COLORS.greenDark]
+        : [COLORS.paintLight, COLORS.paintDark];
+    gradient.addColorStop(0, light);
+    gradient.addColorStop(1, dark);
     ctx.fillStyle = gradient;
     ctx.fill();
     ctx.strokeStyle = COLORS.ink;

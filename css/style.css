@@ -71,6 +71,11 @@
   --paint-edge: #5a1e10;
   --paint-text: #f6ecd6;
 
+  /* The player's pin and pulse turn green where they can search. */
+  --green-light: #82b453;
+  --green: #5c8a33;
+  --green-dark: #3a5f1d;
+
   --brass: #e0bd68;
   --brass-dark: #a98236;
   --signal-good: #a6d46f;
@@ -1161,26 +1166,40 @@ dialog input:focus {
 
 /* Animations and feedback */
 
+/* Grows to 100 m around the player (--pulse-radius is set from the map scale)
+   and lingers there, so it is easy to see whether it still touches a searched
+   area or the shelter. Scaled with a transform, so the map isn't redrawn. */
 #player-pulse {
+  --pulse-radius: 60px;
   position: fixed;
   left: 50%;
   top: 50%;
-  width: 46px;
-  height: 18px;
-  margin: -9px 0 0 -23px;
+  width: calc(2 * var(--pulse-radius));
+  height: calc(2 * var(--pulse-radius));
+  margin: calc(-1 * var(--pulse-radius)) 0 0 calc(-1 * var(--pulse-radius));
   border: 2.5px solid rgba(180, 67, 43, 0.85);
   border-radius: 50%;
+  background: rgba(180, 67, 43, 0.08);
   pointer-events: none;
-  animation: pulse 2.2s ease-out infinite;
+  animation: pulse 2.6s ease-out infinite;
+}
+
+#player-pulse.can-search {
+  border-color: rgba(92, 138, 51, 0.9);
+  background: rgba(92, 138, 51, 0.1);
 }
 
 @keyframes pulse {
-  from {
-    transform: scale(0.3);
+  0% {
+    transform: scale(0.05);
     opacity: 0.9;
   }
-  to {
-    transform: scale(1.7);
+  65% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
     opacity: 0;
   }
 }
