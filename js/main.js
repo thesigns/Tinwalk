@@ -4,10 +4,13 @@ import {
   RESOURCES,
   SEARCH_RADIUS,
   SHELTER_RADIUS,
+  SURVIVOR_CAPACITY_BONUS,
   activeSearchedAreas,
   backpackCapacity,
   canUnload,
   createShelter,
+  dropResources,
+  emptyResources,
   isInShelter,
   pruneSearchedAreas,
   search,
@@ -30,6 +33,9 @@ const REWARD_CARD_MS = 1_300;
 const RIPPLE_MS = 900;
 const ZOOM_STEP = 1.5;
 const TOAST_DURATION_MS = 4_000;
+// Holding a +/- button in the backpack keeps stepping after a short pause.
+const STEP_REPEAT_DELAY_MS = 400;
+const STEP_REPEAT_MS = 90;
 // Frequent enough for searched areas to expire smoothly when debug time runs fast.
 const TICK_MS = 1_000;
 const WELCOMED_KEY = 'tinwalk.welcomed';
@@ -65,6 +71,15 @@ const ui = {
   shelterName: $('shelter-name'),
   survivorDialog: $('survivor-dialog'),
   survivorName: $('survivor-name'),
+  backpackPanel: $('backpack-panel'),
+  backpackPanelLoad: $('backpack-panel-load'),
+  backpackCompanion: $('backpack-companion'),
+  backpackItems: $('backpack-items'),
+  backpackEmpty: $('backpack-empty'),
+  backpackDropHint: $('backpack-drop-hint'),
+  backpackClose: $('backpack-close'),
+  backpackDrop: $('backpack-drop'),
+  backpackRow: $('backpack-row'),
   shelterPanel: $('shelter-panel'),
   shelterPanelName: $('shelter-panel-name'),
   shelterStorage: $('shelter-storage'),
@@ -102,6 +117,8 @@ let searching = false;
 // While loot flies into the backpack, the status bar keeps showing the old load.
 let holdBackpack = false;
 let toastTimer = null;
+// Units marked to be dropped in the open backpack panel, by resource id.
+let dropping = emptyResources();
 
 // A game event the player should hear and feel, e.g. 'found'.
 function feedback(name) {
@@ -137,6 +154,7 @@ function renderStatus() {
     ui.backpack.textContent = `${load}/${capacity}`;
     ui.backpackGauge.style.width = `${(100 * load) / capacity}%`;
     ui.backpackGauge.classList.toggle('full', load >= capacity);
+    ui.backpackHud.setAttribute('aria-label', `Backpack ${load}/${capacity}`);
   }
 
   ui.companion.hidden = !state.companion;
@@ -366,6 +384,89 @@ async function unloadAction() {
   );
 }
 
+// Shows what the player carries and lets them mark supplies to drop.
+// Nothing is dropped until they confirm.
+async function openBackpackPanel() {
+  dropping = emptyResources();
+  const carried = RESOURCES.filter(({ id }) => state.backpack[id] > 0);
+  ui.backpackItems.replaceChildren(...carried.map(backpackRow));
+  ui.backpackEmpty.hidden = carried.length > 0;
+  ui.backpackDropHint.hidden = carried.length === 0;
+  ui.backpackCompanion.hidden = !state.companion;
+  if (state.companion) ui.backpackCompanion.textContent = `${state.companion.name} is with you: +${SURVIVOR_CAPACITY_BONUS} space.`;
+  renderBackpackPanel();
+
+  if ((await ask(ui.backpackPanel)) !== 'drop') return;
+  const marked = RESOURCES.filter(({ id }) => dropping[id] > 0);
+  const dropped = dropResources(state, dropping);
+  if (dropped === 0) return;
+  saveAndUpdate();
+  feedback('drop');
+  replayAnimation(ui.backpackHud, 'bump');
+  if (marked.length === 1) showToast(`You dropped ${dropped} ${marked[0].label}`, marked[0].id);
+  else showToast(`You dropped ${plural(dropped, 'item')}`, 'backpack');
+}
+
+function backpackRow({ id, label }) {
+  const row = ui.backpackRow.content.firstElementChild.cloneNode(true);
+  row.dataset.resource = id;
+  row.querySelector('.resource-icon use').setAttribute('href', `#i-${id}`);
+  row.querySelector('.resource-name').textContent = label;
+  for (const button of row.querySelectorAll('[data-step]')) {
+    const step = Number(button.dataset.step);
+    button.setAttribute('aria-label', step > 0 ? `Drop one ${label}` : `Keep one more ${label}`);
+    holdToRepeat(button, () => {
+      const next = dropping[id] + step;
+      if (next < 0 || next > state.backpack[id]) return false;
+      dropping[id] = next;
+      renderBackpackPanel();
+      return true;
+    });
+  }
+  return row;
+}
+
+function renderBackpackPanel() {
+  const capacity = backpackCapacity(state);
+  const marked = totalResources(dropping);
+  ui.backpackPanelLoad.textContent = `${totalResources(state.backpack) - marked}/${capacity}`;
+  for (const row of ui.backpackItems.children) {
+    const id = row.dataset.resource;
+    const [drop, keep] = row.querySelectorAll('[data-step]');
+    row.querySelector('.resource-count').textContent = state.backpack[id] - dropping[id];
+    row.querySelector('.drop-count').textContent = dropping[id] > 0 ? `−${dropping[id]}` : '';
+    row.classList.toggle('dropping', dropping[id] > 0);
+    drop.disabled = dropping[id] >= state.backpack[id];
+    keep.disabled = dropping[id] === 0;
+  }
+  ui.backpackClose.textContent = marked > 0 ? 'Cancel' : 'Close';
+  ui.backpackDrop.textContent = `Drop ${marked}`;
+  ui.backpackDrop.hidden = marked === 0;
+}
+
+// Steps once when pressed, then keeps stepping while held, until `step` returns false.
+function holdToRepeat(button, step) {
+  let timer = null;
+  const stop = () => clearTimeout(timer);
+  const repeat = (delay) => {
+    timer = setTimeout(() => {
+      if (step()) repeat(STEP_REPEAT_MS);
+    }, delay);
+  };
+  button.addEventListener('pointerdown', (event) => {
+    if (event.button !== 0) return;
+    stop();
+    if (step()) repeat(STEP_REPEAT_DELAY_MS);
+  });
+  for (const type of ['pointerup', 'pointerleave', 'pointercancel']) button.addEventListener(type, stop);
+  // Keyboard presses arrive as clicks without a pointer (detail 0).
+  button.addEventListener('click', (event) => {
+    if (event.detail === 0) step();
+  });
+  // A long press would otherwise open the context menu on touch screens.
+  button.addEventListener('contextmenu', (event) => event.preventDefault());
+}
+
 function openShelterPanel() {
   const { shelter } = state;
   ui.shelterPanelName.textContent = shelter.name;
@@ -449,6 +550,7 @@ ui.actionButton.addEventListener('click', () => {
   const action = currentAction();
   if (action.enabled) ACTIONS[action.id]();
 });
+ui.backpackHud.addEventListener('click', openBackpackPanel);
 ui.shelterButton.addEventListener('click', openShelterPanel);
 $('retry-location').addEventListener('click', () => tracker.start());
 $('zoom-in').addEventListener('click', () => mapView.zoomBy(1 / ZOOM_STEP));

@@ -24,7 +24,7 @@ export const SHELTER_NAME_MAX_LENGTH = 24;
 export const DEFAULT_SHELTER_NAME = 'Shelter';
 
 const BACKPACK_CAPACITY = 30;
-const SURVIVOR_CAPACITY_BONUS = 30;
+export const SURVIVOR_CAPACITY_BONUS = 30;
 const SURVIVOR_CHANCE = 0.05;
 const MIN_LOOT = 1;
 const MAX_LOOT = 3;
@@ -94,6 +94,18 @@ export function search(state, position, time, random = Math.random) {
       ? SURVIVOR_NAMES[Math.floor(random() * SURVIVOR_NAMES.length)]
       : null;
   return { resource, found, carried, survivor };
+}
+
+// Throws resources out of the backpack, e.g. to make room for something else.
+// `amounts` maps resource ids to units; returns how many units were dropped.
+export function dropResources(state, amounts) {
+  let dropped = 0;
+  for (const { id } of RESOURCES) {
+    const amount = Math.min(amounts[id] ?? 0, state.backpack[id]);
+    state.backpack[id] -= amount;
+    dropped += amount;
+  }
+  return dropped;
 }
 
 export function takeSurvivor(state, name) {

@@ -48,11 +48,11 @@
 
   <div id="top">
     <header id="status-bar" class="tin rivets">
-      <div id="backpack-hud" class="hud-item" aria-label="Backpack">
+      <button id="backpack-hud" class="hud-item" type="button">
         <svg id="backpack-icon" class="icon"><use href="#i-backpack"/></svg>
-        <div class="gauge"><div id="backpack-gauge" class="gauge-fill"></div></div>
+        <span class="gauge"><span id="backpack-gauge" class="gauge-fill"></span></span>
         <span id="backpack-status" class="hud-value"></span>
-      </div>
+      </button>
       <div id="companion-status" class="hud-item companion" hidden>
         <svg class="icon"><use href="#i-survivor"/></svg>
         <span id="companion-name"></span>
@@ -190,6 +190,36 @@
       </div>
     </form>
   </dialog>
+
+  <dialog id="backpack-panel" class="paper taped">
+    <form method="dialog">
+      <div class="panel-title">
+        <svg class="icon"><use href="#i-backpack"/></svg>
+        <h2>Backpack</h2>
+        <span id="backpack-panel-load" class="panel-load"></span>
+      </div>
+      <p id="backpack-companion" class="muted"></p>
+      <ul id="backpack-items" class="backpack-items"></ul>
+      <p id="backpack-empty" class="muted">Your backpack is empty.</p>
+      <p id="backpack-drop-hint" class="muted">Drop what you don't need to make room. Dropped supplies are lost.</p>
+      <div class="dialog-buttons">
+        <button id="backpack-close" class="btn btn-ink" value="close"></button>
+        <button id="backpack-drop" class="btn btn-paint" value="drop"></button>
+      </div>
+    </form>
+  </dialog>
+
+  <template id="backpack-row">
+    <li>
+      <svg class="icon resource-icon"><use href=""/></svg>
+      <span class="resource-name"></span>
+      <span class="resource-amount"><span class="resource-count"></span><span class="drop-count"></span></span>
+      <span class="steppers">
+        <button class="btn btn-ink btn-step" type="button" data-step="1"><svg class="icon"><use href="#i-minus"/></svg></button>
+        <button class="btn btn-ink btn-step" type="button" data-step="-1"><svg class="icon"><use href="#i-plus"/></svg></button>
+      </span>
+    </li>
+  </template>
 
   <dialog id="menu-dialog" class="paper taped">
     <h2>Menu</h2>

@@ -487,6 +487,27 @@ button {
   gap: 7px;
 }
 
+/* The backpack readout opens the backpack, so it is a button that looks like the rest of the bar. */
+#backpack-hud {
+  margin: -6px;
+  padding: 6px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  font-family: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#backpack-hud:active {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+#backpack-hud:focus-visible {
+  outline: 3px solid var(--brass);
+  outline-offset: 0;
+}
+
 .hud-value {
   font-size: 20px;
   font-weight: 800;
@@ -504,6 +525,7 @@ button {
 }
 
 .gauge-fill {
+  display: block;
   width: 0;
   height: 100%;
   background:
@@ -856,6 +878,96 @@ dialog input:focus {
 .panel-title h2 {
   margin: 0;
   overflow-wrap: anywhere;
+}
+
+.panel-load {
+  margin-left: auto;
+  font-family: var(--font-stencil);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+#backpack-companion {
+  margin-top: 6px;
+}
+
+.backpack-items {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 14px 0 10px;
+  padding: 0;
+  list-style: none;
+}
+
+.backpack-items li {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 6px 6px 10px;
+  border-radius: 3px;
+  background: rgba(51, 40, 28, 0.07);
+  box-shadow: inset 0 0 0 1px var(--ink-faint);
+  transition: background 150ms;
+}
+
+.backpack-items li.dropping {
+  background: rgba(180, 67, 43, 0.12);
+}
+
+.resource-icon {
+  width: 26px;
+  height: 26px;
+}
+
+.resource-name {
+  font-family: var(--font-stencil);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.resource-amount {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.drop-count {
+  color: var(--paint);
+  font-family: var(--font-stencil);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.steppers {
+  display: flex;
+  gap: 6px;
+}
+
+.btn-step {
+  width: 40px;
+  min-height: 40px;
+  height: 40px;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.btn-step .icon {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2.6;
+}
+
+.btn-ink:disabled {
+  opacity: 0.3;
+  transform: none;
+  background: transparent;
 }
 
 .resource-grid {

@@ -13,6 +13,7 @@ const PATTERNS = {
   unload: [20, 40, 20, 40, 50],
   stamp: [70],
   land: [10],
+  drop: [30, 40, 15],
 };
 
 export const canVibrate = typeof navigator.vibrate === 'function';

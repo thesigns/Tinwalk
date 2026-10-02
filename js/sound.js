@@ -122,6 +122,11 @@ const SOUNDS = {
     thud(sound, time, 0.7);
     clink(sound, time + 0.16, 1.45);
   },
+  // Supplies tossed on the ground.
+  drop(sound, time) {
+    thud(sound, time, 0.4);
+    sound.noise(time + 0.04, { duration: 0.12, volume: 0.35, frequency: 700, filter: 'lowpass' });
+  },
   // An item landing in the backpack.
   land(sound, time) {
     sound.noise(time, { duration: 0.05, volume: 0.7, frequency: 2400, q: 3 });

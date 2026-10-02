@@ -83,6 +83,9 @@ Każde przeszukanie daje losowo 1–3 jednostki jednego zasobu. Zasób jest loso
 - Plecak mieści łącznie 30 jednostek wszystkich zasobów (np. 15 Food i 15 Ammo).
 - Gdy znalezisko nie mieści się w całości, użytkownik zabiera tyle, ile się zmieści, a reszta przepada. Komunikat, np. „You've found 3 Junk, but could only carry 1”.
 - Z pełnym plecakiem nadal można przeszukiwać (np. w nadziei na ocalałego).
+- Dotknięcie plecaka na pasku stanu otwiera jego zawartość: ile jednostek każdego zasobu niesie użytkownik i ile miejsca zostało.
+- Z plecaka można wyrzucać zasoby, np. żeby zrobić miejsce na inne. Użytkownik zaznacza przyciskami −/+, ile jednostek którego zasobu wyrzucić (przytrzymanie przycisku zmienia liczbę dalej), i zatwierdza przyciskiem **Drop**. Zamknięcie okna bez zatwierdzenia niczego nie wyrzuca.
+- Wyrzucone zasoby przepadają. Wyrzucać można wszędzie, także w schronie.
 
 ### Ocaleni (Survivors)
 
@@ -119,7 +122,7 @@ Każde przeszukanie daje losowo 1–3 jednostki jednego zasobu. Zasób jest loso
 ### Interfejs
 
 - Główny ekran to mapa.
-- Pasek stanu pokazuje: zawartość plecaka (np. „Backpack 12/30”), czy idzie z nami ocalały, oraz jakość sygnału GPS.
+- Pasek stanu pokazuje: zawartość plecaka (np. „Backpack 12/30”), czy idzie z nami ocalały, oraz jakość sygnału GPS. Dotknięcie plecaka otwiera panel plecaka.
 - Przyciski zależą od kontekstu: **Create a Shelter**, **Search area**, **Unload**.
 - Panel schronu pokazuje nazwę schronu, stan magazynu i liczbę ocalałych.
 
@@ -156,6 +159,8 @@ Tych rzeczy nie implementujemy w prototypie.
 - Zaawansowane konstrukcje z Tech.
 - Praca ocalałych w schronie.
 - Wpływ terenu na zdobycze.
+- Wybór, co zrobić ze znaleziskiem, które nie mieści się w plecaku (np. wyrzucenie czegoś na miejscu zamiast utraty nadmiaru).
+- Unikalne przedmioty, które zajmują miejsce w plecaku.
 - Pełna aplikacja PWA (instalacja na ekranie głównym, działanie offline).
 - Utrzymywanie włączonego ekranu podczas spaceru (Wake Lock API).
 - Podstawowa ochrona przed oszukiwaniem, np. limit prędkości przemieszczania się.
