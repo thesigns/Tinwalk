@@ -118,14 +118,14 @@
   </div>
 
   <!-- Pops up after a search or unload, then flies into the backpack. -->
-  <div id="reward-card" class="paper taped" role="status" hidden>
+  <div id="reward-card" class="paper" role="status" hidden>
     <div id="reward-medal"><svg class="icon"><use id="reward-icon" href="#i-junk"/></svg></div>
     <div class="reward-title"><span id="reward-amount"></span> <span id="reward-name"></span></div>
     <p id="reward-note"></p>
   </div>
 
   <section id="welcome-screen" class="overlay" hidden>
-    <div class="card paper taped">
+    <div class="card paper">
       <h1 class="wordmark">Tinwalk</h1>
       <p class="tagline">Every walk is a supply run.</p>
       <ol class="steps">
@@ -139,7 +139,7 @@
   </section>
 
   <section id="denied-screen" class="overlay" hidden>
-    <div class="card paper taped">
+    <div class="card paper">
       <svg class="icon icon-hero"><use href="#i-pin"/></svg>
       <h1>Tinwalk needs your location</h1>
       <p>The game is played on real walks, so it can't work without access to your location.</p>
@@ -148,7 +148,7 @@
     </div>
   </section>
 
-  <dialog id="name-dialog" class="paper taped">
+  <dialog id="name-dialog" class="paper">
     <form method="dialog">
       <h2><label for="shelter-name">Name your shelter</label></h2>
       <p class="muted">Pick something you'd paint over the door.</p>
@@ -160,7 +160,7 @@
     </form>
   </dialog>
 
-  <dialog id="survivor-dialog" class="paper taped">
+  <dialog id="survivor-dialog" class="paper">
     <form method="dialog">
       <h2>Survivor found!</h2>
       <div class="survivor-card">
@@ -174,7 +174,7 @@
     </form>
   </dialog>
 
-  <dialog id="shelter-panel" class="paper taped">
+  <dialog id="shelter-panel" class="paper">
     <form method="dialog">
       <div class="panel-title">
         <svg class="icon"><use href="#i-shelter"/></svg>
@@ -191,7 +191,7 @@
     </form>
   </dialog>
 
-  <dialog id="backpack-panel" class="paper taped">
+  <dialog id="backpack-panel" class="paper">
     <form method="dialog">
       <div class="panel-title">
         <svg class="icon"><use href="#i-backpack"/></svg>
@@ -221,7 +221,7 @@
     </li>
   </template>
 
-  <dialog id="menu-dialog" class="paper taped">
+  <dialog id="menu-dialog" class="paper">
     <h2>Menu</h2>
     <div class="menu-toggles">
       <button id="sound-toggle" class="toggle" type="button" role="switch" aria-checked="true">
@@ -243,7 +243,7 @@
     <input id="import-input" type="file" accept=".json,application/json" hidden>
   </dialog>
 
-  <dialog id="import-dialog" class="paper taped">
+  <dialog id="import-dialog" class="paper">
     <form method="dialog">
       <h2>Import save?</h2>
       <p>This replaces your current game, including your shelter and everything in it.</p>
