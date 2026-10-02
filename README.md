@@ -13,22 +13,24 @@ It runs in the browser, needs no account and no server, and your location never 
 1. **Set up a shelter.** At home, tap **Create a Shelter** and give it a name. Your shelter is a circle with a 100 m radius around that spot.
 2. **Go for a walk.** Everything outside your shelter is the wasteland.
 3. **Search areas.** Tap **Search area** to scavenge the spot you're standing on. Each search must be at least 200 m from your shelter and from earlier searches. Searched areas recover after 12 hours, so the same daily walk pays off again tomorrow, and loops beat out-and-back routes.
-4. **Fill your backpack.** Each search turns up 1–3 units of one resource. Your backpack holds 30 units, and anything that doesn't fit is lost.
-5. **Meet survivors.** Every search has a 5% chance of turning up a survivor. Take them with you and they carry 30 extra units, but you can only escort one at a time.
+4. **Fill your backpack.** Each search turns up Junk or Food. The further you are from your shelter, the more you find. Your backpack holds 50 units: tap it to see what you carry and drop what you don't need. Anything that doesn't fit is lost.
+5. **Meet survivors.** A search can turn up a survivor, more often far from home. Take them with you and they carry 30 extra units, but you can only escort one at a time.
 6. **Bring it home.** Back in your shelter, tap **Unload** to move your loot into storage and your survivor into the shelter.
 
-| Resource | How often it turns up |
-|---|---|
-| Junk | 40% |
-| Food | 25% |
-| Ammo | 15% |
-| Meds | 10% |
-| Tech | 10% |
+| Distance from your shelter | Loot per search | Survivor chance |
+|---|---|---|
+| under 1 km | 1 | 1% |
+| 1–2 km | 1–2 | 2% |
+| 2–4 km | 2–4 | 4% |
+| 4–8 km | 3–6 | 6% |
+| over 8 km | 4–8 | 8% |
+
+What you find depends on the terrain: ruins are full of Junk, forests of Food, and plains give a bit of both.
 
 ## Features
 
 - **Real GPS.** Readings less accurate than 50 m are ignored, so actions only unlock with a good signal. The shelter position is averaged over several seconds, since GPS is weakest indoors.
-- **A procedurally generated map.** Instead of a real map, you walk across a fictional wasteland of plains, forests, deserts, hills and ruins, drawn like an old paper field map. The terrain is generated from your coordinates, so the same place on Earth always looks the same, and a typical walk crosses several kinds of terrain.
+- **A procedurally generated map.** Instead of a real map, you walk across a fictional wasteland of plains, forests and ruins, drawn like an old paper field map. The terrain is generated from your coordinates, so the same place on Earth always looks the same, and a typical walk crosses several kinds of terrain.
 - **Private by design.** There is no server: your progress is saved only in your browser, and your location is never sent anywhere. You can export your save to a file and import it back.
 - **Sound and vibration.** Sound effects are synthesized in the browser, with no audio files. Vibration works on Android; iPhone browsers don't support it. Both can be turned off in the menu.
 - **Light on the battery.** The map is rendered into cached tiles, and the position marker's pulse is a CSS animation, so the map isn't redrawn constantly.
@@ -71,10 +73,9 @@ docs/           Design notes (in Polish)
 
 Tinwalk is a prototype. Resources are only collected and counted for now. Ideas for later:
 
-- Building up the shelter with Junk and Tech
+- Building up the shelter and crafting things such as ammo from Junk
 - Survivors eating Food and working in the shelter
-- Combat using Ammo, and healing with Meds
-- Terrain that affects what you find
+- Combat
 - More than one shelter
 - Installing to the home screen (PWA) and working offline
 

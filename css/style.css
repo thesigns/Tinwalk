@@ -940,7 +940,8 @@ dialog input:focus {
 
 .resource-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
   gap: 6px;
   margin: 0;
   padding: 0;

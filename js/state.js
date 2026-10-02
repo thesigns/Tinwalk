@@ -3,10 +3,29 @@
 import { RESOURCES, emptyResources } from './game.js';
 
 const STORAGE_KEY = 'tinwalk.state';
-export const STATE_VERSION = 1;
+export const STATE_VERSION = 2;
 
 const INVALID_SAVE = "This file isn't a valid Tinwalk save";
 const OTHER_VERSION = 'This save comes from a different version of Tinwalk';
+
+// Each migration upgrades a save from the version it is keyed by to the next one.
+const MIGRATIONS = {
+  // Ammo, Meds and Tech were removed: such things will be crafted from Junk instead.
+  1(save) {
+    for (const resources of [save.backpack, save.shelter?.storage]) {
+      if (!isObject(resources)) continue;
+      delete resources.ammo;
+      delete resources.meds;
+      delete resources.tech;
+    }
+    save.version = 2;
+  },
+};
+
+function migrate(save) {
+  while (isObject(save) && MIGRATIONS[save.version]) MIGRATIONS[save.version](save);
+  return save;
+}
 
 export function createInitialState() {
   return {
@@ -23,7 +42,7 @@ export function loadState() {
   try {
     raw = localStorage.getItem(STORAGE_KEY);
     if (raw === null) return createInitialState();
-    const state = JSON.parse(raw);
+    const state = migrate(JSON.parse(raw));
     if (isValidState(state)) return state;
   } catch (error) {
     console.warn('Could not load the saved game', error);
@@ -60,7 +79,7 @@ export function exportState(state) {
 export function parseSave(text) {
   let data;
   try {
-    data = JSON.parse(text);
+    data = migrate(JSON.parse(text));
   } catch {
     return { error: INVALID_SAVE };
   }

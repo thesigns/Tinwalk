@@ -5,6 +5,7 @@ An app that gamifies walks, with a survival/scavenging theme. The user sets up a
 ## Source of truth
 
 - `docs/bootstrap.md` is the app spec (in Polish). Its "Zakres prototypu" section is what's implemented; "Na przyszłość" lists ideas that are deliberately **not** implemented yet. Check the spec before changing game rules.
+- Rules on a specific topic live in their own files in `docs/`, linked from `bootstrap.md` (e.g. `docs/loot.md`: resources, loot by distance and biome, survivor chances). The project author prefers this to growing `bootstrap.md`.
 - The project author communicates in Polish; reply in Polish.
 
 ## Project rules
@@ -58,7 +59,7 @@ All code is in `js/`, loaded from `index.html` via `js/main.js`.
 - **Coordinates:** the map and terrain work in Web Mercator units; distances in game rules use `distanceMeters` (haversine).
 - **Tile cache:** its capacity scales with the number of visible tiles. A fixed, too-small cache made large screens re-render tiles every frame (flickering).
 - **Colors:** the palette is defined as CSS custom properties in `css/style.css`; `COLORS` in `map.js` mirrors it for canvas drawing. Keep them in sync.
-- **Icons:** icons are `<symbol id="i-…">` entries in the SVG sprite in `index.html`; create them in JS with `iconElement(name)`. Resource ids (`junk`, `food`, `ammo`, `meds`, `tech`) double as icon names.
+- **Icons:** icons are `<symbol id="i-…">` entries in the SVG sprite in `index.html`; create them in JS with `iconElement(name)`. Resource ids (`junk`, `food`) double as icon names.
 - **Fonts:** Big Shoulders Stencil (headings, buttons, numbers) and Courier Prime (text) are self-hosted in `fonts/` with their OFL licenses. Canvas labels use them too, so the map re-renders once `document.fonts.ready` resolves.
 - **Feedback:** `feedback(name)` in `main.js` plays both a sound and a vibration; event names are shared between `SOUNDS` in `sound.js` and `PATTERNS` in `haptics.js`. Browsers only allow audio after a user gesture, so `sound.unlock()` runs on every click.
 - **Animations:** respect `prefers-reduced-motion` (CSS media query, and `prefersReducedMotion()` in `fx.js`).

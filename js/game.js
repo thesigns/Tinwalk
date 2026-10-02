@@ -1,17 +1,31 @@
 // Game rules: shelter, searching, backpack, survivors and unloading.
 // Functions take the game state and mutate it; saving is up to the caller.
 
-import { distanceMeters } from './geo.js';
+import { distanceMeters, toMercator } from './geo.js';
 import { SURVIVOR_NAMES } from './names.js';
+import { biomeAt } from './terrain.js';
 
 export const RESOURCES = [
-  { id: 'junk', label: 'Junk', weight: 40 },
-  { id: 'food', label: 'Food', weight: 25 },
-  { id: 'ammo', label: 'Ammo', weight: 15 },
-  { id: 'meds', label: 'Meds', weight: 10 },
-  { id: 'tech', label: 'Tech', weight: 10 },
+  { id: 'junk', label: 'Junk' },
+  { id: 'food', label: 'Food' },
 ];
-const TOTAL_WEIGHT = RESOURCES.reduce((sum, resource) => sum + resource.weight, 0);
+
+// Searches further from the shelter turn up more loot and more survivors.
+// Each tier applies up to (but not including) its maxDistance in meters.
+const LOOT_TIERS = [
+  { maxDistance: 1000, minLoot: 1, maxLoot: 1, survivorChance: 0.01 },
+  { maxDistance: 2000, minLoot: 1, maxLoot: 2, survivorChance: 0.02 },
+  { maxDistance: 4000, minLoot: 2, maxLoot: 4, survivorChance: 0.04 },
+  { maxDistance: 8000, minLoot: 3, maxLoot: 6, survivorChance: 0.06 },
+  { maxDistance: Infinity, minLoot: 4, maxLoot: 8, survivorChance: 0.08 },
+];
+
+// The biome where the player searches decides which resource is likely.
+const BIOME_LOOT_WEIGHTS = {
+  plains: { junk: 50, food: 50 },
+  forest: { junk: 20, food: 80 },
+  ruins: { junk: 80, food: 20 },
+};
 
 export const SHELTER_RADIUS = 100;
 // The player leaves the shelter a bit further out than they enter it, so GPS
@@ -23,11 +37,8 @@ export const SEARCH_EXPIRY_MS = 12 * 60 * 60 * 1000;
 export const SHELTER_NAME_MAX_LENGTH = 24;
 export const DEFAULT_SHELTER_NAME = 'Shelter';
 
-const BACKPACK_CAPACITY = 30;
+const BACKPACK_CAPACITY = 50;
 export const SURVIVOR_CAPACITY_BONUS = 30;
-const SURVIVOR_CHANCE = 0.05;
-const MIN_LOOT = 1;
-const MAX_LOOT = 3;
 
 export function emptyResources() {
   return Object.fromEntries(RESOURCES.map(({ id }) => [id, 0]));
@@ -82,15 +93,17 @@ export function searchBlocker(state, position, time) {
 // Returns { resource, found, carried, survivor }, where survivor is a name or null.
 // A found survivor joins only after takeSurvivor().
 export function search(state, position, time, random = Math.random) {
-  const resource = pickResource(random);
-  const found = MIN_LOOT + Math.floor(random() * (MAX_LOOT - MIN_LOOT + 1));
+  const tier = lootTier(distanceMeters(state.shelter, position));
+  const { x, y } = toMercator(position);
+  const resource = pickResource(BIOME_LOOT_WEIGHTS[biomeAt(x, y).name], random);
+  const found = tier.minLoot + Math.floor(random() * (tier.maxLoot - tier.minLoot + 1));
   const space = Math.max(0, backpackCapacity(state) - totalResources(state.backpack));
   const carried = Math.min(found, space);
   state.backpack[resource.id] += carried;
   state.searchedAreas.push({ lat: position.lat, lon: position.lon, searchedAt: time });
 
   const survivor =
-    !state.companion && random() < SURVIVOR_CHANCE
+    !state.companion && random() < tier.survivorChance
       ? SURVIVOR_NAMES[Math.floor(random() * SURVIVOR_NAMES.length)]
       : null;
   return { resource, found, carried, survivor };
@@ -130,10 +143,15 @@ export function unload(state) {
   return { items, survivor: survivor?.name ?? null };
 }
 
-function pickResource(random) {
-  let roll = random() * TOTAL_WEIGHT;
+function lootTier(distance) {
+  return LOOT_TIERS.find((tier) => distance < tier.maxDistance);
+}
+
+function pickResource(weights, random) {
+  const total = RESOURCES.reduce((sum, { id }) => sum + weights[id], 0);
+  let roll = random() * total;
   for (const resource of RESOURCES) {
-    roll -= resource.weight;
+    roll -= weights[resource.id];
     if (roll < 0) return resource;
   }
   return RESOURCES.at(-1);

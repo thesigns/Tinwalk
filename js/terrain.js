@@ -8,23 +8,21 @@ const noise = createSimplex(20261001);
 
 // Noise frequency in Mercator units. One Mercator unit is ~0.62 m at 52°N,
 // which gives regions from a few hundred meters to about a kilometer there
-// (median ~400 m along a straight walk).
-const REGION_FREQUENCY = 1 / 4000;
+// (median ~430 m along a straight walk, about 5 changes of terrain per 3 km).
+const REGION_FREQUENCY = 1 / 2700;
 const DETAIL_FREQUENCY = 1 / 90;
 const DETAIL_STRENGTH = 0.06;
 
-const RUINS_THRESHOLD = 0.36;
-const HILLS_THRESHOLD = 0.3;
-const FOREST_THRESHOLD = 0.15;
-const DESERT_THRESHOLD = -0.25;
+// Each biome covers about a third of the world. The forest threshold is kept
+// off zero, where simplex noise draws straight borders crossing like an X.
+const RUINS_THRESHOLD = 0.2;
+const FOREST_THRESHOLD = 0.04;
 
 const INK = '#5b4a35';
 
 export const BIOMES = {
   plains: { name: 'plains', color: [214, 204, 159], iconDensity: 0.1, iconSize: 7, drawIcon: drawGrass },
   forest: { name: 'forest', color: [170, 184, 136], iconDensity: 0.75, iconSize: 13, drawIcon: drawTree },
-  desert: { name: 'desert', color: [230, 203, 140], iconDensity: 0.2, iconSize: 12, drawIcon: drawCactus },
-  hills: { name: 'hills', color: [197, 174, 134], iconDensity: 0.4, iconSize: 18, drawIcon: drawHill },
   ruins: { name: 'ruins', color: [190, 183, 168], iconDensity: 0.5, iconSize: 14, drawIcon: drawRuin },
 };
 
@@ -37,11 +35,7 @@ export function biomeAt(x, y) {
   const fx = x * REGION_FREQUENCY;
   const fy = y * REGION_FREQUENCY;
   if (fbm(fx * 1.3 + 101.1, fy * 1.3 + 53.7) > RUINS_THRESHOLD) return BIOMES.ruins;
-  if (fbm(fx + 211.3, fy - 77.9) > HILLS_THRESHOLD) return BIOMES.hills;
-  const moisture = fbm(fx - 391.5, fy + 145.2);
-  if (moisture > FOREST_THRESHOLD) return BIOMES.forest;
-  if (moisture < DESERT_THRESHOLD) return BIOMES.desert;
-  return BIOMES.plains;
+  return fbm(fx - 391.5, fy + 145.2) > FOREST_THRESHOLD ? BIOMES.forest : BIOMES.plains;
 }
 
 // Brightness factor around 1, for a little small-scale variation inside a biome.
@@ -93,43 +87,6 @@ function drawTree(ctx, x, y, size, variant) {
     ctx.fillStyle = '#62804a';
   }
   ctx.fill();
-  ctx.stroke();
-  ctx.restore();
-}
-
-function drawCactus(ctx, x, y, size, variant) {
-  startIcon(ctx, x, y, size);
-  const leftArm = 0.4 + variant * 0.2;
-  const rightArm = 0.6 - variant * 0.2;
-  ctx.beginPath();
-  ctx.moveTo(0, 0);
-  ctx.lineTo(0, -1);
-  ctx.moveTo(0, -leftArm);
-  ctx.lineTo(-0.3, -leftArm);
-  ctx.lineTo(-0.3, -leftArm - 0.25);
-  ctx.moveTo(0, -rightArm);
-  ctx.lineTo(0.3, -rightArm);
-  ctx.lineTo(0.3, -rightArm - 0.25);
-  // An outline: a thick ink stroke with a thinner green stroke on top.
-  ctx.lineWidth = 0.24;
-  ctx.stroke();
-  ctx.lineWidth = 0.24 - 2.4 / size;
-  ctx.strokeStyle = '#7f9a52';
-  ctx.stroke();
-  ctx.restore();
-}
-
-function drawHill(ctx, x, y, size) {
-  startIcon(ctx, x, y, size);
-  ctx.beginPath();
-  ctx.moveTo(-0.6, 0);
-  ctx.quadraticCurveTo(0, -1.1, 0.6, 0);
-  ctx.fillStyle = '#b29871';
-  ctx.fill();
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(0.08, -0.45);
-  ctx.quadraticCurveTo(0.3, -0.3, 0.36, -0.1);
   ctx.stroke();
   ctx.restore();
 }
