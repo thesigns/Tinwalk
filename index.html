@@ -180,7 +180,7 @@
       <h3>Storage</h3>
       <ul id="shelter-storage" class="resource-grid"></ul>
       <h3>Survivors <span id="shelter-survivor-count" class="count"></span></h3>
-      <ul id="shelter-survivor-names" class="name-tags"></ul>
+      <ul id="shelter-survivor-names" class="survivor-badges"></ul>
       <p id="shelter-no-survivors" class="muted">No one has joined you yet.</p>
       <div class="dialog-buttons">
         <button class="btn btn-paint" value="close">Close</button>
@@ -202,6 +202,25 @@
       <div class="dialog-buttons">
         <button id="backpack-close" class="btn btn-ink" value="close"></button>
         <button id="backpack-drop" class="btn btn-paint" value="drop"></button>
+      </div>
+    </form>
+  </dialog>
+
+  <template id="survivor-badge">
+    <li>
+      <span class="survivor-badge-name"></span>
+      <span class="hunger-stage"></span>
+      <span class="hunger-bar"><span class="hunger-fill"></span></span>
+      <span class="hunger-time"></span>
+    </li>
+  </template>
+
+  <dialog id="departure-dialog" class="paper">
+    <form method="dialog">
+      <h2 id="departure-title"></h2>
+      <p id="departure-text"></p>
+      <div class="dialog-buttons">
+        <button class="btn btn-paint" value="close">OK</button>
       </div>
     </form>
   </dialog>

@@ -1,9 +1,10 @@
 // Loads, saves, exports and imports the game state.
 
+import { now } from './clock.js';
 import { RESOURCES, emptyResources } from './game.js';
 
 const STORAGE_KEY = 'tinwalk.state';
-export const STATE_VERSION = 2;
+export const STATE_VERSION = 3;
 
 const INVALID_SAVE = "This file isn't a valid Tinwalk save";
 const OTHER_VERSION = 'This save comes from a different version of Tinwalk';
@@ -20,6 +21,18 @@ const MIGRATIONS = {
     }
     save.version = 2;
   },
+  // Survivors in the shelter started eating. Their arrival wasn't recorded
+  // before, so they arrive, and have just eaten, at the time of the upgrade.
+  2(save) {
+    const time = now();
+    for (const survivor of save.shelter?.survivors ?? []) {
+      if (!isObject(survivor)) continue;
+      survivor.arrivedAt = time;
+      survivor.lastMealAt = time;
+    }
+    if (isObject(save.shelter)) save.shelter.departedSurvivors = [];
+    save.version = 3;
+  },
 };
 
 function migrate(save) {
@@ -30,7 +43,9 @@ function migrate(save) {
 export function createInitialState() {
   return {
     version: STATE_VERSION,
-    shelter: null, // { name, lat, lon, createdAt, storage, survivors: [{ name }] }
+    // { name, lat, lon, createdAt, storage, survivors: [{ name, arrivedAt, lastMealAt }],
+    //   departedSurvivors: [{ name, arrivedAt, leftAt, reason }] }
+    shelter: null,
     searchedAreas: [], // [{ lat, lon, searchedAt }]
     backpack: emptyResources(),
     companion: null, // { name }
@@ -92,6 +107,9 @@ const isNumber = (value) => typeof value === 'number' && Number.isFinite(value);
 const isCount = (value) => Number.isInteger(value) && value >= 0;
 const isPoint = (value) => isObject(value) && isNumber(value.lat) && isNumber(value.lon);
 const isPerson = (value) => isObject(value) && typeof value.name === 'string';
+const isShelterSurvivor = (value) => isPerson(value) && isNumber(value.arrivedAt) && isNumber(value.lastMealAt);
+const isDepartedSurvivor = (value) =>
+  isPerson(value) && isNumber(value.arrivedAt) && isNumber(value.leftAt) && typeof value.reason === 'string';
 const isResources = (value) => isObject(value) && RESOURCES.every(({ id }) => isCount(value[id]));
 
 function isValidShelter(shelter) {
@@ -101,7 +119,9 @@ function isValidShelter(shelter) {
     isNumber(shelter.createdAt) &&
     isResources(shelter.storage) &&
     Array.isArray(shelter.survivors) &&
-    shelter.survivors.every(isPerson)
+    shelter.survivors.every(isShelterSurvivor) &&
+    Array.isArray(shelter.departedSurvivors) &&
+    shelter.departedSurvivors.every(isDepartedSurvivor)
   );
 }
 

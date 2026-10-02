@@ -5,7 +5,7 @@ An app that gamifies walks, with a survival/scavenging theme. The user sets up a
 ## Source of truth
 
 - `docs/bootstrap.md` is the app spec (in Polish). Its "Zakres prototypu" section is what's implemented; "Na przyszłość" lists ideas that are deliberately **not** implemented yet. Check the spec before changing game rules.
-- Rules on a specific topic live in their own files in `docs/`, linked from `bootstrap.md` (e.g. `docs/loot.md`: resources, loot by distance and biome, survivor chances). The project author prefers this to growing `bootstrap.md`.
+- Rules on a specific topic live in their own files in `docs/`, linked from `bootstrap.md` (e.g. `docs/loot.md`: resources, loot by distance and biome, survivor chances; `docs/survivors.md`: survivors in the shelter, meals and hunger). The project author prefers this to growing `bootstrap.md`.
 - The project author communicates in Polish; reply in Polish.
 
 ## Project rules
@@ -35,7 +35,7 @@ All code is in `js/`, loaded from `index.html` via `js/main.js`.
 | Module | Responsibility |
 |---|---|
 | `main.js` | Wires everything together: UI rendering, actions (create shelter, search, unload), dialogs, menu, reward animations |
-| `game.js` | Game rules and constants (radii, loot weights, capacity, survivor chance). Functions mutate the state; the caller saves |
+| `game.js` | Game rules and constants (radii, loot tiers and weights, capacity, survivor meals). Functions mutate the state; the caller saves |
 | `state.js` | State shape, `STATE_VERSION`, load/save to `localStorage`, export/import with validation |
 | `gps.js` | `LocationTracker`: Geolocation API, accuracy/staleness filtering, signal state, manual position for debug |
 | `geo.js` | Haversine distances, Web Mercator projection, weighted position averaging |

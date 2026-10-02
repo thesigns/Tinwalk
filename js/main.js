@@ -11,10 +11,13 @@ import {
   createShelter,
   dropResources,
   emptyResources,
+  HUNGER_STAGES,
+  hungerOf,
   isInShelter,
   pruneSearchedAreas,
   search,
   searchBlocker,
+  settleMeals,
   takeSurvivor,
   totalResources,
   unload,
@@ -42,6 +45,12 @@ const WELCOMED_KEY = 'tinwalk.welcomed';
 
 const POOR_SIGNAL_HINT = 'Waiting for a better GPS signal…';
 const ACTION_ICONS = { locating: 'locate', create: 'shelter', search: 'search', searching: 'search', unload: 'unload' };
+// What each hunger stage is called, and what happens when it runs out.
+const HUNGER_TEXT = {
+  satiated: { label: 'Satiated', next: (hasFood) => (hasFood ? 'eats in' : 'hungry in') },
+  hungry: { label: 'Hungry', next: () => 'starving in' },
+  starving: { label: 'Starving', next: () => 'leaves in' },
+};
 const SEARCH_BLOCKER_HINTS = {
   shelter: 'Too close to your shelter',
   searched: 'This area has already been searched',
@@ -86,6 +95,10 @@ const ui = {
   shelterSurvivorCount: $('shelter-survivor-count'),
   shelterSurvivorNames: $('shelter-survivor-names'),
   shelterNoSurvivors: $('shelter-no-survivors'),
+  survivorBadge: $('survivor-badge'),
+  departureDialog: $('departure-dialog'),
+  departureTitle: $('departure-title'),
+  departureText: $('departure-text'),
   scaleLabel: $('scale-label'),
   scaleLine: $('scale-line'),
   welcomeScreen: $('welcome-screen'),
@@ -117,6 +130,8 @@ let searching = false;
 // While loot flies into the backpack, the status bar keeps showing the old load.
 let holdBackpack = false;
 let toastTimer = null;
+// Survivors listed in the open departure dialog.
+let departed = [];
 // Units marked to be dropped in the open backpack panel, by resource id.
 let dropping = emptyResources();
 
@@ -136,9 +151,14 @@ function update() {
   debugPanel?.update();
 }
 
-// Searched areas expire over time even when nothing else happens.
+// Searched areas expire and survivors get hungry even when nothing else happens.
 function tick() {
-  if (pruneSearchedAreas(state, now())) saveState(state);
+  const time = now();
+  const pruned = pruneSearchedAreas(state, time);
+  const { meals, left } = settleMeals(state, time);
+  if (pruned || meals > 0 || left.length > 0) saveState(state);
+  if (left.length > 0) showDepartures(left);
+  if (ui.shelterPanel.open) renderShelterPanel();
   update();
 }
 
@@ -235,6 +255,19 @@ function renderActions() {
   ui.actionHint.textContent = action.hint ?? '';
   ui.actionHint.hidden = !action.hint;
   ui.shelterButton.hidden = !state.shelter;
+  // Warns about hungry survivors while the player is out on a walk.
+  const hunger = worstHunger();
+  ui.shelterButton.dataset.hunger = hunger;
+  ui.shelterButton.setAttribute('aria-label', hunger === 'satiated' ? 'Shelter' : `Shelter: survivors are ${hunger}`);
+}
+
+// The hungriest stage among the shelter's survivors ('satiated' if there are none).
+function worstHunger() {
+  const time = now();
+  const stages = (state.shelter?.survivors ?? []).map((survivor) =>
+    HUNGER_STAGES.indexOf(hungerOf(survivor, time).stage),
+  );
+  return HUNGER_STAGES[Math.max(0, ...stages)];
 }
 
 function renderMap() {
@@ -369,8 +402,9 @@ async function searchAction() {
 }
 
 async function unloadAction() {
-  const { items, survivor } = unload(state);
+  const { items, survivor, left } = unload(state, now());
   saveAndUpdate();
+  if (left.length > 0) showDepartures(left);
   feedback('unload');
   mapView.playRipple(state.shelter, SHELTER_RADIUS, RIPPLE_MS);
 
@@ -468,7 +502,14 @@ function holdToRepeat(button, step) {
 }
 
 function openShelterPanel() {
+  renderShelterPanel();
+  ui.shelterPanel.showModal();
+}
+
+// Re-rendered every tick while open, so the hunger bars keep moving.
+function renderShelterPanel() {
   const { shelter } = state;
+  if (!shelter) return;
   ui.shelterPanelName.textContent = shelter.name;
   ui.shelterStorage.replaceChildren(
     ...RESOURCES.map(({ id, label }) => {
@@ -484,15 +525,43 @@ function openShelterPanel() {
     }),
   );
   ui.shelterSurvivorCount.textContent = shelter.survivors.length;
-  ui.shelterSurvivorNames.replaceChildren(
-    ...shelter.survivors.map(({ name }) => {
-      const tag = document.createElement('li');
-      tag.textContent = name;
-      return tag;
-    }),
-  );
+  const time = now();
+  ui.shelterSurvivorNames.replaceChildren(...shelter.survivors.map((survivor) => survivorBadge(survivor, time)));
   ui.shelterNoSurvivors.hidden = shelter.survivors.length > 0;
-  ui.shelterPanel.showModal();
+}
+
+// A survivor's name tag, with a bar running down to the end of their current hunger stage.
+function survivorBadge(survivor, time) {
+  const badge = ui.survivorBadge.content.firstElementChild.cloneNode(true);
+  const { stage, startedAt, endsAt } = hungerOf(survivor, time);
+  const text = HUNGER_TEXT[stage];
+  badge.dataset.stage = stage;
+  badge.querySelector('.survivor-badge-name').textContent = survivor.name;
+  badge.querySelector('.hunger-stage').textContent = text.label;
+  badge.querySelector('.hunger-fill').style.width = `${(100 * (endsAt - time)) / (endsAt - startedAt)}%`;
+  badge.querySelector('.hunger-time').textContent =
+    `${text.next(state.shelter.storage.food > 0)} ${formatDuration(endsAt - time)}`;
+  return badge;
+}
+
+function formatDuration(ms) {
+  const hours = ms / (60 * 60 * 1000);
+  return hours >= 1 ? `${Math.ceil(hours)} h` : `${Math.max(1, Math.ceil(hours * 60))} min`;
+}
+
+// Tells the player who left the shelter for lack of food, adding to the dialog if it is open.
+function showDepartures(names) {
+  departed.push(...names);
+  ui.departureTitle.textContent =
+    departed.length === 1 ? `${departed[0]} has left` : `${departed.length} survivors have left`;
+  ui.departureText.textContent = `${listNames(departed)} left ${state.shelter.name}: there was no food.`;
+  if (!ui.departureDialog.open) ui.departureDialog.showModal();
+  feedback('full');
+}
+
+// "Ada", "Ada and Bo", "Ada, Bo and Cy".
+function listNames(names) {
+  return names.length === 1 ? names[0] : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`;
 }
 
 function describeGame() {
@@ -552,6 +621,7 @@ ui.actionButton.addEventListener('click', () => {
 });
 ui.backpackHud.addEventListener('click', openBackpackPanel);
 ui.shelterButton.addEventListener('click', openShelterPanel);
+ui.departureDialog.addEventListener('close', () => (departed = []));
 $('retry-location').addEventListener('click', () => tracker.start());
 $('zoom-in').addEventListener('click', () => mapView.zoomBy(1 / ZOOM_STEP));
 $('zoom-out').addEventListener('click', () => mapView.zoomBy(ZOOM_STEP));

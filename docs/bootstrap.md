@@ -91,12 +91,12 @@ Zasoby, ilość łupu i szansa na ocalałego są opisane w [loot.md](loot.md).
 - Po znalezieniu użytkownik wybiera: **Take with you** albo **Leave**. Pozostawiony ocalały przepada.
 - Ocalały idący z użytkownikiem zwiększa pojemność plecaka o 30 jednostek (łącznie 80).
 - Ocalały ma losowe imię.
-- W prototypie ocaleni w schronie tylko się liczą i nic nie robią.
+- Ocaleni w schronie jedzą i bez jedzenia odchodzą (zob. [survivors.md](survivors.md)). Poza tym w prototypie nic nie robią.
 
 ### Rozładunek (Unload)
 
 - Gdy użytkownik jest w schronie, dostępny jest przycisk **Unload**.
-- Rozładunek przenosi całą zawartość plecaka do magazynu schronu, a towarzyszącego ocalałego do schronu.
+- Rozładunek przenosi całą zawartość plecaka do magazynu schronu, a towarzyszącego ocalałego do schronu. Głodni ocaleni od razu jedzą przyniesione jedzenie.
 - Po rozładunku pojemność plecaka wraca do 50.
 - W schronie nie można przeszukiwać.
 
@@ -121,7 +121,7 @@ Zasoby, ilość łupu i szansa na ocalałego są opisane w [loot.md](loot.md).
 - Główny ekran to mapa.
 - Pasek stanu pokazuje: zawartość plecaka (np. „Backpack 12/50”), czy idzie z nami ocalały, oraz jakość sygnału GPS. Dotknięcie plecaka otwiera panel plecaka.
 - Przyciski zależą od kontekstu: **Create a Shelter**, **Search area**, **Unload**.
-- Panel schronu pokazuje nazwę schronu, stan magazynu i liczbę ocalałych.
+- Panel schronu pokazuje nazwę schronu, stan magazynu oraz ocalałych z ich etapem głodu (zob. [survivors.md](survivors.md)).
 
 #### Pierwsze uruchomienie
 
@@ -151,7 +151,7 @@ Tych rzeczy nie implementujemy w prototypie.
 - Wiele schronów, przenoszenie zasobów między nimi.
 - Rozbudowa schronu z Junk, rozwój w stylu miasta z Cywilizacji.
 - Wytwarzanie przedmiotów z Junk w schronie, np. amunicji. Większe rzeczy kosztują więcej Junk.
-- Zużycie jedzenia przez ocalałych w schronie.
+- Statystyki ocalałych, np. jak długo przetrwali w schronie.
 - Walka z użyciem amunicji.
 - Praca ocalałych w schronie.
 - Konfiguracja wartości gry (np. progów odległości w [loot.md](loot.md)).

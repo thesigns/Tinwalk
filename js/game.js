@@ -1,4 +1,4 @@
-// Game rules: shelter, searching, backpack, survivors and unloading.
+// Game rules: shelter, searching, backpack, survivors, unloading and meals.
 // Functions take the game state and mutate it; saving is up to the caller.
 
 import { distanceMeters, toMercator } from './geo.js';
@@ -37,6 +37,11 @@ export const SEARCH_EXPIRY_MS = 12 * 60 * 60 * 1000;
 export const SHELTER_NAME_MAX_LENGTH = 24;
 export const DEFAULT_SHELTER_NAME = 'Shelter';
 
+// Survivors in the shelter eat 1 Food a day. Without food they get hungry,
+// then starving, and leave the shelter when the last stage runs out.
+const MEAL_INTERVAL_MS = 24 * 60 * 60 * 1000;
+export const HUNGER_STAGES = ['satiated', 'hungry', 'starving'];
+
 const BACKPACK_CAPACITY = 50;
 export const SURVIVOR_CAPACITY_BONUS = 30;
 
@@ -60,6 +65,8 @@ export function createShelter(state, { lat, lon }, name, time) {
     createdAt: time,
     storage: emptyResources(),
     survivors: [],
+    // Survivors who left, kept for statistics such as how long they lasted.
+    departedSurvivors: [],
   };
 }
 
@@ -129,18 +136,77 @@ export function canUnload(state) {
   return totalResources(state.backpack) > 0 || state.companion !== null;
 }
 
-// Moves the backpack into shelter storage and the companion into the shelter.
-// Returns { items, survivor }, where survivor is a name or null.
-export function unload(state) {
+// Moves the backpack into shelter storage and the companion into the shelter,
+// where hungry survivors eat right away. Returns { items, survivor, left }, where
+// survivor is a name or null, and left lists the names of survivors who had
+// already left for lack of food before the unload.
+export function unload(state, time) {
+  const { left } = settleMeals(state, time);
   const items = totalResources(state.backpack);
   for (const { id } of RESOURCES) {
     state.shelter.storage[id] += state.backpack[id];
     state.backpack[id] = 0;
   }
   const survivor = state.companion;
-  if (survivor) state.shelter.survivors.push(survivor);
+  if (survivor) state.shelter.survivors.push({ name: survivor.name, arrivedAt: time, lastMealAt: time });
   state.companion = null;
-  return { items, survivor: survivor?.name ?? null };
+  feedHungry(state.shelter, time);
+  return { items, survivor: survivor?.name ?? null, left };
+}
+
+// A shelter survivor's hunger: { stage, startedAt, endsAt }. When the last
+// stage ends, the survivor leaves.
+export function hungerOf(survivor, time) {
+  const elapsed = Math.floor((time - survivor.lastMealAt) / MEAL_INTERVAL_MS);
+  const index = Math.min(Math.max(elapsed, 0), HUNGER_STAGES.length - 1);
+  const startedAt = survivor.lastMealAt + index * MEAL_INTERVAL_MS;
+  return { stage: HUNGER_STAGES[index], startedAt, endsAt: startedAt + MEAL_INTERVAL_MS };
+}
+
+// Settles every meal and departure due up to `time`, in order. Returns
+// { meals, left }: how many meals were eaten and the names of survivors who
+// left. Storage only changes while the game is
+// open, and unload() settles right before adding food, so any food in storage
+// now was already there when these meals were due: survivors ate on time.
+export function settleMeals(state, time) {
+  const { shelter } = state;
+  if (!shelter) return { meals: 0, left: [] };
+  let meals = 0;
+  while (shelter.storage.food > 0) {
+    const next = mostOverdue(shelter.survivors, time);
+    if (!next) break;
+    next.lastMealAt += MEAL_INTERVAL_MS;
+    shelter.storage.food -= 1;
+    meals++;
+  }
+  const deadline = MEAL_INTERVAL_MS * HUNGER_STAGES.length;
+  const leaving = shelter.survivors.filter((survivor) => time - survivor.lastMealAt >= deadline);
+  shelter.survivors = shelter.survivors.filter((survivor) => !leaving.includes(survivor));
+  // They left when their last stage ran out, which may be long before the game was opened.
+  for (const { name, arrivedAt, lastMealAt } of leaving) {
+    shelter.departedSurvivors.push({ name, arrivedAt, leftAt: lastMealAt + deadline, reason: 'starved' });
+  }
+  return { meals, left: leaving.map(({ name }) => name) };
+}
+
+// Hungry and starving survivors eat as soon as food arrives, the most starved first.
+function feedHungry(shelter, time) {
+  while (shelter.storage.food > 0) {
+    const next = mostOverdue(shelter.survivors, time);
+    if (!next) break;
+    next.lastMealAt = time;
+    shelter.storage.food -= 1;
+  }
+}
+
+// The survivor whose meal has been due the longest, or null if no meal is due.
+function mostOverdue(survivors, time) {
+  let result = null;
+  for (const survivor of survivors) {
+    if (time - survivor.lastMealAt < MEAL_INTERVAL_MS) continue;
+    if (!result || survivor.lastMealAt < result.lastMealAt) result = survivor;
+  }
+  return result;
 }
 
 function lootTier(distance) {

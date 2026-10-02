@@ -16,6 +16,7 @@ It runs in the browser, needs no account and no server, and your location never 
 4. **Fill your backpack.** Each search turns up Junk or Food. The further you are from your shelter, the more you find. Your backpack holds 50 units: tap it to see what you carry and drop what you don't need. Anything that doesn't fit is lost.
 5. **Meet survivors.** A search can turn up a survivor, more often far from home. Take them with you and they carry 30 extra units, but you can only escort one at a time.
 6. **Bring it home.** Back in your shelter, tap **Unload** to move your loot into storage and your survivor into the shelter.
+7. **Keep them fed.** Each survivor in your shelter eats 1 Food a day. Without food they get hungry, then starving, and after three days they leave. Tap **Shelter** to see how long each of them can wait.
 
 | Distance from your shelter | Loot per search | Survivor chance |
 |---|---|---|
@@ -74,7 +75,7 @@ docs/           Design notes (in Polish)
 Tinwalk is a prototype. Resources are only collected and counted for now. Ideas for later:
 
 - Building up the shelter and crafting things such as ammo from Junk
-- Survivors eating Food and working in the shelter
+- Survivors working in the shelter
 - Combat
 - More than one shelter
 - Installing to the home screen (PWA) and working offline
