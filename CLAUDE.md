@@ -1,19 +1,19 @@
 # Tinwalk
 
-A survival/scavenging game played on real walks. The player sets up a shelter at home, walks out into the "wasteland", searches areas for supplies using real GPS, and brings loot and survivors back. It runs in the browser (PWA later) with no server: all state lives in `localStorage`.
+An app that gamifies walks, with a survival/scavenging theme. The user sets up a shelter at home, walks out into the "wasteland", searches areas for supplies using real GPS, and brings loot and survivors back. It runs in the browser (PWA later) with no server: all state lives in `localStorage`.
 
 ## Source of truth
 
-- `docs/bootstrap.md` is the game spec (in Polish). Its "Zakres prototypu" section is what's implemented; "Na przyszłość" lists ideas that are deliberately **not** implemented yet. Check the spec before changing game rules.
-- The user communicates in Polish; reply in Polish.
+- `docs/bootstrap.md` is the app spec (in Polish). Its "Zakres prototypu" section is what's implemented; "Na przyszłość" lists ideas that are deliberately **not** implemented yet. Check the spec before changing game rules.
+- The project author communicates in Polish; reply in Polish.
 
 ## Project rules
 
-- Everything in the game is in English: UI text, code, identifiers, comments, commit messages.
+- Everything in the app is in English: UI text, code, identifiers, comments, commit messages.
 - Exception: documentation in `docs/*.md` is written in Polish.
 - Plain HTML, CSS and JavaScript (ES modules). No frameworks, no build step, no npm dependencies. The map is drawn on a Canvas.
 - Mobile-first, portrait.
-- Commit only when the user asks.
+- Commit only when the project author asks.
 
 ## Running locally
 
@@ -25,7 +25,7 @@ Open `http://localhost:8000/?debug`. Geolocation requires HTTPS, but `localhost`
 
 Chrome caches ES modules aggressively: after editing JS or CSS, hard-reload (Ctrl+Shift+R), or you may test stale code.
 
-Debug mode (`?debug`) shows a GPS diagnostics panel, lets you set the player's position by tapping the map, and can speed up game time (1×, 60×, 3600×) to test the 12-hour expiry of searched areas.
+Debug mode (`?debug`) shows a GPS diagnostics panel, lets you set the user's position by tapping the map, and can speed up game time (1×, 60×, 3600×) to test the 12-hour expiry of searched areas.
 
 ## Architecture
 
@@ -54,7 +54,7 @@ All code is in `js/`, loaded from `index.html` via `js/main.js`.
 
 - **Time:** game rules read time from `clock.now()`, never `Date.now()`, so debug time acceleration works. The exception is GPS reading timestamps, which are wall-clock time and are compared with `Date.now()`.
 - **Saved state:** when changing its shape, bump `STATE_VERSION` in `state.js`, add a migration for older saves, and update `isValidState`. It validates both loading and importing.
-- **Terrain must stay deterministic:** never use `Math.random` there. Changing the noise seed, frequencies or thresholds in `terrain.js` changes the world for every existing player. Terrain sizes were tuned by measuring biome runs along simulated 3 km walks.
+- **Terrain must stay deterministic:** never use `Math.random` there. Changing the noise seed, frequencies or thresholds in `terrain.js` changes the world for every existing user. Terrain sizes were tuned by measuring biome runs along simulated 3 km walks.
 - **Coordinates:** the map and terrain work in Web Mercator units; distances in game rules use `distanceMeters` (haversine).
 - **Tile cache:** its capacity scales with the number of visible tiles. A fixed, too-small cache made large screens re-render tiles every frame (flickering).
 - **Colors:** the palette is defined as CSS custom properties in `css/style.css`; `COLORS` in `map.js` mirrors it for canvas drawing. Keep them in sync.
@@ -74,4 +74,4 @@ There is no test framework.
 
 ## Deployment
 
-Static hosting over HTTPS (GitHub Pages is planned). Deploy `index.html`, `css/`, `js/` and `fonts/`. The server must serve `.js` files with a JavaScript MIME type, since module scripts with the wrong type are rejected. Ideally send `Cache-Control: no-cache` for HTML, JS and CSS, so players don't end up with a mix of old and new files after an update.
+Static hosting over HTTPS (GitHub Pages is planned). Deploy `index.html`, `css/`, `js/` and `fonts/`. The server must serve `.js` files with a JavaScript MIME type, since module scripts with the wrong type are rejected. Ideally send `Cache-Control: no-cache` for HTML, JS and CSS, so users don't end up with a mix of old and new files after an update.
