@@ -2,7 +2,9 @@
 
 Każde przeszukanie daje losową ilość jednego zasobu.
 
-W grze są dwa zasoby: **Junk** i **Food**. Amunicję i inne przedmioty będzie się w przyszłości wytwarzać z Junk w schronie, a większe rzeczy będą kosztowały więcej Junk.
+W grze są dwa zasoby: **Junk** i **Food**. Z Junk wytwarza się w schronie przedmioty (zob. [crafting.md](crafting.md)).
+
+Przeszukanie może też dać podręcznik ([crafting.md](crafting.md#podręczniki-manuals)) albo zakończyć się spotkaniem z wrogiem ([combat.md](combat.md)). Wygrana walka podwaja liczbę zasobów.
 
 ## Odległość od schronu
 

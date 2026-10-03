@@ -1,27 +1,49 @@
 import { now } from './clock.js';
 import { DEBUG_START, DebugPanel, isDebug } from './debug.js';
 import {
+  HUNGER_STAGES,
+  ITEMS,
+  MANUALS,
+  MANUAL_SIZE,
   MIN_SEARCH_DISTANCE,
   RESOURCES,
   SEARCH_RADIUS,
   SHELTER_RADIUS,
-  SURVIVOR_CAPACITY_BONUS,
+  VICTORY_LOOT_MULTIPLIER,
   activeSearchedAreas,
   backpackCapacity,
+  backpackLoad,
+  bestWeapon,
+  canCraft,
+  canPack,
+  canTakeManual,
+  canTreat,
   canUnload,
+  collectLoot,
+  companionCapacityBonus,
+  craft,
   createShelter,
-  dropResources,
+  dropFromBackpack,
   emptyResources,
-  HUNGER_STAGES,
+  fight,
+  freeSpace,
   hungerOf,
   isInShelter,
+  isWounded,
+  knownRecipes,
+  packItem,
   pruneSearchedAreas,
+  runAway,
   search,
   searchBlocker,
   settleMeals,
+  takeManual,
   takeSurvivor,
   totalResources,
+  treat,
   unload,
+  winChance,
+  woundHealsAt,
 } from './game.js';
 import { flyIcon, iconElement, replayAnimation, wait } from './fx.js';
 import { averagePosition, distanceMeters } from './geo.js';
@@ -60,6 +82,9 @@ const SEARCH_BLOCKER_HINTS = {
   shelter: 'Too close to your shelter',
   searched: 'This area has already been searched',
 };
+const ENCOUNTER_TEXT = {
+  'giant-rat': 'A rat the size of a dog jumps out at you, teeth bared.',
+};
 
 const $ = (id) => document.getElementById(id);
 const ui = {
@@ -69,6 +94,7 @@ const ui = {
   backpackGauge: $('backpack-gauge'),
   companion: $('companion-status'),
   companionName: $('companion-name'),
+  companionIcon: document.querySelector('#companion-status use'),
   gpsHud: $('gps-hud'),
   gps: $('gps-status'),
   signalBars: [...document.querySelectorAll('.signal-bars i')],
@@ -85,9 +111,22 @@ const ui = {
   shelterName: $('shelter-name'),
   survivorDialog: $('survivor-dialog'),
   survivorName: $('survivor-name'),
+  encounterDialog: $('encounter-dialog'),
+  encounterTitle: $('encounter-title'),
+  encounterIcon: $('encounter-icon'),
+  encounterText: $('encounter-text'),
+  encounterOdds: $('encounter-odds'),
+  manualDialog: $('manual-dialog'),
+  manualName: $('manual-name'),
+  manualText: $('manual-text'),
+  manualNoSpace: $('manual-no-space'),
+  manualTake: $('manual-take'),
+  manualBackpack: $('manual-backpack'),
   backpackPanel: $('backpack-panel'),
   backpackPanelLoad: $('backpack-panel-load'),
   backpackCompanion: $('backpack-companion'),
+  backpackCompanionText: $('backpack-companion-text'),
+  backpackTreat: $('backpack-treat'),
   backpackItems: $('backpack-items'),
   backpackEmpty: $('backpack-empty'),
   backpackDropHint: $('backpack-drop-hint'),
@@ -97,6 +136,11 @@ const ui = {
   shelterPanel: $('shelter-panel'),
   shelterPanelName: $('shelter-panel-name'),
   shelterStorage: $('shelter-storage'),
+  shelterItems: $('shelter-items'),
+  shelterManuals: $('shelter-manuals'),
+  shelterRecipes: $('shelter-recipes'),
+  workshopHint: $('workshop-hint'),
+  itemRow: $('item-row'),
   shelterSurvivorCount: $('shelter-survivor-count'),
   shelterSurvivorNames: $('shelter-survivor-names'),
   shelterNoSurvivors: $('shelter-no-survivors'),
@@ -137,8 +181,11 @@ let holdBackpack = false;
 let toastTimer = null;
 // Survivors listed in the open departure dialog.
 let departed = [];
-// Units marked to be dropped in the open backpack panel, by resource id.
-let dropping = emptyResources();
+// What is marked to be dropped in the open backpack panel: resource units by
+// id, backpack items and manual ids.
+let dropping = { resources: emptyResources(), items: [], manuals: [] };
+// Survivor name tags in the shelter panel, kept between renders (see renderSurvivorBadges).
+const survivorBadges = new WeakMap();
 
 // A game event the player should hear and feel, e.g. 'found'.
 function feedback(name) {
@@ -173,9 +220,10 @@ function saveAndUpdate() {
 }
 
 function renderStatus() {
+  const time = now();
   if (!holdBackpack) {
-    const load = totalResources(state.backpack);
-    const capacity = backpackCapacity(state);
+    const load = backpackLoad(state);
+    const capacity = backpackCapacity(state, time);
     ui.backpack.textContent = `${load}/${capacity}`;
     ui.backpackGauge.style.width = `${(100 * load) / capacity}%`;
     ui.backpackGauge.classList.toggle('full', load >= capacity);
@@ -184,6 +232,10 @@ function renderStatus() {
 
   ui.companion.hidden = !state.companion;
   ui.companionName.textContent = state.companion?.name ?? '';
+  const wounded = state.companion !== null && isWounded(state.companion, time);
+  ui.companion.classList.toggle('wounded', wounded);
+  ui.companionIcon.setAttribute('href', wounded ? '#i-wound' : '#i-survivor');
+  ui.companion.setAttribute('aria-label', wounded ? `${state.companion.name}, wounded` : ui.companionName.textContent);
 
   const { bars, label, description } = gpsStatus();
   ui.signalBars.forEach((bar, index) => bar.classList.toggle('on', index < bars));
@@ -373,12 +425,25 @@ async function searchAction() {
   searching = false;
 
   holdBackpack = true;
-  const { resource, found, carried, survivor } = search(state, position, now());
+  const result = search(state, position, now());
   saveAndUpdate();
+  let { loot } = result;
+  let victory = null;
+  if (result.enemy) {
+    holdBackpack = false;
+    update();
+    victory = await encounter(result.enemy);
+    if (!victory) return;
+    holdBackpack = true;
+    loot = collectLoot(state, position, now(), VICTORY_LOOT_MULTIPLIER);
+    saveAndUpdate();
+  }
 
+  const { resource, found, carried, survivor, manual } = loot;
   let message = `You've found ${found} ${resource.label}`;
   if (carried === 0) message += ', but your backpack is full';
   else if (carried < found) message += `, but could only carry ${carried}`;
+  if (victory) message = `${victory} ${message}`;
   feedback(carried > 0 ? 'found' : 'full');
   await showReward({
     icon: resource.id,
@@ -395,7 +460,59 @@ async function searchAction() {
     feedback('land');
   }
 
-  if (!survivor) return;
+  if (survivor) await offerSurvivor(survivor);
+  if (manual) await offerManual(manual);
+}
+
+// Asks whether to fight the enemy or run, and settles it. Returns a note for
+// the loot card after a won fight, or null if the search ends here.
+async function encounter(enemy) {
+  const weapon = bestWeapon(state);
+  const chance = `${Math.round(100 * winChance(state, enemy))}% to win`;
+  ui.encounterTitle.textContent = `${enemy.label}!`;
+  ui.encounterIcon.setAttribute('href', `#i-${enemy.id}`);
+  ui.encounterText.textContent = ENCOUNTER_TEXT[enemy.id];
+  ui.encounterOdds.textContent =
+    (weapon
+      ? `With your ${ITEMS[weapon.id].label} (${plural(weapon.uses, 'use')} left): ${chance}.`
+      : `Bare-handed: ${chance}.`) + ' Running away costs some of your supplies.';
+  feedback('enemy');
+
+  if ((await ask(ui.encounterDialog)) !== 'fight') {
+    const lost = runAway(state, enemy);
+    saveAndUpdate();
+    feedback('flee');
+    const total = totalResources(lost);
+    if (total > 0) replayAnimation(ui.backpackHud, 'bump');
+    showToast(total > 0 ? `You ran, dropping ${describeResources(lost)}` : 'You ran and got away', enemy.id);
+    return null;
+  }
+
+  const { won, weapon: used, wornOut, lost, wounded } = fight(state, enemy, now());
+  saveAndUpdate();
+  const wornNote = wornOut ? ` Your ${ITEMS[used].label} is worn out.` : '';
+  if (won) {
+    feedback('hit');
+    return `You fought off the ${enemy.label}: double loot!${wornNote}`;
+  }
+
+  feedback('defeat');
+  const total = totalResources(lost);
+  let note = `The ${enemy.label} got the better of you.`;
+  if (total > 0) note += ` You lost ${describeResources(lost)}.`;
+  if (wounded) note += ` ${state.companion.name} was wounded.`;
+  await showReward({ icon: enemy.id, amount: total > 0 ? `−${total}` : '', name: 'Defeat', note: note + wornNote, empty: true });
+  if (total > 0) replayAnimation(ui.backpackHud, 'bump');
+  if (wounded) replayAnimation(ui.companion, 'bump');
+  return null;
+}
+
+// "3 Junk and 1 Food", leaving out resources with no units.
+function describeResources(amounts) {
+  return listNames(RESOURCES.filter(({ id }) => amounts[id] > 0).map(({ id, label }) => `${amounts[id]} ${label}`));
+}
+
+async function offerSurvivor(survivor) {
   ui.survivorName.textContent = survivor;
   feedback('survivor');
   if ((await ask(ui.survivorDialog)) === 'take') {
@@ -409,8 +526,40 @@ async function searchAction() {
   }
 }
 
+// Offers a found manual. If it doesn't fit, the player can open the backpack
+// to drop something, and then gets the offer again.
+async function offerManual(id) {
+  const { label } = MANUALS[id];
+  const recipes = Object.values(ITEMS).filter((item) => item.manual === id).map((item) => item.label);
+  ui.manualName.textContent = label;
+  ui.manualText.textContent = `Bring it to your shelter to craft: ${listNames(recipes)}. Takes ${MANUAL_SIZE} backpack space.`;
+  feedback('manual');
+  for (;;) {
+    const fits = canTakeManual(state, now());
+    ui.manualTake.disabled = !fits;
+    ui.manualNoSpace.hidden = fits;
+    const answer = ask(ui.manualDialog);
+    // Without room, making room is the likely next step, not leaving the manual.
+    if (!fits) ui.manualBackpack.focus();
+    const choice = await answer;
+    if (choice === 'backpack') {
+      await openBackpackPanel();
+      continue;
+    }
+    if (choice === 'take' && takeManual(state, id, now())) {
+      saveAndUpdate();
+      replayAnimation(ui.backpackHud, 'bump');
+      feedback('land');
+      showToast(`You packed the ${label}`, 'manual');
+    } else {
+      showToast(`You left the ${label} behind`, 'manual');
+    }
+    return;
+  }
+}
+
 async function unloadAction() {
-  const { items, survivor, left } = unload(state, now());
+  const { items, manuals, survivor, left } = unload(state, now());
   saveAndUpdate();
   if (left.length > 0) showDepartures(left);
   feedback('unload');
@@ -418,49 +567,98 @@ async function unloadAction() {
 
   const messages = [];
   if (items > 0) messages.push(`Unloaded ${plural(items, 'item')}`);
+  for (const id of manuals) messages.push(`${MANUALS[id].label} added to the workshop`);
   if (survivor) messages.push(`${survivor} moved into ${state.shelter.name}`);
-  await showReward(
-    items > 0
-      ? { icon: 'unload', amount: `+${items}`, name: 'Stored', note: messages.join('. ') }
-      : { icon: 'survivor', amount: '', name: survivor, note: messages.join('. ') },
-  );
+  const note = messages.join('. ');
+  let card = { icon: 'survivor', amount: '', name: survivor, note };
+  if (items > 0) card = { icon: 'unload', amount: `+${items}`, name: 'Stored', note };
+  else if (manuals.length > 0) card = { icon: 'manual', amount: '', name: 'Workshop', note };
+  await showReward(card);
 }
 
-// Shows what the player carries and lets them mark supplies to drop.
+// Shows what the player carries and lets them mark things to drop.
 // Nothing is dropped until they confirm.
 async function openBackpackPanel() {
-  dropping = emptyResources();
-  const carried = RESOURCES.filter(({ id }) => state.backpack[id] > 0);
-  ui.backpackItems.replaceChildren(...carried.map(backpackRow));
-  ui.backpackEmpty.hidden = carried.length > 0;
-  ui.backpackDropHint.hidden = carried.length === 0;
-  ui.backpackCompanion.hidden = !state.companion;
-  if (state.companion) ui.backpackCompanion.textContent = `${state.companion.name} is with you: +${SURVIVOR_CAPACITY_BONUS} space.`;
-  renderBackpackPanel();
+  dropping = { resources: emptyResources(), items: [], manuals: [] };
+  renderBackpackRows();
 
   if ((await ask(ui.backpackPanel)) !== 'drop') return;
-  const marked = RESOURCES.filter(({ id }) => dropping[id] > 0);
-  const dropped = dropResources(state, dropping);
-  if (dropped === 0) return;
+  const parts = [
+    ...RESOURCES.filter(({ id }) => dropping.resources[id] > 0).map(({ id, label }) => ({
+      text: `${dropping.resources[id]} ${label}`,
+      icon: id,
+    })),
+    ...dropping.items.map((item) => ({ text: `your ${ITEMS[item.id].label}`, icon: item.id })),
+    ...dropping.manuals.map((id) => ({ text: `the ${MANUALS[id].label}`, icon: 'manual' })),
+  ];
+  if (dropFromBackpack(state, dropping) === 0) return;
   saveAndUpdate();
   feedback('drop');
   replayAnimation(ui.backpackHud, 'bump');
-  if (marked.length === 1) showToast(`You dropped ${dropped} ${marked[0].label}`, marked[0].id);
-  else showToast(`You dropped ${plural(dropped, 'item')}`, 'backpack');
+  showToast(`You dropped ${listNames(parts.map(({ text }) => text))}`, parts.length === 1 ? parts[0].icon : 'backpack');
 }
 
-function backpackRow({ id, label }) {
+// One row per resource, item and manual in the backpack. Items and manuals
+// are dropped whole, so their rows can only be marked once.
+function renderBackpackRows() {
+  const rows = RESOURCES.filter(({ id }) => state.backpack[id] > 0).map(({ id, label }) =>
+    backpackRow({
+      icon: id,
+      label,
+      max: state.backpack[id],
+      marked: () => dropping.resources[id],
+      mark: (count) => (dropping.resources[id] = count),
+      count: (marked) => state.backpack[id] - marked,
+    }),
+  );
+  for (const item of state.backpackItems) {
+    const { label, uses } = ITEMS[item.id];
+    rows.push(
+      backpackRow({
+        icon: item.id,
+        label,
+        max: 1,
+        marked: () => Number(dropping.items.includes(item)),
+        mark: (count) =>
+          (dropping.items = count ? [...dropping.items, item] : dropping.items.filter((other) => other !== item)),
+        count: () => `${item.uses}/${uses}`,
+      }),
+    );
+  }
+  for (const id of state.backpackManuals) {
+    rows.push(
+      backpackRow({
+        icon: 'manual',
+        label: MANUALS[id].label,
+        max: 1,
+        marked: () => Number(dropping.manuals.includes(id)),
+        mark: (count) =>
+          (dropping.manuals = count ? [...dropping.manuals, id] : dropping.manuals.filter((other) => other !== id)),
+        count: () => '',
+      }),
+    );
+  }
+  ui.backpackItems.replaceChildren(...rows);
+  ui.backpackEmpty.hidden = rows.length > 0;
+  ui.backpackDropHint.hidden = rows.length === 0;
+  renderBackpackPanel();
+}
+
+// `entry` describes a row: { icon, label, max, marked(), mark(count), count(marked) },
+// where count() is the text shown for what is left.
+function backpackRow(entry) {
   const row = ui.backpackRow.content.firstElementChild.cloneNode(true);
-  row.dataset.resource = id;
-  row.querySelector('.resource-icon use').setAttribute('href', `#i-${id}`);
-  row.querySelector('.resource-name').textContent = label;
+  row.entry = entry;
+  row.classList.toggle('single', entry.max === 1);
+  row.querySelector('.resource-icon use').setAttribute('href', `#i-${entry.icon}`);
+  row.querySelector('.resource-name').textContent = entry.label;
   for (const button of row.querySelectorAll('[data-step]')) {
     const step = Number(button.dataset.step);
-    button.setAttribute('aria-label', step > 0 ? `Drop one ${label}` : `Keep one more ${label}`);
+    button.setAttribute('aria-label', step > 0 ? `Drop one ${entry.label}` : `Keep one more ${entry.label}`);
     holdToRepeat(button, () => {
-      const next = dropping[id] + step;
-      if (next < 0 || next > state.backpack[id]) return false;
-      dropping[id] = next;
+      const next = entry.marked() + step;
+      if (next < 0 || next > entry.max) return false;
+      entry.mark(next);
       renderBackpackPanel();
       return true;
     });
@@ -469,21 +667,56 @@ function backpackRow({ id, label }) {
 }
 
 function renderBackpackPanel() {
-  const capacity = backpackCapacity(state);
-  const marked = totalResources(dropping);
-  ui.backpackPanelLoad.textContent = `${totalResources(state.backpack) - marked}/${capacity}`;
+  const time = now();
+  const markedLoad =
+    totalResources(dropping.resources) +
+    dropping.items.reduce((sum, item) => sum + ITEMS[item.id].size, 0) +
+    dropping.manuals.length * MANUAL_SIZE;
+  const markedCount = totalResources(dropping.resources) + dropping.items.length + dropping.manuals.length;
+  ui.backpackPanelLoad.textContent = `${backpackLoad(state) - markedLoad}/${backpackCapacity(state, time)}`;
   for (const row of ui.backpackItems.children) {
-    const id = row.dataset.resource;
+    const { max, marked, count } = row.entry;
     const [drop, keep] = row.querySelectorAll('[data-step]');
-    row.querySelector('.resource-count').textContent = state.backpack[id] - dropping[id];
-    row.querySelector('.drop-count').textContent = dropping[id] > 0 ? `−${dropping[id]}` : '';
-    row.classList.toggle('dropping', dropping[id] > 0);
-    drop.disabled = dropping[id] >= state.backpack[id];
-    keep.disabled = dropping[id] === 0;
+    const amount = marked();
+    row.querySelector('.resource-count').textContent = count(amount);
+    row.querySelector('.drop-count').textContent = amount > 0 && max > 1 ? `−${amount}` : '';
+    row.classList.toggle('dropping', amount > 0);
+    drop.disabled = amount >= max;
+    keep.disabled = amount === 0;
   }
-  ui.backpackClose.textContent = marked > 0 ? 'Cancel' : 'Close';
-  ui.backpackDrop.textContent = `Drop ${marked}`;
-  ui.backpackDrop.hidden = marked === 0;
+  ui.backpackClose.textContent = markedCount > 0 ? 'Cancel' : 'Close';
+  ui.backpackDrop.textContent = `Drop ${markedCount}`;
+  ui.backpackDrop.hidden = markedCount === 0;
+
+  const { companion } = state;
+  ui.backpackCompanion.hidden = !companion;
+  if (!companion) return;
+  const wounded = isWounded(companion, time);
+  const space = `+${companionCapacityBonus(state, time)} space`;
+  ui.backpackCompanionText.textContent = wounded
+    ? `${companion.name} is wounded: ${space}. Heals in ${formatDuration(woundHealsAt(companion) - time)}.`
+    : `${companion.name} is with you: ${space}.`;
+  ui.backpackTreat.hidden = !wounded;
+  ui.backpackTreat.disabled = !canTreat(state, companion, time);
+}
+
+function treatCompanion() {
+  const { companion } = state;
+  if (!companion || !treat(state, companion, now())) return;
+  saveAndUpdate();
+  feedback('heal');
+  showToast(`You dressed ${companion.name}'s wound`, 'first-aid-kit');
+  // The kit may be used up, so forget it if it was marked to be dropped.
+  dropping.items = dropping.items.filter((item) => state.backpackItems.includes(item));
+  renderBackpackRows();
+}
+
+function treatSurvivor(survivor) {
+  if (!treat(state, survivor, now())) return;
+  saveAndUpdate();
+  feedback('heal');
+  showToast(`${survivor.name}'s wound has been dressed`, 'first-aid-kit');
+  renderShelterPanel();
 }
 
 // Steps once when pressed, then keeps stepping while held, until `step` returns false.
@@ -518,6 +751,7 @@ function openShelterPanel() {
 function renderShelterPanel() {
   const { shelter } = state;
   if (!shelter) return;
+  const time = now();
   ui.shelterPanelName.textContent = shelter.name;
   ui.shelterStorage.replaceChildren(
     ...RESOURCES.map(({ id, label }) => {
@@ -532,15 +766,115 @@ function renderShelterPanel() {
       return tile;
     }),
   );
+
+  const space = freeSpace(state, time);
+  renderOnChange(ui.shelterItems, [shelter.items, inShelter, space], () =>
+    shelter.items.map((item) => {
+      const { label, uses, size } = ITEMS[item.id];
+      return itemRow({
+        icon: item.id,
+        label,
+        detail: `${item.uses}/${uses} uses · ${size} space`,
+        action: 'Pack',
+        enabled: inShelter && canPack(state, item, time),
+        onClick: () => packAction(item),
+      });
+    }),
+  );
+
+  renderOnChange(ui.shelterManuals, shelter.manuals, () =>
+    shelter.manuals.map((id) => {
+      const chip = document.createElement('li');
+      const name = document.createElement('span');
+      name.textContent = MANUALS[id].label;
+      chip.append(iconElement('manual'), name);
+      return chip;
+    }),
+  );
+  renderOnChange(ui.shelterRecipes, [shelter.manuals, shelter.storage.junk, inShelter], () =>
+    knownRecipes(state).map(([id, { label, cost, uses, size }]) =>
+      itemRow({
+        icon: id,
+        label,
+        detail: `${cost} Junk · ${uses} uses · ${size} space`,
+        action: 'Craft',
+        enabled: inShelter && canCraft(state, id),
+        onClick: () => craftAction(id),
+      }),
+    ),
+  );
+  let hint = '';
+  if (shelter.manuals.length === 0) hint = 'Recipes come from manuals found in the wasteland.';
+  else if (!inShelter) hint = 'Craft and pack gear while you are in the shelter.';
+  ui.workshopHint.textContent = hint;
+  ui.workshopHint.hidden = !hint;
+
   ui.shelterSurvivorCount.textContent = shelter.survivors.length;
-  const time = now();
-  ui.shelterSurvivorNames.replaceChildren(...shelter.survivors.map((survivor) => survivorBadge(survivor, time)));
+  renderSurvivorBadges(time);
   ui.shelterNoSurvivors.hidden = shelter.survivors.length > 0;
 }
 
-// A survivor's name tag, with a bar running down to the end of their current hunger stage.
-function survivorBadge(survivor, time) {
-  const badge = ui.survivorBadge.content.firstElementChild.cloneNode(true);
+// The shelter panel re-renders every tick, and replacing a button between
+// press and release would swallow the tap, so lists with buttons are only
+// rebuilt when what they show changes.
+function renderOnChange(list, shown, build) {
+  const signature = JSON.stringify(shown);
+  if (list.dataset.signature === signature) return;
+  list.dataset.signature = signature;
+  list.replaceChildren(...build());
+}
+
+function itemRow({ icon, label, detail, action, enabled, onClick }) {
+  const row = ui.itemRow.content.firstElementChild.cloneNode(true);
+  row.querySelector('.resource-icon use').setAttribute('href', `#i-${icon}`);
+  row.querySelector('.resource-name').textContent = label;
+  row.querySelector('.item-detail').textContent = detail;
+  const button = row.querySelector('.item-action');
+  button.textContent = action;
+  button.disabled = !enabled;
+  button.setAttribute('aria-label', `${action} ${label}`);
+  button.addEventListener('click', onClick);
+  return row;
+}
+
+function craftAction(id) {
+  if (!inShelter || !craft(state, id)) return;
+  saveAndUpdate();
+  feedback('craft');
+  showToast(`You crafted a ${ITEMS[id].label}`, id);
+  renderShelterPanel();
+}
+
+function packAction(item) {
+  if (!inShelter || !packItem(state, item, now())) return;
+  saveAndUpdate();
+  feedback('land');
+  replayAnimation(ui.backpackHud, 'bump');
+  showToast(`You packed your ${ITEMS[item.id].label}`, item.id);
+  renderShelterPanel();
+}
+
+// Updates the name tags in place, for the same reason as renderOnChange().
+function renderSurvivorBadges(time) {
+  const badges = state.shelter.survivors.map((survivor) => {
+    let badge = survivorBadges.get(survivor);
+    if (!badge) {
+      badge = ui.survivorBadge.content.firstElementChild.cloneNode(true);
+      badge.querySelector('.treat').addEventListener('click', () => treatSurvivor(survivor));
+      survivorBadges.set(survivor, badge);
+    }
+    updateSurvivorBadge(badge, survivor, time);
+    return badge;
+  });
+  const shown = [...ui.shelterSurvivorNames.children];
+  if (badges.length !== shown.length || badges.some((badge, i) => badge !== shown[i])) {
+    ui.shelterSurvivorNames.replaceChildren(...badges);
+  }
+}
+
+// A survivor's name tag, with a bar running down to the end of their current
+// hunger stage, and their wound if they have one.
+function updateSurvivorBadge(badge, survivor, time) {
   const { stage, startedAt, endsAt } = hungerOf(survivor, time);
   const text = HUNGER_TEXT[stage];
   badge.dataset.stage = stage;
@@ -549,7 +883,13 @@ function survivorBadge(survivor, time) {
   badge.querySelector('.hunger-fill').style.width = `${(100 * (endsAt - time)) / (endsAt - startedAt)}%`;
   badge.querySelector('.hunger-time').textContent =
     `${text.next(state.shelter.storage.food > 0)} ${formatDuration(endsAt - time)}`;
-  return badge;
+  const wounded = isWounded(survivor, time);
+  badge.querySelector('.wound').hidden = !wounded;
+  if (!wounded) return;
+  badge.querySelector('.wound-time').textContent = `heals in ${formatDuration(woundHealsAt(survivor) - time)}`;
+  const treatButton = badge.querySelector('.treat');
+  treatButton.disabled = !canTreat(state, survivor, time);
+  treatButton.setAttribute('aria-label', `Treat ${survivor.name}`);
 }
 
 function formatDuration(ms) {
@@ -628,6 +968,7 @@ ui.actionButton.addEventListener('click', () => {
   if (action.enabled) ACTIONS[action.id]();
 });
 ui.backpackHud.addEventListener('click', openBackpackPanel);
+ui.backpackTreat.addEventListener('click', treatCompanion);
 ui.shelterButton.addEventListener('click', openShelterPanel);
 ui.departureDialog.addEventListener('close', () => (departed = []));
 $('retry-location').addEventListener('click', () => tracker.start());
@@ -690,8 +1031,10 @@ ui.shelterName.addEventListener('keydown', (event) => {
   event.preventDefault();
   ui.nameDialog.close('create');
 });
-// The player has to choose whether to take the survivor.
-ui.survivorDialog.addEventListener('cancel', (event) => event.preventDefault());
+// The player has to choose whether to take the survivor or manual, and whether to fight.
+for (const dialog of [ui.survivorDialog, ui.manualDialog, ui.encounterDialog]) {
+  dialog.addEventListener('cancel', (event) => event.preventDefault());
+}
 
 tracker.addEventListener('change', update);
 

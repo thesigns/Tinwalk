@@ -131,4 +131,48 @@ const SOUNDS = {
   land(sound, time) {
     sound.noise(time, { duration: 0.05, volume: 0.7, frequency: 2400, q: 3 });
   },
+  // A growl, then a squeal.
+  enemy(sound, time) {
+    sound.tone(time, { frequency: 110, endFrequency: 70, type: 'sawtooth', duration: 0.5, volume: 0.1 });
+    sound.noise(time, { duration: 0.45, volume: 0.5, frequency: 300, filter: 'lowpass' });
+    sound.tone(time + 0.45, { frequency: 1900, endFrequency: 2600, type: 'triangle', duration: 0.18, volume: 0.12 });
+  },
+  // A swing that lands.
+  hit(sound, time) {
+    sound.noise(time, { duration: 0.12, volume: 0.5, frequency: 3000, q: 0.7 });
+    thud(sound, time + 0.1, 0.6);
+    clink(sound, time + 0.12, 0.8);
+  },
+  // Knocked down: two thuds and a falling note.
+  defeat(sound, time) {
+    thud(sound, time, 0.6);
+    thud(sound, time + 0.18, 0.45);
+    sound.tone(time + 0.1, { frequency: 330, endFrequency: 150, type: 'triangle', duration: 0.6, volume: 0.15 });
+  },
+  // Running footsteps.
+  flee(sound, time) {
+    for (let i = 0; i < 6; i++) {
+      sound.noise(time + i * 0.11, { duration: 0.05, volume: 0.6 - i * 0.07, frequency: 500, filter: 'lowpass' });
+    }
+  },
+  // Hammering scrap into shape.
+  craft(sound, time) {
+    for (let i = 0; i < 3; i++) {
+      thud(sound, time + i * 0.2, 0.3);
+      clink(sound, time + i * 0.2, 0.7 + i * 0.05);
+    }
+  },
+  // A bandage, then a gentle rising pair of notes.
+  heal(sound, time) {
+    sound.noise(time, { duration: 0.25, volume: 0.25, frequency: 4000, filter: 'highpass' });
+    sound.tone(time + 0.15, { frequency: 659.25, type: 'triangle', duration: 0.35, volume: 0.18 });
+    sound.tone(time + 0.3, { frequency: 880, type: 'triangle', duration: 0.5, volume: 0.18 });
+  },
+  // Pages riffling.
+  manual(sound, time) {
+    for (let i = 0; i < 5; i++) {
+      sound.noise(time + i * 0.05, { duration: 0.04, volume: 0.4, frequency: 3500, filter: 'highpass' });
+    }
+    clink(sound, time + 0.3, 1.26);
+  },
 };

@@ -73,32 +73,37 @@ Zasoby, ilość łupu i szansa na ocalałego są opisane w [loot.md](loot.md).
 | Food  | utrzymanie ocalałych w schronie                          |
 
 - Komunikat po przeszukaniu, np. „You've found 3 Junk”.
-- **W prototypie zasoby są tylko zbierane i liczone.** Nie ma zużycia jedzenia, walki, wytwarzania ani budowania.
+- Przeszukanie może dać podręcznik, który odblokowuje wytwarzanie przedmiotów (zob. [crafting.md](crafting.md)).
+- Przeszukanie może zakończyć się spotkaniem z wrogiem (zob. [combat.md](combat.md)).
+- W prototypie nie ma budowania.
 
 ### Plecak
 
-- Plecak mieści łącznie 50 jednostek wszystkich zasobów (np. 25 Junk i 25 Food).
+- Plecak mieści łącznie 50 jednostek wszystkich zasobów i przedmiotów (np. 25 Junk i 25 Food). Ile miejsca zajmuje przedmiot albo podręcznik, opisuje [crafting.md](crafting.md).
 - Gdy znalezisko nie mieści się w całości, użytkownik zabiera tyle, ile się zmieści, a reszta przepada. Komunikat, np. „You've found 3 Junk, but could only carry 1”.
 - Z pełnym plecakiem nadal można przeszukiwać (np. w nadziei na ocalałego).
-- Dotknięcie plecaka na pasku stanu otwiera jego zawartość: ile jednostek każdego zasobu niesie użytkownik i ile miejsca zostało.
+- Dotknięcie plecaka na pasku stanu otwiera jego zawartość: ile jednostek każdego zasobu niesie użytkownik, jakie przedmioty i ile miejsca zostało.
 - Z plecaka można wyrzucać zasoby, np. żeby zrobić miejsce na inne. Użytkownik zaznacza przyciskami −/+, ile jednostek którego zasobu wyrzucić (przytrzymanie przycisku zmienia liczbę dalej), i zatwierdza przyciskiem **Drop**. Zamknięcie okna bez zatwierdzenia niczego nie wyrzuca.
-- Wyrzucone zasoby przepadają. Wyrzucać można wszędzie, także w schronie.
+- Przedmioty i podręczniki wyrzuca się pojedynczo.
+- Wyrzucone zasoby i przedmioty przepadają. Wyrzucać można wszędzie, także w schronie.
 
 ### Ocaleni (Survivors)
 
 - Każde przeszukanie może dać ocalałego, osobno od losowania zasobów. Szansa zależy od odległości od schronu (zob. [loot.md](loot.md)).
 - Ocalały może się pojawić tylko wtedy, gdy z użytkownikiem nie idzie już żaden ocalały. Użytkownik eskortuje najwyżej jednego ocalałego naraz.
 - Po znalezieniu użytkownik wybiera: **Take with you** albo **Leave**. Pozostawiony ocalały przepada.
-- Ocalały idący z użytkownikiem zwiększa pojemność plecaka o 30 jednostek (łącznie 80).
+- Ocalały idący z użytkownikiem zwiększa pojemność plecaka o 30 jednostek (łącznie 80), a ranny tylko o 10 (zob. [combat.md](combat.md#rany)).
 - Ocalały ma losowe imię.
 - Ocaleni w schronie jedzą i bez jedzenia odchodzą (zob. [survivors.md](survivors.md)). Poza tym w prototypie nic nie robią.
+- Ocalały może zostać ranny w walce. Ranę leczy się apteczką albo goi się sama (zob. [combat.md](combat.md#rany)).
 
 ### Rozładunek (Unload)
 
 - Gdy użytkownik jest w schronie, dostępny jest przycisk **Unload**.
-- Rozładunek przenosi całą zawartość plecaka do magazynu schronu, a towarzyszącego ocalałego do schronu. Głodni ocaleni od razu jedzą przyniesione jedzenie.
+- Rozładunek przenosi całą zawartość plecaka (zasoby, przedmioty i podręczniki) do magazynu schronu, a towarzyszącego ocalałego do schronu. Głodni ocaleni od razu jedzą przyniesione jedzenie.
 - Po rozładunku pojemność plecaka wraca do 50.
 - W schronie nie można przeszukiwać.
+- W schronie można też wytwarzać przedmioty i zabierać je z magazynu do plecaka (zob. [crafting.md](crafting.md)).
 
 ### Mapa
 
@@ -123,7 +128,7 @@ Zasoby, ilość łupu i szansa na ocalałego są opisane w [loot.md](loot.md).
 - Główny ekran to mapa.
 - Pasek stanu pokazuje: zawartość plecaka (np. „Backpack 12/50”), czy idzie z nami ocalały, oraz jakość sygnału GPS. Dotknięcie plecaka otwiera panel plecaka.
 - Przyciski zależą od kontekstu: **Create a Shelter**, **Search area**, **Unload**.
-- Panel schronu pokazuje nazwę schronu, stan magazynu oraz ocalałych z ich etapem głodu (zob. [survivors.md](survivors.md)).
+- Panel schronu pokazuje nazwę schronu, stan magazynu, przedmioty i podręczniki, warsztat (zob. [crafting.md](crafting.md)) oraz ocalałych z ich etapem głodu i ranami (zob. [survivors.md](survivors.md)).
 
 #### Pierwsze uruchomienie
 
@@ -152,13 +157,15 @@ Tych rzeczy nie implementujemy w prototypie.
 
 - Wiele schronów, przenoszenie zasobów między nimi.
 - Rozbudowa schronu z Junk, rozwój w stylu miasta z Cywilizacji.
-- Wytwarzanie przedmiotów z Junk w schronie, np. amunicji. Większe rzeczy kosztują więcej Junk.
+- Wytwarzanie amunicji i kolejnych przedmiotów z Junk.
 - Statystyki ocalałych, np. jak długo przetrwali w schronie.
 - Walka z użyciem amunicji.
+- Kolejni wrogowie, np. bandyci zabierający Junk. Szansa na wroga zależna od odległości od schronu i biomu.
+- Pancerz zwiększający obronę użytkownika.
+- Wiedza od ocalałych, np. była pielęgniarka w schronie pozwala wytwarzać apteczki.
 - Praca ocalałych w schronie.
 - Konfiguracja wartości gry (np. progów odległości w [loot.md](loot.md)).
 - Wybór, co zrobić ze znaleziskiem, które nie mieści się w plecaku (np. wyrzucenie czegoś na miejscu zamiast utraty nadmiaru).
-- Unikalne przedmioty, które zajmują miejsce w plecaku.
 - Pełna aplikacja PWA (instalacja na ekranie głównym, działanie offline).
 - Utrzymywanie włączonego ekranu podczas spaceru (Wake Lock API).
 - Podstawowa ochrona przed oszukiwaniem, np. limit prędkości przemieszczania się.

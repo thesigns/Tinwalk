@@ -29,6 +29,12 @@
     <symbol id="i-vibrate" viewBox="0 0 24 24"><rect x="8" y="4" width="8" height="16" rx="1.5"/><path d="M4.5 9v6M19.5 9v6M2 10.5v3M22 10.5v3"/></symbol>
     <symbol id="i-junk" viewBox="0 0 24 24"><path d="M12 3.5 19.4 7.75v8.5L12 20.5l-7.4-4.25v-8.5z"/><circle cx="12" cy="12" r="3.2"/></symbol>
     <symbol id="i-food" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="6" ry="2.2"/><path d="M6 6v12c0 1.2 2.7 2.2 6 2.2s6-1 6-2.2V6"/><path d="M6 10.5c0 1.2 2.7 2.2 6 2.2s6-1 6-2.2"/></symbol>
+    <symbol id="i-knife" viewBox="0 0 24 24"><path d="M9 15 19.5 4.5c.6 3.2-.8 6.6-4 9.8L13 16.8"/><path d="m6.5 12.5 5 5"/><path d="m4 20 4-4"/></symbol>
+    <symbol id="i-combat-knife" viewBox="0 0 24 24"><path d="M9 15 20.5 3.5c.7 3.8-.9 7.7-4.5 11.3L13 17.8"/><path d="m5.5 11.5 7 7"/><path d="m3.5 20.5 4-4"/><path d="m13.5 10.5 1.5 1.5M16 8l1.5 1.5"/></symbol>
+    <symbol id="i-first-aid-kit" viewBox="0 0 24 24"><rect x="3.5" y="7" width="17" height="13" rx="1.5"/><path d="M9 7V4.5h6V7"/><path d="M12 10.5v6M9 13.5h6"/></symbol>
+    <symbol id="i-manual" viewBox="0 0 24 24"><path d="M5 19.5V5.5A1.5 1.5 0 0 1 6.5 4H19v13H6.5A1.5 1.5 0 0 0 5 18.5 1.5 1.5 0 0 0 6.5 20H19"/><path d="M9 8h6M9 11h4"/></symbol>
+    <symbol id="i-giant-rat" viewBox="0 0 24 24"><path d="M4.5 16.5c0-4.2 3.2-7.5 7.6-7.5 2.8 0 4.7 1.4 6 3.3l2.4 2.2c-.4 1.2-1.7 2-3.3 2z"/><circle cx="14.5" cy="9.3" r="1.9"/><circle cx="17.4" cy="12.6" r=".5" fill="currentColor"/><path d="M4.5 16.5c-1.8.2-2.4 1.8-1.3 2.8s3.3.6 5.3.2"/><path d="M8.5 16.5v2M14 16.5v2"/></symbol>
+    <symbol id="i-wound" viewBox="0 0 24 24"><rect x="3" y="8.5" width="18" height="7" rx="3.5" transform="rotate(-35 12 12)"/><path d="M10.5 11.5h.01M13.5 12.5h.01M11.5 13.5h.01M12.5 10.5h.01"/></symbol>
   </svg>
 
   <canvas id="map"></canvas>
@@ -171,6 +177,36 @@
     </form>
   </dialog>
 
+  <dialog id="encounter-dialog" class="paper">
+    <form method="dialog">
+      <h2 id="encounter-title"></h2>
+      <div class="survivor-card">
+        <div class="portrait enemy"><svg class="icon"><use id="encounter-icon" href=""/></svg></div>
+        <p><span id="encounter-text"></span><br><span id="encounter-odds" class="muted"></span></p>
+      </div>
+      <div class="dialog-buttons">
+        <button class="btn btn-ink" value="run">Run</button>
+        <button class="btn btn-paint" value="fight" autofocus>Fight</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="manual-dialog" class="paper">
+    <form method="dialog">
+      <h2>Manual found!</h2>
+      <div class="survivor-card">
+        <div class="portrait"><svg class="icon"><use href="#i-manual"/></svg></div>
+        <p><strong id="manual-name"></strong><br><span id="manual-text" class="muted"></span></p>
+      </div>
+      <p id="manual-no-space" class="muted">Not enough room in your backpack.</p>
+      <div class="dialog-buttons">
+        <button class="btn btn-ink" value="leave">Leave</button>
+        <button id="manual-backpack" class="btn btn-ink btn-square" value="backpack" aria-label="Open backpack"><svg class="icon"><use href="#i-backpack"/></svg></button>
+        <button id="manual-take" class="btn btn-paint" value="take" autofocus>Take</button>
+      </div>
+    </form>
+  </dialog>
+
   <dialog id="shelter-panel" class="paper">
     <form method="dialog">
       <div class="panel-title">
@@ -179,6 +215,11 @@
       </div>
       <h3>Storage</h3>
       <ul id="shelter-storage" class="resource-grid"></ul>
+      <ul id="shelter-items" class="item-list"></ul>
+      <h3>Workshop</h3>
+      <ul id="shelter-manuals" class="manual-list"></ul>
+      <ul id="shelter-recipes" class="item-list"></ul>
+      <p id="workshop-hint" class="muted"></p>
       <h3>Survivors <span id="shelter-survivor-count" class="count"></span></h3>
       <ul id="shelter-survivor-names" class="survivor-badges"></ul>
       <p id="shelter-no-survivors" class="muted">No one has joined you yet.</p>
@@ -195,7 +236,10 @@
         <h2>Backpack</h2>
         <span id="backpack-panel-load" class="panel-load"></span>
       </div>
-      <p id="backpack-companion" class="muted"></p>
+      <div id="backpack-companion">
+        <p id="backpack-companion-text" class="muted"></p>
+        <button id="backpack-treat" class="btn btn-ink btn-small" type="button"><svg class="icon"><use href="#i-first-aid-kit"/></svg><span>Treat</span></button>
+      </div>
       <ul id="backpack-items" class="backpack-items"></ul>
       <p id="backpack-empty" class="muted">Your backpack is empty.</p>
       <p id="backpack-drop-hint" class="muted">Drop what you don't need to make room. Dropped supplies are lost.</p>
@@ -212,6 +256,23 @@
       <span class="hunger-stage"></span>
       <span class="hunger-bar"><span class="hunger-fill"></span></span>
       <span class="hunger-time"></span>
+      <span class="wound" hidden>
+        <svg class="icon"><use href="#i-wound"/></svg>
+        <span class="wound-label">Wounded</span>
+        <span class="wound-time"></span>
+        <button class="btn btn-ink btn-small treat" type="button">Treat</button>
+      </span>
+    </li>
+  </template>
+
+  <template id="item-row">
+    <li>
+      <svg class="icon resource-icon"><use href=""/></svg>
+      <span class="item-text">
+        <span class="resource-name"></span>
+        <span class="item-detail"></span>
+      </span>
+      <button class="btn btn-ink btn-small item-action" type="button"></button>
     </li>
   </template>
 

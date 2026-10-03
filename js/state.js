@@ -1,10 +1,10 @@
 // Loads, saves, exports and imports the game state.
 
 import { now } from './clock.js';
-import { RESOURCES, emptyResources } from './game.js';
+import { ITEMS, MANUALS, RESOURCES, emptyResources } from './game.js';
 
 const STORAGE_KEY = 'tinwalk.state';
-export const STATE_VERSION = 3;
+export const STATE_VERSION = 4;
 
 const INVALID_SAVE = "This file isn't a valid Tinwalk save";
 const OTHER_VERSION = 'This save comes from a different version of Tinwalk';
@@ -33,6 +33,21 @@ const MIGRATIONS = {
     if (isObject(save.shelter)) save.shelter.departedSurvivors = [];
     save.version = 3;
   },
+  // Crafting, fights and wounds: items and manuals, and no one is wounded yet.
+  3(save) {
+    save.backpackItems = [];
+    save.backpackManuals = [];
+    save.searchesWithoutManual = 0;
+    if (isObject(save.companion)) save.companion.woundedAt = null;
+    if (isObject(save.shelter)) {
+      save.shelter.items = [];
+      save.shelter.manuals = [];
+      for (const survivor of save.shelter.survivors ?? []) {
+        if (isObject(survivor)) survivor.woundedAt = null;
+      }
+    }
+    save.version = 4;
+  },
 };
 
 function migrate(save) {
@@ -43,12 +58,17 @@ function migrate(save) {
 export function createInitialState() {
   return {
     version: STATE_VERSION,
-    // { name, lat, lon, createdAt, storage, survivors: [{ name, arrivedAt, lastMealAt }],
+    // { name, lat, lon, createdAt, storage, items, manuals,
+    //   survivors: [{ name, arrivedAt, lastMealAt, woundedAt }],
     //   departedSurvivors: [{ name, arrivedAt, leftAt, reason }] }
     shelter: null,
     searchedAreas: [], // [{ lat, lon, searchedAt }]
     backpack: emptyResources(),
-    companion: null, // { name }
+    backpackItems: [], // [{ id, uses }]
+    backpackManuals: [], // manual ids
+    companion: null, // { name, woundedAt }
+    // Raises the chance of finding a manual, see game.js.
+    searchesWithoutManual: 0,
   };
 }
 
@@ -107,10 +127,19 @@ const isNumber = (value) => typeof value === 'number' && Number.isFinite(value);
 const isCount = (value) => Number.isInteger(value) && value >= 0;
 const isPoint = (value) => isObject(value) && isNumber(value.lat) && isNumber(value.lon);
 const isPerson = (value) => isObject(value) && typeof value.name === 'string';
-const isShelterSurvivor = (value) => isPerson(value) && isNumber(value.arrivedAt) && isNumber(value.lastMealAt);
+const isLivingPerson = (value) => isPerson(value) && (value.woundedAt === null || isNumber(value.woundedAt));
+const isShelterSurvivor = (value) =>
+  isLivingPerson(value) && isNumber(value.arrivedAt) && isNumber(value.lastMealAt);
 const isDepartedSurvivor = (value) =>
   isPerson(value) && isNumber(value.arrivedAt) && isNumber(value.leftAt) && typeof value.reason === 'string';
 const isResources = (value) => isObject(value) && RESOURCES.every(({ id }) => isCount(value[id]));
+const isItem = (value) =>
+  isObject(value) && Object.hasOwn(ITEMS, value.id) && isCount(value.uses) && value.uses > 0;
+const isItemList = (value) => Array.isArray(value) && value.every(isItem);
+const isManualList = (value) =>
+  Array.isArray(value) &&
+  value.every((id) => Object.hasOwn(MANUALS, id)) &&
+  new Set(value).size === value.length;
 
 function isValidShelter(shelter) {
   return (
@@ -118,6 +147,8 @@ function isValidShelter(shelter) {
     typeof shelter.name === 'string' &&
     isNumber(shelter.createdAt) &&
     isResources(shelter.storage) &&
+    isItemList(shelter.items) &&
+    isManualList(shelter.manuals) &&
     Array.isArray(shelter.survivors) &&
     shelter.survivors.every(isShelterSurvivor) &&
     Array.isArray(shelter.departedSurvivors) &&
@@ -133,6 +164,9 @@ function isValidState(state) {
     Array.isArray(state.searchedAreas) &&
     state.searchedAreas.every((area) => isPoint(area) && isNumber(area.searchedAt)) &&
     isResources(state.backpack) &&
-    (state.companion === null || isPerson(state.companion))
+    isItemList(state.backpackItems) &&
+    isManualList(state.backpackManuals) &&
+    isCount(state.searchesWithoutManual) &&
+    (state.companion === null || isLivingPerson(state.companion))
   );
 }

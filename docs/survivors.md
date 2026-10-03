@@ -13,6 +13,7 @@ Zasady życia ocalałych, którzy trafili do schronu. Znajdowanie ocalałych i e
 - Każdy ocalały w schronie zjada 1 Food raz na 24 godziny.
 - Liczy się tylko jedzenie w magazynie schronu. Food w plecaku trzeba najpierw rozładować.
 - Ocalały idący z użytkownikiem nie je. Jego licznik zaczyna się dopiero po przybyciu do schronu.
+- Ranny ocalały (zob. [combat.md](combat.md#rany)) przy każdym posiłku zjada 2 Food zamiast 1. Jeśli w magazynie jest tylko 1 Food, zjada je i też zostaje najedzony.
 
 ## Etapy głodu
 
@@ -26,7 +27,7 @@ Każdy etap trwa 24 godziny:
 
 - Bez jedzenia użytkownik ma więc 72 godziny od ostatniego posiłku ocalałego, żeby przynieść jedzenie do schronu.
 - Głodny lub głodujący ocalały zjada 1 Food, gdy tylko pojawi się ono w magazynie (czyli przy rozładunku), i znów jest najedzony na 24 godziny.
-- Gdy jedzenia nie wystarcza dla wszystkich, pierwszeństwo ma ten, kto czeka na posiłek najdłużej.
+- Gdy jedzenia nie wystarcza dla wszystkich, pierwszeństwo ma ten, kto czeka na posiłek najdłużej. Ranny zjada wtedy swoje 2 Food naraz, zanim przyjdzie kolej na następnego.
 - Ocalały, który opuścił schron, przepada, ale zostaje w historii schronu (zob. niżej).
 
 ## Historia
@@ -48,4 +49,5 @@ Każdy etap trwa 24 godziny:
   - głodny: „starving in 20 h”,
   - głodujący: „leaves in 5 h”.
 - Kolor paska i etapu zależy od etapu: zielony, pomarańczowy, czerwony.
+- Ranny ocalały ma na plakietce także oznaczenie rany i przycisk **Treat** (zob. [combat.md](combat.md#rany)).
 - Gdy któryś ocalały jest głodny, przycisk **Shelter** ma pomarańczową kropkę, a gdy któryś głoduje, czerwoną, pulsującą. Dzięki temu widać to także podczas spaceru.

@@ -14,6 +14,13 @@ const PATTERNS = {
   stamp: [70],
   land: [10],
   drop: [30, 40, 15],
+  enemy: [80, 50, 80],
+  hit: [40],
+  defeat: [120, 60, 120],
+  flee: [15, 40, 15, 40, 15],
+  craft: [20, 60, 20, 60, 30],
+  heal: [20, 80, 40],
+  manual: [30, 50, 30],
 };
 
 export const canVibrate = typeof navigator.vibrate === 'function';
