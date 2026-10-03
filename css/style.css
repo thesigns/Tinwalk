@@ -651,6 +651,8 @@ button {
   background: rgba(24, 20, 15, 0.72);
   backdrop-filter: blur(2px);
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(239, 230, 208, 0.35) transparent;
 }
 
 .card {
@@ -732,11 +734,15 @@ button {
 
 /* Dialogs */
 
+/* Thin scrollbars in ink, here and on the overlays. Phones draw their own
+   overlay scrollbars, so this mostly matters on desktop. */
 dialog {
   width: min(380px, calc(100% - 32px));
   padding: 26px 22px 22px;
   border: 0;
   border-radius: 3px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(51, 40, 28, 0.4) transparent;
 }
 
 dialog[open] {
