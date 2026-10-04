@@ -5,13 +5,20 @@
 // current scale and stretches the tiles slightly to fit.
 
 import { hash } from './noise.js';
-import { biomeAt, groundShadeAt } from './terrain.js';
+import { BIOMES, BLOCK_LENGTH, BLOCK_WIDTH, biomeAt, blocksOf, fromGrid, groundShadeAt, isEmptyLot, landAt, settlementsIn } from './terrain.js';
 
 export const TILE_SIZE = 256;
 const GROUND_STEP = 4; // tile pixels between ground color samples
 const ICON_CELL = 22; // tile pixels between possible icon positions
 // Ground along biome borders is darkened, like a hand-tinted map.
 const BORDER_SHADE = 0.84;
+// Ruined buildings fill each block but its share of the streets around it.
+// Every few streets is a wider main road.
+const STREET_INSET = 10;
+const MAIN_ROAD_INSET = 22;
+const MAIN_ROAD_EVERY = 4;
+// Buildings come in a few shades, so blocks don't look like floor tiles.
+const BUILDING_SHADES = [0.83, 0.86, 0.9];
 const MIN_CACHED_TILES = 48;
 // The cache holds several screens of tiles, so zooming back and forth doesn't re-render them.
 const CACHED_SCREENS = 3;
@@ -71,6 +78,7 @@ export class TerrainTiles {
 
     this.drawGround(ctx, left, top, unitsPerPixel);
     ctx.setTransform(this.pixelRatio, 0, 0, this.pixelRatio, 0, 0);
+    this.drawSettlements(ctx, level, left, top, unitsPerPixel);
     this.drawIcons(ctx, level, left, top, unitsPerPixel);
 
     this.cache.set(`${level}/${tx}/${ty}`, canvas);
@@ -91,7 +99,7 @@ export class TerrainTiles {
     const biomes = new Array(span * span);
     for (let row = 0; row < span; row++) {
       for (let col = 0; col < span; col++) {
-        biomes[row * span + col] = biomeAt(left + (col - 1) * step, top - (row - 1) * step);
+        biomes[row * span + col] = landAt(left + (col - 1) * step, top - (row - 1) * step);
       }
     }
 
@@ -116,6 +124,69 @@ export class TerrainTiles {
     ctx.imageSmoothingEnabled = true;
     // Source offset by half a pixel puts the sample centers exactly on the tile edges.
     ctx.drawImage(this.groundCanvas, 0.5, 0.5, samples - 1, samples - 1, 0, 0, ctx.canvas.width, ctx.canvas.height);
+  }
+
+  // Settlements are drawn as shapes on top of the ground, not sampled like
+  // it, so their blocks and streets stay crisp at every zoom level.
+  drawSettlements(ctx, level, left, top, unitsPerPixel) {
+    const size = TerrainTiles.worldSize(level);
+    const margin = 2 * BLOCK_LENGTH;
+    const inset = (index) => (((index % MAIN_ROAD_EVERY) + MAIN_ROAD_EVERY) % MAIN_ROAD_EVERY === 0 ? MAIN_ROAD_INSET : STREET_INSET);
+    const [r, g, b] = BIOMES.ruins.color;
+    const shaded = (factor) => `rgb(${r * factor}, ${g * factor}, ${b * factor})`;
+
+    for (const settlement of settlementsIn(left, top - size, left + size, top)) {
+      const blocks = blocksOf(settlement);
+      const corner = (u, v) => {
+        const { x, y } = fromGrid(settlement, u, v);
+        return [(x - left) / unitsPerPixel, (top - y) / unitsPerPixel];
+      };
+      const addQuad = (path, u0, v0, u1, v1) => {
+        path.moveTo(...corner(u0, v0));
+        path.lineTo(...corner(u1, v0));
+        path.lineTo(...corner(u1, v1));
+        path.lineTo(...corner(u0, v1));
+        path.closePath();
+      };
+      const ground = new Path2D();
+      const buildings = BUILDING_SHADES.map(() => new Path2D());
+      const outline = new Path2D();
+      for (const [i, j] of blocks.list) {
+        const center = fromGrid(settlement, (i + 0.5) * BLOCK_LENGTH, (j + 0.5) * BLOCK_WIDTH);
+        if (center.x < left - margin || center.x > left + size + margin) continue;
+        if (center.y < top - size - margin || center.y > top + margin) continue;
+        const u0 = i * BLOCK_LENGTH;
+        const v0 = j * BLOCK_WIDTH;
+        const u1 = u0 + BLOCK_LENGTH;
+        const v1 = v0 + BLOCK_WIDTH;
+        addQuad(ground, u0, v0, u1, v1);
+        if (!isEmptyLot(settlement, i, j)) {
+          const shade = Math.floor(hash(i, j, settlement.seed + 1) * BUILDING_SHADES.length);
+          addQuad(buildings[shade], u0 + inset(i), v0 + inset(j), u1 - inset(i + 1), v1 - inset(j + 1));
+        }
+        // The settlement's edge: block sides with no block beyond them.
+        for (const [di, dj, a, b] of [
+          [-1, 0, [u0, v0], [u0, v1]],
+          [1, 0, [u1, v0], [u1, v1]],
+          [0, -1, [u0, v0], [u1, v0]],
+          [0, 1, [u0, v1], [u1, v1]],
+        ]) {
+          if (blocks.has(i + di, j + dj)) continue;
+          outline.moveTo(...corner(...a));
+          outline.lineTo(...corner(...b));
+        }
+      }
+      ctx.fillStyle = shaded(1);
+      ctx.fill(ground);
+      BUILDING_SHADES.forEach((shade, index) => {
+        ctx.fillStyle = shaded(shade);
+        ctx.fill(buildings[index]);
+      });
+      ctx.strokeStyle = shaded(BORDER_SHADE);
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.stroke(outline);
+    }
   }
 
   // Icons sit at jittered points of a grid fixed in the world, so an icon near

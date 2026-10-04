@@ -41,8 +41,8 @@ All code is in `js/`, loaded from `index.html` via `js/main.js`.
 | `geo.js` | Haversine distances, Web Mercator projection, weighted position averaging |
 | `clock.js` | Game time (`now()`), which debug mode can speed up |
 | `map.js` | `MapView`: canvas rendering, zoom gestures, markers, short map animations (`playSweep`, `playRipple`) |
-| `terrain.js` | Procedural biomes, ground colors and icon drawing, as pure functions of Mercator coordinates |
-| `terrain-tiles.js` | Renders terrain into cached tiles per zoom level |
+| `terrain.js` | Procedural biomes (warped-noise forests, settlements with street grids), ground colors and icon drawing, as pure functions of Mercator coordinates |
+| `terrain-tiles.js` | Renders terrain into cached tiles per zoom level: sampled ground, settlements drawn as shapes, icons |
 | `noise.js` | Seeded simplex noise and integer hashing |
 | `fx.js` | DOM helpers: `iconElement`, flying icons, replaying CSS animations |
 | `sound.js` | Sound effects synthesized with the Web Audio API (no audio files) |
@@ -55,7 +55,7 @@ All code is in `js/`, loaded from `index.html` via `js/main.js`.
 
 - **Time:** game rules read time from `clock.now()`, never `Date.now()`, so debug time acceleration works. The exception is GPS reading timestamps, which are wall-clock time and are compared with `Date.now()`.
 - **Saved state:** when changing its shape, bump `STATE_VERSION` in `state.js`, add a migration for older saves, and update `isValidState`. It validates both loading and importing.
-- **Terrain must stay deterministic:** never use `Math.random` there. Changing the noise seed, frequencies or thresholds in `terrain.js` changes the world for every existing user. Terrain sizes were tuned by measuring biome runs along simulated 3 km walks.
+- **Terrain must stay deterministic:** never use `Math.random` there. Changing the noise seed, frequencies, thresholds or settlement parameters in `terrain.js` changes the world for every existing user. Terrain sizes were tuned by measuring biome runs along simulated 3 km walks.
 - **Coordinates:** the map and terrain work in Web Mercator units; distances in game rules use `distanceMeters` (haversine).
 - **Tile cache:** its capacity scales with the number of visible tiles. A fixed, too-small cache made large screens re-render tiles every frame (flickering).
 - **Colors:** the palette is defined as CSS custom properties in `css/style.css`; `COLORS` in `map.js` mirrors it for canvas drawing. Keep them in sync.

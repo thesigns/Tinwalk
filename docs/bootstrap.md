@@ -109,11 +109,18 @@ Zasoby, ilość łupu i szansa na ocalałego są opisane w [loot.md](loot.md).
 
 ### Mapa
 
-- Aplikacja nie pokazuje prawdziwej mapy. W tle rysowana jest fikcyjna, proceduralnie generowana mapa terenu ze schematycznymi ikonami. Są trzy biomy: las (drzewa), ruiny (zrujnowane budynki) i równiny (rzadka trawa). Każdy zajmuje mniej więcej jedną trzecią świata.
+- Aplikacja nie pokazuje prawdziwej mapy. W tle rysowana jest fikcyjna, proceduralnie generowana mapa terenu ze schematycznymi ikonami. Są trzy biomy: równiny (rzadka trawa), las (drzewa) i ruiny (zrujnowane budynki).
+- Równiny zajmują ok. 50% świata, bo dają najbardziej zrównoważony łup. Lasy i ruiny zajmują po ok. 25%.
+- Równiny to tło: wszystko, co nie jest lasem ani ruinami.
+- Lasy powstają z szumu simplex zniekształconego drugim szumem (domain warping), więc mają nieregularne brzegi, zatoki i polany, a nie obłe plamy.
+- Ruiny to pozostałości osad. Świat jest podzielony na komórki ok. 1,85 km, a w każdej może stać jedna osada o promieniu ok. 185–925 m. Osada ma własną, obróconą siatkę ulic z prostokątnymi kwartałami (ok. 90 × 60 m) i szerszą arterią co cztery przecznice. Jej brzeg jest postrzępiony szumem, a część kwartałów to puste działki.
+- Gdy osady się stykają, każdy kwartał należy do tej, której brzeg jest bliżej, więc łączą się jak dzielnice jednego miasta.
+- Ruiny obejmują całe kwartały razem z ulicami, więc na ulicy w osadzie też jest się w ruinach.
+- Osady są rysowane jako wektorowe kształty, a nie próbkowane jak reszta terenu, żeby kwartały i ulice były ostre przy każdym przybliżeniu.
 - Teren jest generowany deterministycznie z szerokości i długości geograficznej (np. szum simplex), więc to samo miejsce na Ziemi zawsze wygląda tak samo.
 - Szum jest próbkowany we współrzędnych metrycznych (Web Mercator), a nie bezpośrednio w stopniach. Stopień długości geograficznej jest krótszy niż stopień szerokości (w Polsce ok. 65–70 km wobec 111 km), więc próbkowanie w stopniach rozciągałoby teren w poziomie.
 - Teren jest renderowany w kafelkach na niewidocznych płótnach (offscreen canvas) i trzymany w pamięci podręcznej, żeby nie rysować wszystkich ikon w każdej klatce.
-- Regiony terenu mają skalę od kilkuset metrów do około kilometra, tak żeby typowy spacer przechodził przez kilka różnych terenów.
+- Regiony terenu mają skalę od kilkuset metrów do około kilometra, tak żeby typowy spacer przechodził przez kilka różnych terenów. Na prostym odcinku 3 km teren zmienia się średnio ok. 6 razy.
 - Mapa jest zawsze skierowana na północ.
 - Na mapie widoczne są:
   - schron jako okrąg z nazwą,
