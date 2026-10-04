@@ -37,6 +37,7 @@ import {
   search,
   searchBlocker,
   settleMeals,
+  settlementAtPosition,
   takeManual,
   takeSurvivor,
   totalResources,
@@ -145,7 +146,9 @@ const ui = {
   departureTitle: $('departure-title'),
   departureText: $('departure-text'),
   scaleLabel: $('scale-label'),
+  location: $('location'),
   locationLabel: $('location-label'),
+  locationPlace: $('location-place'),
   scaleLine: $('scale-line'),
   welcomeScreen: $('welcome-screen'),
   menuDialog: $('menu-dialog'),
@@ -241,10 +244,13 @@ function renderStatus() {
   ui.gpsHud.setAttribute('aria-label', description);
 
   const { position } = tracker;
-  ui.locationLabel.hidden = !position;
+  ui.location.hidden = !position;
   if (position) {
+    const settlement = inShelter ? null : settlementAtPosition(position);
     ui.locationLabel.textContent = inShelter ? 'Shelter' : biomeAtPosition(position).label;
-    ui.locationLabel.classList.toggle('uncertain', !tracker.hasGoodSignal);
+    ui.locationPlace.hidden = !settlement;
+    ui.locationPlace.textContent = settlement?.name ?? '';
+    ui.location.classList.toggle('uncertain', !tracker.hasGoodSignal);
   }
 }
 

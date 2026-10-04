@@ -31,6 +31,15 @@ const MAIN_ROAD_INSET = 22;
 const MAIN_ROAD_EVERY = 4;
 // Buildings come in a few shades, so blocks don't look like floor tiles.
 const BUILDING_SHADES = [0.83, 0.86, 0.9];
+// Up close, blocks are drawn as separate buildings (sizes in Mercator units).
+const MAX_UNITS_PER_PIXEL_FOR_BUILDINGS = 2;
+const BUILDING_DEPTH = 30;
+const BUILDING_MIN_LENGTH = 22;
+const BUILDING_MAX_LENGTH = 42;
+const BUILDING_GAP = 3;
+// Share of buildings that are damaged; some of those have collapsed to rubble.
+const BUILDING_RUINED_SHARE = 0.4;
+const WALL_SHADE = 0.7;
 const MIN_CACHED_TILES = 48;
 // The cache holds several screens of tiles, so zooming back and forth doesn't re-render them.
 const CACHED_SCREENS = 3;
@@ -177,10 +186,12 @@ export class TerrainTiles {
   }
 
   // Settlements are drawn as shapes on top of the ground, not sampled like
-  // it, so their blocks and streets stay crisp at every zoom level.
+  // it, so their blocks and streets stay crisp at every zoom level. Up close,
+  // blocks break up into buildings, some of them damaged or collapsed.
   drawSettlements(ctx, level, left, top, unitsPerPixel) {
     const size = TerrainTiles.worldSize(level);
     const margin = 2 * BLOCK_LENGTH;
+    const detailed = unitsPerPixel <= MAX_UNITS_PER_PIXEL_FOR_BUILDINGS;
     const inset = (index) => (((index % MAIN_ROAD_EVERY) + MAIN_ROAD_EVERY) % MAIN_ROAD_EVERY === 0 ? MAIN_ROAD_INSET : STREET_INSET);
     const [r, g, b] = BIOMES.ruins.color;
     const shaded = (factor) => `rgb(${r * factor}, ${g * factor}, ${b * factor})`;
@@ -191,15 +202,15 @@ export class TerrainTiles {
         const { x, y } = fromGrid(settlement, u, v);
         return [(x - left) / unitsPerPixel, (top - y) / unitsPerPixel];
       };
-      const addQuad = (path, u0, v0, u1, v1) => {
-        path.moveTo(...corner(u0, v0));
-        path.lineTo(...corner(u1, v0));
-        path.lineTo(...corner(u1, v1));
-        path.lineTo(...corner(u0, v1));
+      const addPolygon = (path, points) => {
+        points.forEach(([u, v], index) => (index === 0 ? path.moveTo(...corner(u, v)) : path.lineTo(...corner(u, v))));
         path.closePath();
       };
+      const addQuad = (path, u0, v0, u1, v1) => addPolygon(path, [[u0, v0], [u1, v0], [u1, v1], [u0, v1]]);
       const ground = new Path2D();
       const buildings = BUILDING_SHADES.map(() => new Path2D());
+      const walls = new Path2D();
+      const rubble = new Path2D();
       const outline = new Path2D();
       for (const [i, j] of blocks.list) {
         const center = fromGrid(settlement, (i + 0.5) * BLOCK_LENGTH, (j + 0.5) * BLOCK_WIDTH);
@@ -211,8 +222,20 @@ export class TerrainTiles {
         const v1 = v0 + BLOCK_WIDTH;
         addQuad(ground, u0, v0, u1, v1);
         if (!isEmptyLot(settlement, i, j)) {
-          const shade = Math.floor(hash(i, j, settlement.seed + 1) * BUILDING_SHADES.length);
-          addQuad(buildings[shade], u0 + inset(i), v0 + inset(j), u1 - inset(i + 1), v1 - inset(j + 1));
+          const lot = [u0 + inset(i), v0 + inset(j), u1 - inset(i + 1), v1 - inset(j + 1)];
+          if (!detailed) {
+            const shade = Math.floor(hash(i, j, settlement.seed + 1) * BUILDING_SHADES.length);
+            addQuad(buildings[shade], ...lot);
+          } else {
+            for (const building of buildingsOf(settlement.seed, i, j, ...lot)) {
+              if (building.collapsed) {
+                addPolygon(rubble, building.points);
+              } else {
+                addPolygon(buildings[building.shade], building.points);
+                addPolygon(walls, building.points);
+              }
+            }
+          }
         }
         // The settlement's edge: block sides with no block beyond them.
         for (const [di, dj, a, b] of [
@@ -232,6 +255,15 @@ export class TerrainTiles {
         ctx.fillStyle = shaded(shade);
         ctx.fill(buildings[index]);
       });
+      if (detailed) {
+        ctx.lineWidth = 0.8;
+        ctx.lineJoin = 'miter';
+        ctx.strokeStyle = shaded(WALL_SHADE);
+        ctx.stroke(walls);
+        ctx.setLineDash([2, 2]);
+        ctx.stroke(rubble);
+        ctx.setLineDash([]);
+      }
       ctx.strokeStyle = shaded(BORDER_SHADE);
       ctx.lineWidth = 2;
       ctx.lineCap = 'round';
@@ -262,4 +294,48 @@ export class TerrainTiles {
       }
     }
   }
+}
+
+// The buildings of a block: two rows along its long streets, with a yard
+// between them. Returns [{ points: [[u, v]], shade, collapsed }] in the
+// settlement's grid coordinates; damaged buildings miss a corner.
+function buildingsOf(seed, i, j, u0, v0, u1, v1) {
+  const buildings = [];
+  const depth = Math.min(BUILDING_DEPTH, (v1 - v0) / 2);
+  for (const [row, b0, b1] of [[0, v0, v0 + depth], [1, v1 - depth, v1]]) {
+    let a = u0;
+    for (let n = 0; u1 - a > 1; n++) {
+      const random = (salt) => hash(i, 2 * j + row, seed + 16 * n + salt);
+      let length = BUILDING_MIN_LENGTH + (BUILDING_MAX_LENGTH - BUILDING_MIN_LENGTH) * random(2);
+      // The last building takes up the rest of the row.
+      if (u1 - a - length < BUILDING_MIN_LENGTH) length = u1 - a;
+      const box = [a + BUILDING_GAP / 2, b0, a + length - BUILDING_GAP / 2, b1];
+      a += length;
+      const damage = random(3);
+      if (damage < BUILDING_RUINED_SHARE * 0.4) {
+        buildings.push({ points: rectangle(...box), shade: 0, collapsed: true });
+        continue;
+      }
+      const shade = Math.floor(random(4) * BUILDING_SHADES.length);
+      const points = damage < BUILDING_RUINED_SHARE ? withMissingCorner(box, random(5), random(6)) : rectangle(...box);
+      buildings.push({ points, shade, collapsed: false });
+    }
+  }
+  return buildings;
+}
+
+function rectangle(u0, v0, u1, v1) {
+  return [[u0, v0], [u1, v0], [u1, v1], [u0, v1]];
+}
+
+// An L shape: the box with a bite out of one corner, picked by `which`.
+function withMissingCorner([u0, v0, u1, v1], which, size) {
+  const cut = 0.35 + 0.25 * size;
+  const flipU = which < 0.5;
+  const flipV = which % 0.5 < 0.25;
+  const shape = [[0, 0], [1, 0], [1, 1 - cut], [1 - cut, 1 - cut], [1 - cut, 1], [0, 1]];
+  return shape.map(([a, b]) => [
+    flipU ? u1 - a * (u1 - u0) : u0 + a * (u1 - u0),
+    flipV ? v1 - b * (v1 - v0) : v0 + b * (v1 - v0),
+  ]);
 }

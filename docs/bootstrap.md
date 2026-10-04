@@ -109,7 +109,7 @@ Zasoby, ilość łupu i szansa na ocalałego są opisane w [loot.md](loot.md).
 
 ### Mapa
 
-- Aplikacja nie pokazuje prawdziwej mapy. W tle rysowana jest fikcyjna, proceduralnie generowana mapa terenu ze schematycznymi ikonami. Są trzy biomy: równiny (rzadka trawa), las (drzewa) i ruiny (zrujnowane budynki).
+- Aplikacja nie pokazuje prawdziwej mapy. W tle rysowana jest fikcyjna, proceduralnie generowana mapa terenu ze schematycznymi ikonami. Są trzy biomy: równiny (rzadkie kępki trawy, rysowane jak znak łąki na mapach topograficznych: pionowe kreski na krótkiej linii gruntu), las (drzewa) i ruiny (plan zrujnowanego miasta).
 - Równiny zajmują ok. 50% świata, bo dają najbardziej zrównoważony łup. Lasy i ruiny zajmują po ok. 25%.
 - Równiny to tło: wszystko, co nie jest lasem ani ruinami.
 - Lasy powstają z szumu simplex zniekształconego drugim szumem (domain warping), więc mają nieregularne brzegi, zatoki i polany, a nie obłe plamy.
@@ -117,6 +117,9 @@ Zasoby, ilość łupu i szansa na ocalałego są opisane w [loot.md](loot.md).
 - Gdy osady się stykają, każdy kwartał należy do tej, której brzeg jest bliżej, więc łączą się jak dzielnice jednego miasta.
 - Ruiny obejmują całe kwartały razem z ulicami, więc na ulicy w osadzie też jest się w ruinach.
 - Osady są rysowane jako wektorowe kształty, a nie próbkowane jak reszta terenu, żeby kwartały i ulice były ostre przy każdym przybliżeniu.
+- Ruiny nie mają ikon. Przy oddaleniu kwartał jest jedną plamą, a przy największych przybliżeniach (do ok. 750 m szerokości widoku) rozpada się na budynki: dwa rzędy wzdłuż dłuższych ulic z podwórzem pośrodku. Część budynków jest uszkodzona (brakuje im rogu), a część zawalona (zostaje tylko przerywany obrys).
+- Każda osada ma stałą, wylosowaną nazwę złożoną z dwóch członów, np. „Rustford” albo „Pinemouth”. Nazwa jest wydrukowana na mapie nad środkiem osady, większa dla większych osad.
+- Grunt ma bardzo delikatne, rozległe cieniowanie, żeby nie był płaski, ale nie wyglądał na poplamiony.
 - Teren jest generowany deterministycznie z szerokości i długości geograficznej (np. szum simplex), więc to samo miejsce na Ziemi zawsze wygląda tak samo.
 - Szum jest próbkowany we współrzędnych metrycznych (Web Mercator), a nie bezpośrednio w stopniach. Stopień długości geograficznej jest krótszy niż stopień szerokości (w Polsce ok. 65–70 km wobec 111 km), więc próbkowanie w stopniach rozciągałoby teren w poziomie.
 - Teren jest renderowany w kafelkach na niewidocznych płótnach (offscreen canvas) i trzymany w pamięci podręcznej, żeby nie rysować wszystkich ikon w każdej klatce.
@@ -137,7 +140,7 @@ Zasoby, ilość łupu i szansa na ocalałego są opisane w [loot.md](loot.md).
 - Główny ekran to mapa.
 - Pasek stanu pokazuje: zawartość plecaka (np. „Backpack 12/50”), czy idzie z nami ocalały, oraz jakość sygnału GPS. Dotknięcie plecaka otwiera panel plecaka.
 - Przyciski zależą od kontekstu: **Create a Shelter**, **Search area**, **Unload**.
-- Obok kompasu i podziałki mapy jedno słowo mówi, gdzie stoi użytkownik: **Shelter**, **Plains**, **Forest** albo **Ruins**. Dzięki temu na granicy biomów nie trzeba zgadywać z mapy, jaki łup da przeszukanie. Bez pozycji słowa nie ma, a przy słabym sygnale jest przygaszone, tak jak pinezka.
+- Obok kompasu i podziałki mapy jedno słowo mówi, gdzie stoi użytkownik: **Shelter**, **Plains**, **Forest** albo **Ruins**. W ruinach pod spodem jest mniejszym drukiem nazwa osady. Dzięki temu na granicy biomów nie trzeba zgadywać z mapy, jaki łup da przeszukanie. Bez pozycji słowa nie ma, a przy słabym sygnale jest przygaszone, tak jak pinezka.
 - Panel schronu pokazuje nazwę schronu, stan magazynu, przedmioty i podręczniki, warsztat (zob. [crafting.md](crafting.md)) oraz ocalałych z ich etapem głodu i ranami (zob. [survivors.md](survivors.md)).
 
 #### Pierwsze uruchomienie

@@ -4,7 +4,7 @@
 
 import { distanceMeters, toMercator } from './geo.js';
 import { SURVIVOR_NAMES } from './names.js';
-import { biomeAt } from './terrain.js';
+import { biomeAt, settlementAt } from './terrain.js';
 
 export const RESOURCES = [
   { id: 'junk', label: 'Junk' },
@@ -195,6 +195,12 @@ export function search(state, position, time, random = Math.random) {
 export function biomeAtPosition(position) {
   const { x, y } = toMercator(position);
   return biomeAt(x, y);
+}
+
+// The settlement whose ruins are at a { lat, lon } position, or null.
+export function settlementAtPosition(position) {
+  const { x, y } = toMercator(position);
+  return settlementAt(x, y);
 }
 
 // Returns { resource, found, carried, survivor, manual }, where survivor is a

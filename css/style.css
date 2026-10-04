@@ -219,16 +219,29 @@ input {
   text-shadow: 0 0 3px var(--paper), 0 0 3px var(--paper);
 }
 
-#location-label {
+#location {
+  display: flex;
+  flex-direction: column;
   margin-left: 4px;
-  font: 800 24px/1 var(--font-stencil);
+  font-family: var(--font-stencil);
+  font-weight: 800;
+  line-height: 1;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   text-shadow: 0 0 3px var(--paper), 0 0 3px var(--paper), 0 0 6px var(--paper);
 }
 
+#location-label {
+  font-size: 24px;
+}
+
+/* The settlement's name, under "Ruins". */
+#location-place {
+  font-size: 14px;
+}
+
 /* Like the pin, it fades without a good signal: the position may be off. */
-#location-label.uncertain {
+#location.uncertain {
   opacity: 0.5;
 }
 

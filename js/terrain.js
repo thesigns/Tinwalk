@@ -10,6 +10,7 @@
 // Plains cover about half of the world, forests and ruins a quarter each. A
 // straight 3 km walk crosses about 6 borders between them.
 
+import { SETTLEMENT_NAME_ENDS, SETTLEMENT_NAME_STARTS } from './names.js';
 import { createSimplex, hash } from './noise.js';
 
 const noise = createSimplex(20261001);
@@ -19,8 +20,9 @@ const FOREST_FREQUENCY = 1 / 3200;
 const FOREST_WARP = 0.4;
 // Forests cover about a third of the land outside settlements.
 const FOREST_THRESHOLD = 0.154;
-const DETAIL_FREQUENCY = 1 / 90;
-const DETAIL_STRENGTH = 0.06;
+// Broad and faint, so it livens up the ground without looking like stains.
+const DETAIL_FREQUENCY = 1 / 600;
+const DETAIL_STRENGTH = 0.03;
 
 // Each cell of this grid may hold one settlement, somewhere in its middle.
 const SETTLEMENT_CELL = 3000;
@@ -37,11 +39,13 @@ const EDGE_FREQUENCY = 1 / 700;
 const EMPTY_LOT_CHANCE = 0.07;
 
 const INK = '#5b4a35';
+const GRASS_INK = 'rgba(91, 74, 53, 0.55)';
 
 export const BIOMES = {
   plains: { name: 'plains', label: 'Plains', color: [214, 204, 159], iconDensity: 0.1, iconSize: 7, drawIcon: drawGrass },
   forest: { name: 'forest', label: 'Forest', color: [170, 184, 136], iconDensity: 0.75, iconSize: 13, drawIcon: drawTree },
-  ruins: { name: 'ruins', label: 'Ruins', color: [190, 183, 168], iconDensity: 0.35, iconSize: 14, drawIcon: drawRuin },
+  // Ruins have no icons: their buildings are drawn with the settlement plan.
+  ruins: { name: 'ruins', label: 'Ruins', color: [190, 183, 168], iconDensity: 0 },
 };
 
 // Octaves of noise, each half the size and 0.45 times as strong, in roughly [-1, 1].
@@ -74,7 +78,7 @@ export function landAt(x, y) {
 }
 
 export function biomeAt(x, y) {
-  return blockAt(x, y) ? BIOMES.ruins : landAt(x, y);
+  return settlementAt(x, y) ? BIOMES.ruins : landAt(x, y);
 }
 
 // Brightness factor around 1, for a little small-scale variation inside a biome.
@@ -88,7 +92,7 @@ const settlementCache = new Map();
 const MAX_CACHED_SETTLEMENTS = 4096;
 
 // The settlement in a grid cell, or null:
-// { x, y, radius, reach, cos, sin, seed, cx, cy, blocks }, with blocks filled in by blocksOf().
+// { name, size, x, y, radius, reach, cos, sin, seed, cx, cy, blocks }, with blocks filled in by blocksOf().
 // Its street grid is rotated by an angle of its own; block (i, j) spans
 // [i, i + 1] block lengths by [j, j + 1] block widths in the grid's coordinates.
 function settlementIn(cx, cy) {
@@ -96,9 +100,14 @@ function settlementIn(cx, cy) {
   if (settlementCache.has(key)) return settlementCache.get(key);
   let settlement = null;
   if (hash(cx, cy, 701) < SETTLEMENT_CHANCE) {
-    const radius = SETTLEMENT_MIN_RADIUS + (SETTLEMENT_MAX_RADIUS - SETTLEMENT_MIN_RADIUS) * hash(cx, cy, 704);
+    const size = hash(cx, cy, 704);
+    const radius = SETTLEMENT_MIN_RADIUS + (SETTLEMENT_MAX_RADIUS - SETTLEMENT_MIN_RADIUS) * size;
     const angle = hash(cx, cy, 705) * (Math.PI / 2);
+    const start = SETTLEMENT_NAME_STARTS[Math.floor(hash(cx, cy, 707) * SETTLEMENT_NAME_STARTS.length)];
+    const end = SETTLEMENT_NAME_ENDS[Math.floor(hash(cx, cy, 708) * SETTLEMENT_NAME_ENDS.length)];
     settlement = {
+      name: start + end,
+      size, // 0 for the smallest settlements, 1 for the largest
       x: (cx + 0.15 + 0.7 * hash(cx, cy, 702)) * SETTLEMENT_CELL,
       y: (cy + 0.15 + 0.7 * hash(cx, cy, 703)) * SETTLEMENT_CELL,
       radius,
@@ -195,8 +204,8 @@ export function settlementsIn(minX, minY, maxX, maxY) {
   return found;
 }
 
-// Whether the point is in a block of some settlement, streets included.
-function blockAt(x, y) {
+// The settlement with a block at the point, streets included, or null.
+export function settlementAt(x, y) {
   const cx = Math.floor(x / SETTLEMENT_CELL);
   const cy = Math.floor(y / SETTLEMENT_CELL);
   for (let dy = -1; dy <= 1; dy++) {
@@ -208,10 +217,10 @@ function blockAt(x, y) {
       if (ox * ox + oy * oy > settlement.reach ** 2) continue;
       const u = ox * settlement.cos + oy * settlement.sin;
       const v = -ox * settlement.sin + oy * settlement.cos;
-      if (blocksOf(settlement).has(Math.floor(u / BLOCK_LENGTH), Math.floor(v / BLOCK_WIDTH))) return true;
+      if (blocksOf(settlement).has(Math.floor(u / BLOCK_LENGTH), Math.floor(v / BLOCK_WIDTH))) return settlement;
     }
   }
-  return false;
+  return null;
 }
 
 // Icons are drawn with their base at (x, y), extending upward, `size` pixels tall.
@@ -227,15 +236,19 @@ function startIcon(ctx, x, y, size) {
   ctx.strokeStyle = INK;
 }
 
+// The meadow sign of topographic maps: upright strokes on a short ground line.
 function drawGrass(ctx, x, y, size) {
   startIcon(ctx, x, y, size);
+  ctx.strokeStyle = GRASS_INK;
   ctx.beginPath();
+  ctx.moveTo(-0.5, 0);
+  ctx.lineTo(0.5, 0);
+  ctx.moveTo(-0.25, 0);
+  ctx.lineTo(-0.25, -0.55);
   ctx.moveTo(0, 0);
-  ctx.lineTo(-0.35, -0.7);
-  ctx.moveTo(0, 0);
-  ctx.lineTo(0, -1);
-  ctx.moveTo(0, 0);
-  ctx.lineTo(0.35, -0.7);
+  ctx.lineTo(0, -0.85);
+  ctx.moveTo(0.25, 0);
+  ctx.lineTo(0.25, -0.55);
   ctx.stroke();
   ctx.restore();
 }
@@ -259,26 +272,5 @@ function drawTree(ctx, x, y, size, variant) {
   }
   ctx.fill();
   ctx.stroke();
-  ctx.restore();
-}
-
-function drawRuin(ctx, x, y, size, variant) {
-  startIcon(ctx, x, y, size);
-  if (variant < 0.5) ctx.scale(-1, 1);
-  ctx.beginPath();
-  ctx.moveTo(-0.4, 0);
-  ctx.lineTo(-0.4, -0.85);
-  ctx.lineTo(-0.1, -0.85);
-  ctx.lineTo(0, -0.6);
-  ctx.lineTo(0.15, -0.72);
-  ctx.lineTo(0.4, -0.45);
-  ctx.lineTo(0.4, 0);
-  ctx.closePath();
-  ctx.fillStyle = '#9b958b';
-  ctx.fill();
-  ctx.stroke();
-  ctx.fillStyle = INK;
-  ctx.fillRect(-0.27, -0.6, 0.16, 0.16);
-  ctx.fillRect(-0.27, -0.3, 0.16, 0.16);
   ctx.restore();
 }

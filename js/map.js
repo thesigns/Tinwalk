@@ -4,6 +4,7 @@
 import { SEARCH_INFLUENCE, SEARCH_RADIUS, searchWeight } from './game.js';
 import { fromMercator, mercatorUnitsPerMeter, toMercator } from './geo.js';
 import { TerrainTiles } from './terrain-tiles.js';
+import { settlementsIn } from './terrain.js';
 
 // How many meters the shorter side of the screen covers.
 const DEFAULT_VIEW_WIDTH_METERS = 1500;
@@ -22,6 +23,9 @@ const OUTLINE_CELL_PX = 5;
 const WOBBLE_PX = 1.4;
 const WOBBLE_PERIOD_METERS = 190;
 const LABEL_FONT = '800 17px "Big Shoulders Stencil", Impact, sans-serif';
+// Settlement names are printed on the map, larger for larger settlements.
+const PLACE_FONT_SIZES = [13, 19];
+const PLACE_FONT = (size) => `800 ${size}px "Big Shoulders Stencil", Impact, sans-serif`;
 // The shelter icon from the SVG sprite, in its 24x24 box.
 const HUT_ICON = new Path2D('M3 11.5 12 4l9 7.5M5.5 10v10.5h13V10M10 20.5V15h4v5.5');
 
@@ -164,6 +168,7 @@ export class MapView {
 
     const complete = this.drawTerrain(scene.center);
     if (!complete) this.requestFrame();
+    this.drawPlaceNames(scene.center);
     this.drawSearchedAreas(scene.center, scene.searchedAreas);
     if (scene.shelter) this.drawShelter(scene.center, scene.shelter);
     this.drawEffects();
@@ -334,6 +339,38 @@ export class MapView {
         if (child) ctx.drawImage(child, x + (dx * width) / 2, y + ((1 - dy) * height) / 2, width / 2, height / 2);
       }
     }
+  }
+
+  // Settlement names, printed in ink over the middle of each settlement.
+  // They are drawn here rather than into the terrain tiles, so they use the
+  // web font once it loads and stay the same size at every zoom.
+  drawPlaceNames(center) {
+    const { ctx, width, height } = this;
+    const c = toMercator(center);
+    const units = this.unitsPerPixel(center);
+    const halfWidth = (width / 2) * units;
+    const halfHeight = (height / 2) * units;
+    const settlements = settlementsIn(c.x - halfWidth, c.y - halfHeight, c.x + halfWidth, c.y + halfHeight);
+    if (settlements.length === 0) return;
+
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.lineJoin = 'round';
+    ctx.letterSpacing = '0.08em';
+    for (const settlement of settlements) {
+      const x = width / 2 + (settlement.x - c.x) / units;
+      const y = height / 2 - (settlement.y - c.y) / units;
+      const [smallest, largest] = PLACE_FONT_SIZES;
+      ctx.font = PLACE_FONT(Math.round(smallest + (largest - smallest) * settlement.size));
+      const label = settlement.name.toUpperCase();
+      ctx.strokeStyle = COLORS.paper;
+      ctx.lineWidth = 4;
+      ctx.strokeText(label, x, y);
+      ctx.fillStyle = COLORS.ink;
+      ctx.fillText(label, x, y);
+    }
+    ctx.restore();
   }
 
   // Searched areas are crossed out in red pencil: they merge into blobs with a

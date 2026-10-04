@@ -49,7 +49,7 @@ All code is in `js/`, loaded from `index.html` via `js/main.js`.
 | `haptics.js` | Vibration patterns (Android only; iPhone browsers don't support it) |
 | `settings.js` | On/off preferences in `localStorage` |
 | `debug.js` | Debug panel and the debug clock |
-| `names.js` | Survivor names |
+| `names.js` | Survivor names and settlement name parts |
 
 ## Conventions and gotchas
 
