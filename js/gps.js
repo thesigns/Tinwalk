@@ -2,18 +2,28 @@
 // the signal is good enough for location-dependent actions.
 // Fires 'change' on any update and 'reading' when a new position is accepted.
 
+import { distanceMeters } from './geo.js';
+
 export const MAX_ACCURACY_METERS = 50;
 export const MAX_READING_AGE_MS = 30_000;
 const RESTART_DELAY_MS = 5_000;
 const MANUAL_ACCURACY_METERS = 5;
+// When the browser doesn't report speed, it is worked out from the readings
+// of the last half minute, over at least a few seconds, so that GPS jitter
+// while standing still doesn't look like running.
+const SPEED_WINDOW_MS = 30_000;
+const MIN_SPEED_SPAN_MS = 10_000;
 
 const WATCH_OPTIONS = { enableHighAccuracy: true, maximumAge: 0, timeout: 20_000 };
 
 export class LocationTracker extends EventTarget {
   constructor() {
     super();
-    this.position = null; // last accepted reading: { lat, lon, accuracy, timestamp }
+    // Last accepted reading: { lat, lon, accuracy, timestamp, speed }, with
+    // speed in m/s, or null if unknown.
+    this.position = null;
     this.lastReading = null; // last raw reading, accepted or not
+    this.recent = []; // accepted readings from the last SPEED_WINDOW_MS
     this.signal = 'searching'; // 'searching' | 'good' | 'poor' | 'unavailable' | 'denied'
     this.manual = false;
     this.stats = { received: 0, accepted: 0, poor: 0, stale: 0 };
@@ -55,7 +65,8 @@ export class LocationTracker extends EventTarget {
   setManualPosition({ lat, lon }) {
     this.stop();
     this.manual = true;
-    this.position = { lat, lon, accuracy: MANUAL_ACCURACY_METERS, timestamp: Date.now() };
+    this.position = { lat, lon, accuracy: MANUAL_ACCURACY_METERS, timestamp: Date.now(), speed: null };
+    this.recent = [];
     this.dispatchEvent(new Event('reading'));
     this.setSignal('good');
   }
@@ -80,11 +91,22 @@ export class LocationTracker extends EventTarget {
       this.signal = 'poor';
     } else {
       this.stats.accepted++;
+      reading.speed = Number.isFinite(coords.speed) ? coords.speed : this.estimateSpeed(reading);
       this.position = reading;
       this.signal = 'good';
       this.dispatchEvent(new Event('reading'));
     }
     this.notify();
+  }
+
+  // Speed in m/s between the oldest recent reading and this one, or null.
+  estimateSpeed(reading) {
+    this.recent = this.recent.filter((other) => reading.timestamp - other.timestamp <= SPEED_WINDOW_MS);
+    this.recent.push(reading);
+    const [oldest] = this.recent;
+    const span = reading.timestamp - oldest.timestamp;
+    if (span < MIN_SPEED_SPAN_MS) return null;
+    return distanceMeters(oldest, reading) / (span / 1000);
   }
 
   handleError(error) {

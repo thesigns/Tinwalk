@@ -67,7 +67,7 @@ Wszystko w tej sekcji ma zostać zaimplementowane teraz. Rzeczy spoza tej sekcji
 
 ### Zdobycze
 
-Zasoby, ilość łupu i szansa na ocalałego są opisane w [loot.md](loot.md).
+Zasoby i ilość łupu są opisane w [loot.md](loot.md).
 
 | Zasób | Zastosowanie (docelowo)                                  |
 |-------|----------------------------------------------------------|
@@ -77,13 +77,14 @@ Zasoby, ilość łupu i szansa na ocalałego są opisane w [loot.md](loot.md).
 - Komunikat po przeszukaniu, np. „You've found 3 Junk”.
 - Przeszukanie może dać podręcznik, który odblokowuje wytwarzanie przedmiotów (zob. [crafting.md](crafting.md)).
 - Przeszukanie może zakończyć się spotkaniem z wrogiem (zob. [combat.md](combat.md)).
+- Przeszukanie może czasem odkryć landmark, który zostaje na mapie na zawsze (zob. [landmarks.md](landmarks.md)).
 - W prototypie nie ma budowania.
 
 ### Plecak
 
 - Plecak mieści łącznie 50 jednostek wszystkich zasobów i przedmiotów (np. 25 Junk i 25 Food). Ile miejsca zajmuje przedmiot albo podręcznik, opisuje [crafting.md](crafting.md).
 - Gdy znalezisko nie mieści się w całości, użytkownik zabiera tyle, ile się zmieści, a reszta przepada. Komunikat, np. „You've found 3 Junk, but could only carry 1”.
-- Z pełnym plecakiem nadal można przeszukiwać (np. w nadziei na ocalałego).
+- Z pełnym plecakiem nadal można przeszukiwać (np. w nadziei na landmark albo żeby uratować ocalałego).
 - Dotknięcie plecaka na pasku stanu otwiera jego zawartość: ile jednostek każdego zasobu niesie użytkownik, jakie przedmioty i ile miejsca zostało.
 - Z plecaka można wyrzucać zasoby, np. żeby zrobić miejsce na inne. Użytkownik zaznacza przyciskami −/+, ile jednostek którego zasobu wyrzucić (przytrzymanie przycisku zmienia liczbę dalej), i zatwierdza przyciskiem **Drop**. Zamknięcie okna bez zatwierdzenia niczego nie wyrzuca.
 - Przedmioty i podręczniki wyrzuca się pojedynczo.
@@ -91,9 +92,9 @@ Zasoby, ilość łupu i szansa na ocalałego są opisane w [loot.md](loot.md).
 
 ### Ocaleni (Survivors)
 
-- Każde przeszukanie może dać ocalałego, osobno od losowania zasobów. Szansa zależy od odległości od schronu (zob. [loot.md](loot.md)).
-- Ocalały może się pojawić tylko wtedy, gdy z użytkownikiem nie idzie już żaden ocalały. Użytkownik eskortuje najwyżej jednego ocalałego naraz.
-- Po znalezieniu użytkownik wybiera: **Take with you** albo **Leave**. Pozostawiony ocalały przepada.
+- Ocalałych zdobywa się tylko w misjach ratunkowych: radio w schronie odbiera wezwanie rannego ocalałego, który czeka przy landmarku (zob. [landmarks.md](landmarks.md)). Zwykłe przeszukanie nie daje ocalałych.
+- Użytkownik eskortuje najwyżej jednego ocalałego naraz.
+- Po ratunku użytkownik wybiera: **Take with you** albo **Leave**. Pozostawiony ocalały przepada.
 - Ocalały idący z użytkownikiem zwiększa pojemność plecaka o 30 jednostek (łącznie 80), a ranny tylko o 10 (zob. [combat.md](combat.md#rany)).
 - Ocalały ma losowe imię.
 - Ocaleni w schronie jedzą i bez jedzenia odchodzą (zob. [survivors.md](survivors.md)). Poza tym w prototypie nic nie robią.
@@ -129,6 +130,7 @@ Zasoby, ilość łupu i szansa na ocalałego są opisane w [loot.md](loot.md).
 - Na mapie widoczne są:
   - schron jako okrąg z nazwą,
   - aktywne przeszukane obszary jako zlane kształty, zakreskowane czerwonym ołówkiem, z krzyżykiem w miejscu każdego przeszukania,
+  - odkryte landmarki jako małe ikony, a cel misji ratunkowej zakreślony czerwonym ołówkiem (zob. [landmarks.md](landmarks.md)),
   - pozycja użytkownika jako pinezka (z okręgiem dokładności GPS),
 - Pinezka jest zielona, gdy użytkownik może przeszukać obszar, a czerwona, gdy nie może (np. jest w przeszukanym obszarze, za blisko schronu albo w schronie). Przy słabym sygnale pinezka jest szara.
 - Domyślny widok obejmuje około 1–2 km wokół użytkownika i jest wycentrowany na użytkowniku.
@@ -141,7 +143,7 @@ Zasoby, ilość łupu i szansa na ocalałego są opisane w [loot.md](loot.md).
 - Pasek stanu pokazuje: zawartość plecaka (np. „Backpack 12/50”), czy idzie z nami ocalały, oraz jakość sygnału GPS. Dotknięcie plecaka otwiera panel plecaka.
 - Przyciski zależą od kontekstu: **Create a Shelter**, **Search area**, **Unload**.
 - Obok kompasu i podziałki mapy jedno słowo mówi, gdzie stoi użytkownik: **Shelter**, **Plains**, **Forest** albo **Ruins**. W ruinach pod spodem jest mniejszym drukiem nazwa osady. Dzięki temu na granicy biomów nie trzeba zgadywać z mapy, jaki łup da przeszukanie. Bez pozycji słowa nie ma, a przy słabym sygnale jest przygaszone, tak jak pinezka.
-- Panel schronu pokazuje nazwę schronu, stan magazynu, przedmioty i podręczniki, warsztat (zob. [crafting.md](crafting.md)) oraz ocalałych z ich etapem głodu i ranami (zob. [survivors.md](survivors.md)).
+- Panel schronu pokazuje nazwę schronu, stan magazynu, przedmioty i podręczniki, warsztat (zob. [crafting.md](crafting.md)), radio (zob. [landmarks.md](landmarks.md#radio)) oraz ocalałych z ich etapem głodu i ranami (zob. [survivors.md](survivors.md)).
 
 #### Pierwsze uruchomienie
 
@@ -182,3 +184,5 @@ Tych rzeczy nie implementujemy w prototypie.
 - Pełna aplikacja PWA (instalacja na ekranie głównym, działanie offline).
 - Utrzymywanie włączonego ekranu podczas spaceru (Wake Lock API).
 - Podstawowa ochrona przed oszukiwaniem, np. limit prędkości przemieszczania się.
+- Inne misje do landmarków, np. „czeka tam coś specjalnego”.
+- Łup zależny od rodzaju landmarku, np. apteka częściej daje apteczki.

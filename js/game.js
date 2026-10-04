@@ -1,5 +1,5 @@
-// Game rules: shelter, searching, backpack, survivors, unloading and meals,
-// crafting, fights and wounds.
+// Game rules: shelter, searching, backpack, landmarks, the radio and rescue
+// missions, survivors, unloading and meals, crafting, fights and wounds.
 // Functions take the game state and mutate it; saving is up to the caller.
 
 import { distanceMeters, toMercator } from './geo.js';
@@ -11,14 +11,14 @@ export const RESOURCES = [
   { id: 'food', label: 'Food' },
 ];
 
-// Searches further from the shelter turn up more loot and more survivors.
+// Searches further from the shelter turn up more loot.
 // Each tier applies up to (but not including) its maxDistance in meters.
 const LOOT_TIERS = [
-  { maxDistance: 1000, minLoot: 1, maxLoot: 1, survivorChance: 0.01 },
-  { maxDistance: 2000, minLoot: 1, maxLoot: 2, survivorChance: 0.02 },
-  { maxDistance: 4000, minLoot: 2, maxLoot: 4, survivorChance: 0.04 },
-  { maxDistance: 8000, minLoot: 3, maxLoot: 6, survivorChance: 0.06 },
-  { maxDistance: Infinity, minLoot: 4, maxLoot: 8, survivorChance: 0.08 },
+  { maxDistance: 1000, minLoot: 1, maxLoot: 1 },
+  { maxDistance: 2000, minLoot: 1, maxLoot: 2 },
+  { maxDistance: 4000, minLoot: 2, maxLoot: 4 },
+  { maxDistance: 8000, minLoot: 3, maxLoot: 6 },
+  { maxDistance: Infinity, minLoot: 4, maxLoot: 8 },
 ];
 
 // The biome where the player searches decides which resource is likely.
@@ -30,9 +30,13 @@ const BIOME_LOOT_WEIGHTS = {
 
 // Manuals unlock crafting recipes. Ids double as keys in the save.
 export const MANUALS = {
+  radio: { label: 'Radio Manual' },
   knifemaking: { label: 'Knifemaking Manual' },
   pharmacology: { label: 'Pharmacology Manual' },
 };
+// The radio leads to rescue missions, the only way to find survivors, so its
+// manual always comes first.
+const FIRST_MANUAL = 'radio';
 export const MANUAL_SIZE = 3;
 // Each search without a manual makes the next one likelier, so bad luck
 // doesn't keep a player from crafting for long.
@@ -40,6 +44,7 @@ const MANUAL_BASE_CHANCE = 0.02;
 const MANUAL_CHANCE_STEP = 0.01;
 const MANUAL_MAX_CHANCE = 0.2;
 // Pharmacies are in towns, so the Pharmacology Manual turns up more often in ruins.
+// The first manual is always the same, so it needs no weights.
 const BIOME_MANUAL_WEIGHTS = {
   plains: { knifemaking: 1, pharmacology: 1 },
   forest: { knifemaking: 1, pharmacology: 1 },
@@ -53,6 +58,47 @@ export const ITEMS = {
   'first-aid-kit': { label: 'First aid kit', manual: 'pharmacology', cost: 7, uses: 3, size: 2 },
 };
 const FIRST_AID_KIT = 'first-aid-kit';
+
+// The radio is built once and stays in the shelter. Expensive on purpose:
+// building it is a goal in itself.
+export const RADIO = { label: 'Radio', manual: 'radio', cost: 30 };
+// One listen every few hours. The chance of a call grows the longer the radio
+// has been quiet, counted from the end of the last mission, so a player who
+// listens once a day always hears someone.
+export const LISTEN_COOLDOWN_MS = 4 * 60 * 60 * 1000;
+const CALL_CHANCE_STEP = 0.25;
+const CALL_CHANCE_PERIOD_MS = 4 * 60 * 60 * 1000;
+const MISSION_DURATION_MS = 24 * 60 * 60 * 1000;
+
+// Landmarks, by the biome they are found in. Ids double as icon names.
+export const LANDMARKS = {
+  'abandoned-mine': { label: 'Abandoned Mine', biome: 'plains' },
+  farmstead: { label: 'Farmstead', biome: 'plains' },
+  windmill: { label: 'Windmill', biome: 'plains' },
+  'grain-silo': { label: 'Grain Silo', biome: 'plains' },
+  'bus-wreck': { label: 'Bus Wreck', biome: 'plains' },
+  'roadside-shrine': { label: 'Roadside Shrine', biome: 'plains' },
+  watchtower: { label: 'Watchtower', biome: 'forest' },
+  'lean-to': { label: 'Lean-to', biome: 'forest' },
+  'hunting-stand': { label: 'Hunting Stand', biome: 'forest' },
+  'ranger-station': { label: 'Ranger Station', biome: 'forest' },
+  bunker: { label: 'Bunker', biome: 'forest' },
+  'plane-wreck': { label: 'Plane Wreck', biome: 'forest' },
+  pharmacy: { label: 'Pharmacy', biome: 'ruins' },
+  'gas-station': { label: 'Gas Station', biome: 'ruins' },
+  'police-station': { label: 'Police Station', biome: 'ruins' },
+  school: { label: 'School', biome: 'ruins' },
+  'water-tower': { label: 'Water Tower', biome: 'ruins' },
+  church: { label: 'Church', biome: 'ruins' },
+};
+const LANDMARK_CHANCE = 0.06;
+// Few and far between, so the map doesn't get crowded, and never right by
+// the shelter, so going to one means going out.
+const LANDMARK_SPACING = 500;
+const LANDMARK_SHELTER_DISTANCE = 500;
+// A landmark stands where the player searched, which proves they could get
+// there on foot. From a bus or a train it could end up on a road or railway.
+const MAX_LANDMARK_SPEED = 10 / 3.6;
 
 // lossOnRun and lossOnDefeat are the shares of backpack resources the player
 // loses. Ids double as icon names.
@@ -133,6 +179,7 @@ export function createShelter(state, { lat, lon }, name, time) {
     storage: emptyResources(),
     items: [],
     manuals: [],
+    radio: null,
     survivors: [],
     // Survivors who left, kept for statistics such as how long they lasted.
     departedSurvivors: [],
@@ -183,12 +230,16 @@ export function searchBlocker(state, position, time) {
 
 // Searches the area, which counts as searched whatever happens next. Returns
 // { enemy } if an enemy shows up: the player then fights or runs, and only a
-// won fight brings loot. Otherwise returns { loot } from collectLoot().
+// won fight brings loot. Otherwise returns { loot, rescued }, with loot from
+// collectLoot() and rescued the name of the survivor found if the search
+// reached the rescue mission's landmark, or null.
 export function search(state, position, time, random = Math.random) {
   state.searchedAreas.push({ lat: position.lat, lon: position.lon, searchedAt: time });
+  const rescued = completeRescue(state, time);
+  // A wounded survivor wouldn't have lasted with enemies around.
   // There is only one kind of enemy so far.
-  if (random() < ENCOUNTER_CHANCE) return { enemy: ENEMIES[0] };
-  return { loot: collectLoot(state, position, time, 1, random) };
+  if (!rescued && random() < ENCOUNTER_CHANCE) return { enemy: ENEMIES[0] };
+  return { loot: collectLoot(state, position, time, 1, random), rescued };
 }
 
 // The biome at a { lat, lon } position, e.g. BIOMES.forest.
@@ -203,9 +254,10 @@ export function settlementAtPosition(position) {
   return settlementAt(x, y);
 }
 
-// Returns { resource, found, carried, survivor, manual }, where survivor is a
-// name or null and manual a manual id or null. A found survivor joins only
-// after takeSurvivor(), and a found manual is carried only after takeManual().
+// Returns { resource, found, carried, manual, landmark }, where manual is a
+// manual id or null and landmark a newly discovered landmark or null. A found
+// manual is carried only after takeManual(); a landmark is on the map at once.
+// The position may carry the player's speed in m/s (see gps.js).
 export function collectLoot(state, position, time, multiplier = 1, random = Math.random) {
   const tier = lootTier(distanceMeters(state.shelter, position));
   const biome = biomeAtPosition(position).name;
@@ -213,12 +265,13 @@ export function collectLoot(state, position, time, multiplier = 1, random = Math
   const found = multiplier * (tier.minLoot + Math.floor(random() * (tier.maxLoot - tier.minLoot + 1)));
   const carried = Math.min(found, freeSpace(state, time));
   state.backpack[resource.id] += carried;
-
-  const survivor =
-    !state.companion && random() < tier.survivorChance
-      ? SURVIVOR_NAMES[Math.floor(random() * SURVIVOR_NAMES.length)]
-      : null;
-  return { resource, found, carried, survivor, manual: rollManual(state, biome, random) };
+  return {
+    resource,
+    found,
+    carried,
+    manual: rollManual(state, biome, random),
+    landmark: rollLandmark(state, position, biome, time, random),
+  };
 }
 
 // A manual the player doesn't have yet, or null.
@@ -231,8 +284,26 @@ function rollManual(state, biome, random) {
     return null;
   }
   state.searchesWithoutManual = 0;
+  if (missing.includes(FIRST_MANUAL)) return FIRST_MANUAL;
   const weights = BIOME_MANUAL_WEIGHTS[biome];
   return pickWeighted(missing.map((id) => ({ id })), weights, random).id;
+}
+
+// Sometimes discovers a landmark where the player searched. Returns it, or null.
+function rollLandmark(state, position, biome, time, random) {
+  if (!canHaveLandmark(state, position) || random() >= LANDMARK_CHANCE) return null;
+  const types = Object.keys(LANDMARKS).filter((type) => LANDMARKS[type].biome === biome);
+  const type = types[Math.floor(random() * types.length)];
+  const landmark = { type, lat: position.lat, lon: position.lon, discoveredAt: time };
+  state.landmarks.push(landmark);
+  return landmark;
+}
+
+function canHaveLandmark(state, position) {
+  // An unknown speed counts as walking: it is unknown mostly when standing still.
+  if (position.speed > MAX_LANDMARK_SPEED) return false;
+  if (distanceMeters(state.shelter, position) < LANDMARK_SHELTER_DISTANCE) return false;
+  return state.landmarks.every((landmark) => distanceMeters(landmark, position) >= LANDMARK_SPACING);
 }
 
 // Whether the player has the manual, in the shelter or on the way there.
@@ -356,6 +427,13 @@ export function treat(state, survivor, time) {
   return true;
 }
 
+// What a manual lets the player craft, by label.
+export function manualRecipes(id) {
+  const labels = Object.values(ITEMS).filter((item) => item.manual === id).map((item) => item.label);
+  if (RADIO.manual === id) labels.push(RADIO.label);
+  return labels;
+}
+
 // Items the shelter's manuals let the player craft, as [id, item] pairs.
 export function knownRecipes(state) {
   return Object.entries(ITEMS).filter(([, item]) => state.shelter.manuals.includes(item.manual));
@@ -373,6 +451,89 @@ export function craft(state, id) {
   state.shelter.storage.junk -= ITEMS[id].cost;
   state.shelter.items.push({ id, uses: ITEMS[id].uses });
   return true;
+}
+
+export function knowsRadio(state) {
+  return state.shelter.manuals.includes(RADIO.manual);
+}
+
+export function canBuildRadio(state) {
+  return knowsRadio(state) && !state.shelter.radio && state.shelter.storage.junk >= RADIO.cost;
+}
+
+// Builds the radio from Junk in storage. The caller checks that the player
+// is in the shelter.
+export function buildRadio(state, time) {
+  if (!canBuildRadio(state)) return false;
+  state.shelter.storage.junk -= RADIO.cost;
+  state.shelter.radio = { builtAt: time, lastListenAt: null, quietSince: time };
+  return true;
+}
+
+// Landmarks a survivor could call from: those outside searched areas, where
+// the player can still search, and so reach them.
+export function callableLandmarks(state, time) {
+  const areas = activeSearchedAreas(state, time);
+  return state.landmarks.filter((landmark) => !isSearched(areas, landmark));
+}
+
+// Why the player can't listen to the radio: 'mission', 'away', 'companion',
+// 'cooldown' or 'landmarks', or null if they can. The caller checks that
+// there is a radio.
+export function listenBlocker(state, inShelter, time) {
+  if (state.mission) return 'mission';
+  if (!inShelter) return 'away';
+  if (state.companion) return 'companion';
+  if (time < listenReadyAt(state.shelter.radio)) return 'cooldown';
+  return callableLandmarks(state, time).length === 0 ? 'landmarks' : null;
+}
+
+export function listenReadyAt(radio) {
+  return radio.lastListenAt === null ? -Infinity : radio.lastListenAt + LISTEN_COOLDOWN_MS;
+}
+
+export function callChance(radio, time) {
+  const periods = Math.floor(Math.max(0, time - radio.quietSince) / CALL_CHANCE_PERIOD_MS);
+  return Math.min(1, CALL_CHANCE_STEP * (1 + periods));
+}
+
+// Listens to the radio. Returns the rescue mission if a survivor calls, or
+// null for static. The caller checks listenBlocker() first.
+export function listen(state, time, random = Math.random) {
+  const { radio } = state.shelter;
+  radio.lastListenAt = time;
+  if (random() >= callChance(radio, time)) return null;
+  const landmarks = callableLandmarks(state, time);
+  const { type, lat, lon } = landmarks[Math.floor(random() * landmarks.length)];
+  const survivor = SURVIVOR_NAMES[Math.floor(random() * SURVIVOR_NAMES.length)];
+  state.mission = { survivor, landmark: { type, lat, lon }, calledAt: time };
+  return state.mission;
+}
+
+export function missionEndsAt(mission) {
+  return mission.calledAt + MISSION_DURATION_MS;
+}
+
+// Ends the mission if the survivor's time ran out. Returns the failed
+// mission, or null.
+export function expireMission(state, time) {
+  const { mission } = state;
+  if (!mission || time < missionEndsAt(mission)) return null;
+  state.mission = null;
+  // The radio went quiet when the mission ended, not when the game was opened.
+  state.shelter.radio.quietSince = missionEndsAt(mission);
+  return mission;
+}
+
+// Ends the mission if its landmark has just been searched. Returns the
+// rescued survivor's name, or null. They join only after takeSurvivor().
+function completeRescue(state, time) {
+  const { mission } = state;
+  if (!mission || time >= missionEndsAt(mission)) return null;
+  if (!isSearched(activeSearchedAreas(state, time), mission.landmark)) return null;
+  state.mission = null;
+  state.shelter.radio.quietSince = time;
+  return mission.survivor;
 }
 
 export function canPack(state, item, time) {
@@ -406,8 +567,9 @@ export function dropFromBackpack(state, { resources, items = [], manuals = [] })
   return dropped;
 }
 
-export function takeSurvivor(state, name) {
-  state.companion = { name, woundedAt: null };
+// Rescued survivors called for help because they were hurt, so they start wounded.
+export function takeSurvivor(state, name, time) {
+  state.companion = { name, woundedAt: time };
 }
 
 export function canUnload(state) {

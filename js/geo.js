@@ -21,6 +21,16 @@ export function distanceMeters(a, b) {
   return 2 * EARTH_RADIUS * Math.asin(Math.sqrt(h));
 }
 
+// Initial bearing from a to b in degrees, clockwise from north (0-360).
+export function bearingDegrees(a, b) {
+  const lat1 = toRadians(a.lat);
+  const lat2 = toRadians(b.lat);
+  const dLon = toRadians(b.lon - a.lon);
+  const y = Math.sin(dLon) * Math.cos(lat2);
+  const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
+  return (toDegrees(Math.atan2(y, x)) + 360) % 360;
+}
+
 // Average of { lat, lon, accuracy } readings, weighted so more accurate readings count more.
 // Plain averaging of degrees is fine for points a few dozen meters apart.
 export function averagePosition(readings) {

@@ -21,6 +21,11 @@ const PATTERNS = {
   craft: [20, 60, 20, 60, 30],
   heal: [20, 80, 40],
   manual: [30, 50, 30],
+  listen: [10, 300, 10, 500, 10, 400, 10],
+  call: [30, 60, 30, 60, 30, 150, 90, 60, 90],
+  static: [15],
+  lost: [100, 100, 60],
+  landmark: [70, 80, 30],
 };
 
 export const canVibrate = typeof navigator.vibrate === 'function';

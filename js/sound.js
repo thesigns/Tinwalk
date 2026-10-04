@@ -56,6 +56,27 @@ export class SoundEffects {
     this.envelope(biquad, time, duration, volume, 0.003, source);
   }
 
+  // Steady filtered noise that fades in and out, e.g. radio static.
+  hiss(time, { duration, volume, frequency, q = 0.7, fade = 0.3 }) {
+    const source = this.context.createBufferSource();
+    source.buffer = this.noiseBuffer;
+    source.loop = true;
+    const biquad = this.context.createBiquadFilter();
+    biquad.type = 'bandpass';
+    biquad.frequency.value = frequency;
+    biquad.Q.value = q;
+    const gain = this.context.createGain();
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(volume, time + fade);
+    gain.gain.setValueAtTime(volume, time + duration - fade);
+    gain.gain.linearRampToValueAtTime(0, time + duration);
+    source.connect(biquad);
+    biquad.connect(gain);
+    gain.connect(this.master);
+    source.start(time);
+    source.stop(time + duration + 0.05);
+  }
+
   envelope(node, time, duration, volume, attack, source = node) {
     const gain = this.context.createGain();
     gain.gain.setValueAtTime(0, time);
@@ -167,6 +188,46 @@ const SOUNDS = {
     sound.noise(time, { duration: 0.25, volume: 0.25, frequency: 4000, filter: 'highpass' });
     sound.tone(time + 0.15, { frequency: 659.25, type: 'triangle', duration: 0.35, volume: 0.18 });
     sound.tone(time + 0.3, { frequency: 880, type: 'triangle', duration: 0.5, volume: 0.18 });
+  },
+  // Turning the dial through static, with crackles. Lasts about as long as
+  // listening does in main.js.
+  listen(sound, time) {
+    sound.hiss(time, { duration: 3.4, volume: 0.22, frequency: 1800 });
+    for (let i = 0; i < 14; i++) {
+      sound.noise(time + 0.2 + Math.random() * 3, {
+        duration: 0.02 + Math.random() * 0.04,
+        volume: 0.3 + Math.random() * 0.4,
+        frequency: 2500 + Math.random() * 2500,
+        q: 4,
+      });
+    }
+    // Squeals of the dial passing stations.
+    for (const start of [0.6, 1.9]) {
+      sound.tone(time + start, { frequency: 1400, endFrequency: 700, type: 'sine', duration: 0.4, volume: 0.04 });
+    }
+  },
+  // A voice breaking through: Morse-like beeps.
+  call(sound, time) {
+    [0, 0.12, 0.24, 0.5, 0.74, 0.98, 1.24, 1.36, 1.48].forEach((start, i) => {
+      const long = i >= 3 && i <= 5;
+      sound.tone(time + start, { frequency: 880, type: 'square', duration: long ? 0.2 : 0.08, volume: 0.05 });
+    });
+  },
+  // Nothing but static, dying out.
+  static(sound, time) {
+    sound.noise(time, { duration: 0.5, volume: 0.35, frequency: 1800, q: 0.7 });
+  },
+  // The signal fading out for good.
+  lost(sound, time) {
+    sound.hiss(time, { duration: 1.2, volume: 0.15, frequency: 1500, fade: 0.1 });
+    sound.tone(time + 0.2, { frequency: 440, endFrequency: 180, type: 'triangle', duration: 0.9, volume: 0.15 });
+  },
+  // A new place stamped onto the map.
+  landmark(sound, time) {
+    thud(sound, time, 0.6);
+    [659.25, 987.77].forEach((frequency, i) => {
+      sound.tone(time + 0.15 + i * 0.12, { frequency, type: 'triangle', duration: 0.45, volume: 0.16 });
+    });
   },
   // Pages riffling.
   manual(sound, time) {

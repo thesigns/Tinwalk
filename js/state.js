@@ -1,10 +1,10 @@
 // Loads, saves, exports and imports the game state.
 
 import { now } from './clock.js';
-import { ITEMS, MANUALS, RESOURCES, emptyResources } from './game.js';
+import { ITEMS, LANDMARKS, MANUALS, RESOURCES, emptyResources } from './game.js';
 
 const STORAGE_KEY = 'tinwalk.state';
-export const STATE_VERSION = 4;
+export const STATE_VERSION = 5;
 
 const INVALID_SAVE = "This file isn't a valid Tinwalk save";
 const OTHER_VERSION = 'This save comes from a different version of Tinwalk';
@@ -48,6 +48,14 @@ const MIGRATIONS = {
     }
     save.version = 4;
   },
+  // Landmarks, the radio and rescue missions. The Radio Manual is new, so no
+  // one has it yet.
+  4(save) {
+    save.landmarks = [];
+    save.mission = null;
+    if (isObject(save.shelter)) save.shelter.radio = null;
+    save.version = 5;
+  },
 };
 
 function migrate(save) {
@@ -59,10 +67,14 @@ export function createInitialState() {
   return {
     version: STATE_VERSION,
     // { name, lat, lon, createdAt, storage, items, manuals,
+    //   radio: { builtAt, lastListenAt, quietSince } | null,
     //   survivors: [{ name, arrivedAt, lastMealAt, woundedAt }],
     //   departedSurvivors: [{ name, arrivedAt, leftAt, reason }] }
     shelter: null,
     searchedAreas: [], // [{ lat, lon, searchedAt }]
+    landmarks: [], // [{ type, lat, lon, discoveredAt }]
+    // The rescue mission under way: { survivor, landmark: { type, lat, lon }, calledAt }
+    mission: null,
     backpack: emptyResources(),
     backpackItems: [], // [{ id, uses }]
     backpackManuals: [], // manual ids
@@ -140,6 +152,15 @@ const isManualList = (value) =>
   Array.isArray(value) &&
   value.every((id) => Object.hasOwn(MANUALS, id)) &&
   new Set(value).size === value.length;
+const isLandmarkPoint = (value) => isPoint(value) && Object.hasOwn(LANDMARKS, value.type);
+const isLandmark = (value) => isLandmarkPoint(value) && isNumber(value.discoveredAt);
+const isMission = (value) =>
+  isObject(value) && typeof value.survivor === 'string' && isLandmarkPoint(value.landmark) && isNumber(value.calledAt);
+const isRadio = (value) =>
+  isObject(value) &&
+  isNumber(value.builtAt) &&
+  (value.lastListenAt === null || isNumber(value.lastListenAt)) &&
+  isNumber(value.quietSince);
 
 function isValidShelter(shelter) {
   return (
@@ -149,6 +170,7 @@ function isValidShelter(shelter) {
     isResources(shelter.storage) &&
     isItemList(shelter.items) &&
     isManualList(shelter.manuals) &&
+    (shelter.radio === null || isRadio(shelter.radio)) &&
     Array.isArray(shelter.survivors) &&
     shelter.survivors.every(isShelterSurvivor) &&
     Array.isArray(shelter.departedSurvivors) &&
@@ -163,6 +185,10 @@ function isValidState(state) {
     (state.shelter === null || isValidShelter(state.shelter)) &&
     Array.isArray(state.searchedAreas) &&
     state.searchedAreas.every((area) => isPoint(area) && isNumber(area.searchedAt)) &&
+    Array.isArray(state.landmarks) &&
+    state.landmarks.every(isLandmark) &&
+    // A mission needs a radio, which is in the shelter.
+    (state.mission === null || (isMission(state.mission) && state.shelter?.radio != null)) &&
     isResources(state.backpack) &&
     isItemList(state.backpackItems) &&
     isManualList(state.backpackManuals) &&

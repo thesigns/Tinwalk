@@ -3,17 +3,22 @@ import { DEBUG_START, DebugPanel, isDebug } from './debug.js';
 import {
   HUNGER_STAGES,
   ITEMS,
+  LANDMARKS,
   MANUALS,
   MANUAL_SIZE,
+  RADIO,
   RESOURCES,
   SEARCH_RADIUS,
   SHELTER_RADIUS,
   VICTORY_LOOT_MULTIPLIER,
+  WOUNDED_CAPACITY_BONUS,
   activeSearchedAreas,
   backpackCapacity,
   biomeAtPosition,
   backpackLoad,
   bestWeapon,
+  buildRadio,
+  canBuildRadio,
   canCraft,
   canPack,
   canTakeManual,
@@ -25,12 +30,19 @@ import {
   createShelter,
   dropFromBackpack,
   emptyResources,
+  expireMission,
   fight,
   freeSpace,
   hungerOf,
   isInShelter,
   isWounded,
   knownRecipes,
+  knowsRadio,
+  listen,
+  listenBlocker,
+  listenReadyAt,
+  manualRecipes,
+  missionEndsAt,
   packItem,
   pruneSearchedAreas,
   runAway,
@@ -47,7 +59,7 @@ import {
   woundHealsAt,
 } from './game.js';
 import { flyIcon, iconElement, replayAnimation, wait } from './fx.js';
-import { averagePosition, distanceMeters } from './geo.js';
+import { averagePosition, bearingDegrees, distanceMeters } from './geo.js';
 import { LocationTracker } from './gps.js';
 import { Haptics, canVibrate } from './haptics.js';
 import { MapView } from './map.js';
@@ -58,6 +70,8 @@ const SHELTER_LOCATING_MS = 10_000;
 const SEARCH_ANIMATION_MS = 1_400;
 const REWARD_CARD_MS = 1_300;
 const RIPPLE_MS = 900;
+// How long the radio crackles before the player hears whether anyone called.
+const LISTEN_MS = 3_400;
 const ZOOM_STEP = 1.5;
 const TOAST_DURATION_MS = 4_000;
 // Holding a +/- button in the backpack keeps stepping after a short pause.
@@ -82,6 +96,16 @@ const SEARCH_BLOCKER_HINTS = {
 const ENCOUNTER_TEXT = {
   'giant-rat': 'A rat the size of a dog jumps out at you, teeth bared.',
 };
+const COMPASS_POINTS = [
+  { short: 'N', long: 'north' },
+  { short: 'NE', long: 'north-east' },
+  { short: 'E', long: 'east' },
+  { short: 'SE', long: 'south-east' },
+  { short: 'S', long: 'south' },
+  { short: 'SW', long: 'south-west' },
+  { short: 'W', long: 'west' },
+  { short: 'NW', long: 'north-west' },
+];
 
 const $ = (id) => document.getElementById(id);
 const ui = {
@@ -108,6 +132,17 @@ const ui = {
   shelterName: $('shelter-name'),
   survivorDialog: $('survivor-dialog'),
   survivorName: $('survivor-name'),
+  survivorNote: $('survivor-note'),
+  radioSection: $('radio-section'),
+  radioText: $('radio-text'),
+  radioListen: $('radio-listen'),
+  radioDialog: $('radio-dialog'),
+  radioTitle: $('radio-title'),
+  radioMessage: $('radio-message'),
+  radioNote: $('radio-note'),
+  missionNote: $('mission-note'),
+  missionTitle: $('mission-title'),
+  missionDetail: $('mission-detail'),
   encounterDialog: $('encounter-dialog'),
   encounterTitle: $('encounter-title'),
   encounterIcon: $('encounter-icon'),
@@ -175,6 +210,7 @@ let started = false; // location tracking starts only after the welcome screen
 let inShelter = false;
 let locatingShelter = false;
 let searching = false;
+let listening = false;
 // While loot flies into the backpack, the status bar keeps showing the old load.
 let holdBackpack = false;
 let toastTimer = null;
@@ -202,13 +238,16 @@ function update() {
   debugPanel?.update();
 }
 
-// Searched areas expire and survivors get hungry even when nothing else happens.
+// Searched areas expire, survivors get hungry and rescue missions run out
+// even when nothing else happens.
 function tick() {
   const time = now();
   const pruned = pruneSearchedAreas(state, time);
   const { meals, left } = settleMeals(state, time);
-  if (pruned || meals > 0 || left.length > 0) saveState(state);
+  const failed = expireMission(state, time);
+  if (pruned || meals > 0 || left.length > 0 || failed) saveState(state);
   if (left.length > 0) showDepartures(left);
+  if (failed) showLostSignal(failed);
   if (ui.shelterPanel.open) renderShelterPanel();
   update();
 }
@@ -252,6 +291,25 @@ function renderStatus() {
     ui.locationPlace.textContent = settlement?.name ?? '';
     ui.location.classList.toggle('uncertain', !tracker.hasGoodSignal);
   }
+
+  const { mission } = state;
+  ui.missionNote.hidden = !mission;
+  if (mission) {
+    const { landmark, survivor } = mission;
+    const from = position ?? state.shelter;
+    ui.missionTitle.textContent = `${survivor} · ${LANDMARKS[landmark.type].label}`;
+    ui.missionDetail.textContent =
+      `${formatDistance(distanceMeters(from, landmark))} ${compassPoint(from, landmark).short}` +
+      ` · ${formatDuration(missionEndsAt(mission) - time)} left`;
+  }
+}
+
+function compassPoint(from, to) {
+  return COMPASS_POINTS[Math.round(bearingDegrees(from, to) / 45) % COMPASS_POINTS.length];
+}
+
+function formatDistance(meters) {
+  return meters < 1000 ? `${Math.round(meters / 10) * 10} m` : `${(meters / 1000).toFixed(1)} km`;
 }
 
 // Signal bars (0-4), a short label for the status bar and a full description.
@@ -345,6 +403,8 @@ function renderMap() {
     player: position ? { position, good: tracker.hasGoodSignal, canSearch } : null,
     shelter: state.shelter && { ...state.shelter, radius: SHELTER_RADIUS },
     searchedAreas: activeSearchedAreas(state, now()),
+    landmarks: state.landmarks,
+    target: state.mission?.landmark ?? null,
   });
 }
 
@@ -434,6 +494,7 @@ async function searchAction() {
   const result = search(state, position, now());
   saveAndUpdate();
   let { loot } = result;
+  const { rescued = null } = result;
   let victory = null;
   if (result.enemy) {
     holdBackpack = false;
@@ -445,7 +506,7 @@ async function searchAction() {
     saveAndUpdate();
   }
 
-  const { resource, found, carried, survivor, manual } = loot;
+  const { resource, found, carried, manual, landmark } = loot;
   let message = `You've found ${found} ${resource.label}`;
   if (carried === 0) message += ', but your backpack is full';
   else if (carried < found) message += `, but could only carry ${carried}`;
@@ -466,8 +527,27 @@ async function searchAction() {
     feedback('land');
   }
 
-  if (survivor) await offerSurvivor(survivor);
+  if (landmark) await showLandmark(landmark);
+  if (rescued) await offerSurvivor(rescued);
   if (manual) await offerManual(manual);
+}
+
+// A newly discovered landmark is stamped onto the map.
+async function showLandmark(landmark) {
+  const { label } = LANDMARKS[landmark.type];
+  feedback('landmark');
+  mapView.playRipple(landmark, 0, RIPPLE_MS);
+  await showReward({
+    icon: landmark.type,
+    amount: '',
+    name: label,
+    note: `You've discovered ${withArticle(label)}. It stays on your map.`,
+  });
+}
+
+// "an Abandoned Mine", "a Farmstead".
+function withArticle(label) {
+  return `${/^[aeiou]/i.test(label) ? 'an' : 'a'} ${label}`;
 }
 
 // Asks whether to fight the enemy or run, and settles it. Returns a note for
@@ -520,9 +600,10 @@ function describeResources(amounts) {
 
 async function offerSurvivor(survivor) {
   ui.survivorName.textContent = survivor;
+  ui.survivorNote.textContent = `Wounded: +${WOUNDED_CAPACITY_BONUS} backpack space until the wound heals.`;
   feedback('survivor');
   if ((await ask(ui.survivorDialog)) === 'take') {
-    takeSurvivor(state, survivor);
+    takeSurvivor(state, survivor, now());
     saveAndUpdate();
     replayAnimation(ui.companion, 'bump');
     feedback('land');
@@ -536,9 +617,9 @@ async function offerSurvivor(survivor) {
 // to drop something, and then gets the offer again.
 async function offerManual(id) {
   const { label } = MANUALS[id];
-  const recipes = Object.values(ITEMS).filter((item) => item.manual === id).map((item) => item.label);
   ui.manualName.textContent = label;
-  ui.manualText.textContent = `Bring it to your shelter to craft: ${listNames(recipes)}. Takes ${MANUAL_SIZE} backpack space.`;
+  ui.manualText.textContent =
+    `Bring it to your shelter to craft: ${listNames(manualRecipes(id))}. Takes ${MANUAL_SIZE} backpack space.`;
   feedback('manual');
   for (;;) {
     const fits = canTakeManual(state, now());
@@ -797,8 +878,9 @@ function renderShelterPanel() {
       return chip;
     }),
   );
-  renderOnChange(ui.shelterRecipes, [shelter.manuals, shelter.storage.junk, inShelter], () =>
-    knownRecipes(state).map(([id, { label, cost, uses, size }]) =>
+  renderOnChange(ui.shelterRecipes, [shelter.manuals, shelter.storage.junk, inShelter, shelter.radio !== null], () => [
+    ...(knowsRadio(state) ? [radioRow()] : []),
+    ...knownRecipes(state).map(([id, { label, cost, uses, size }]) =>
       itemRow({
         icon: id,
         label,
@@ -808,16 +890,122 @@ function renderShelterPanel() {
         onClick: () => craftAction(id),
       }),
     ),
-  );
+  ]);
   let hint = '';
   if (shelter.manuals.length === 0) hint = 'Recipes come from manuals found in the wasteland.';
   else if (!inShelter) hint = 'Craft and pack gear while you are in the shelter.';
   ui.workshopHint.textContent = hint;
   ui.workshopHint.hidden = !hint;
 
+  renderRadio(time);
+
   ui.shelterSurvivorCount.textContent = shelter.survivors.length;
   renderSurvivorBadges(time);
   ui.shelterNoSurvivors.hidden = shelter.survivors.length > 0;
+}
+
+// The radio in the workshop: a recipe until it is built, then a stamp.
+function radioRow() {
+  if (state.shelter.radio) {
+    return itemRow({ icon: 'radio', label: RADIO.label, detail: 'Stays in the shelter', action: null });
+  }
+  return itemRow({
+    icon: 'radio',
+    label: RADIO.label,
+    detail: `${RADIO.cost} Junk · stays in the shelter`,
+    action: 'Build',
+    enabled: inShelter && canBuildRadio(state),
+    onClick: buildRadioAction,
+  });
+}
+
+// Its text changes every tick, but the Listen button stays the same element
+// (see renderOnChange for why).
+function renderRadio(time) {
+  const { radio } = state.shelter;
+  ui.radioSection.hidden = !radio;
+  if (!radio) return;
+  const blocker = listenBlocker(state, inShelter, time);
+  ui.radioText.textContent = listening ? 'Listening…' : radioText(blocker, time);
+  ui.radioListen.disabled = listening || blocker !== null;
+  ui.radioListen.classList.toggle('listening', listening);
+}
+
+function radioText(blocker, time) {
+  const { radio } = state.shelter;
+  switch (blocker) {
+    case 'mission': {
+      const { survivor, landmark } = state.mission;
+      return (
+        `${survivor} is waiting at the ${LANDMARKS[landmark.type].label}, ${describeWhere(landmark)}. ` +
+        `${formatDuration(missionEndsAt(state.mission) - time)} left.`
+      );
+    }
+    case 'away':
+      return 'Listen in from the shelter.';
+    case 'companion':
+      return `Bring ${state.companion.name} inside first.`;
+    case 'cooldown': {
+      const wait = formatDuration(listenReadyAt(radio) - time);
+      // Listened since the last mission ended, so all they heard was static.
+      const heardStatic = radio.lastListenAt > radio.quietSince;
+      return `${heardStatic ? 'Only static.' : 'The airwaves are quiet.'} Listen again in ${wait}.`;
+    }
+    case 'landmarks':
+      return 'Survivors call from places you know. Discover landmarks in the wasteland.';
+    default:
+      return 'Someone out there may be calling for help.';
+  }
+}
+
+// "2.4 km north-east of Bunker"
+function describeWhere(landmark) {
+  const { shelter } = state;
+  return `${formatDistance(distanceMeters(shelter, landmark))} ${compassPoint(shelter, landmark).long} of ${shelter.name}`;
+}
+
+function buildRadioAction() {
+  if (!inShelter || !buildRadio(state, now())) return;
+  saveAndUpdate();
+  feedback('craft');
+  showToast(`You built a ${RADIO.label}`, 'radio');
+  renderShelterPanel();
+}
+
+async function listenAction() {
+  if (listening || !state.shelter?.radio || listenBlocker(state, inShelter, now()) !== null) return;
+  listening = true;
+  feedback('listen');
+  renderShelterPanel();
+  await wait(LISTEN_MS);
+  listening = false;
+  const mission = listen(state, now());
+  saveAndUpdate();
+  renderShelterPanel();
+  if (!mission) {
+    feedback('static');
+    return;
+  }
+
+  const { survivor, landmark } = mission;
+  const { label } = LANDMARKS[landmark.type];
+  feedback('call');
+  ui.radioTitle.textContent = 'Distress call';
+  ui.radioMessage.textContent = `“This is ${survivor}… I'm hurt… ${label}… ${describeWhere(landmark)}… please hurry…”`;
+  ui.radioNote.textContent =
+    `Search the area at the ${label} within ${formatDuration(missionEndsAt(mission) - now())} to bring ${survivor} home.`;
+  await ask(ui.radioDialog);
+  // Show the player where to go.
+  ui.shelterPanel.close();
+  mapView.playRipple(landmark, 0, RIPPLE_MS);
+}
+
+function showLostSignal({ survivor, landmark }) {
+  ui.radioTitle.textContent = 'Signal lost';
+  ui.radioMessage.textContent = `The signal from the ${LANDMARKS[landmark.type].label} went silent.`;
+  ui.radioNote.textContent = `No one came for ${survivor} in time.`;
+  if (!ui.radioDialog.open) ui.radioDialog.showModal();
+  feedback('lost');
 }
 
 // The shelter panel re-renders every tick, and replacing a button between
@@ -836,6 +1024,14 @@ function itemRow({ icon, label, detail, action, enabled, onClick }) {
   row.querySelector('.resource-name').textContent = label;
   row.querySelector('.item-detail').textContent = detail;
   const button = row.querySelector('.item-action');
+  if (!action) {
+    // Already built: a stamp instead of a button.
+    const stamp = document.createElement('span');
+    stamp.className = 'item-stamp';
+    stamp.textContent = 'Built';
+    button.replaceWith(stamp);
+    return row;
+  }
   button.textContent = action;
   button.disabled = !enabled;
   button.setAttribute('aria-label', `${action} ${label}`);
@@ -923,7 +1119,8 @@ function describeGame() {
   if (!position) return '—';
   const zone = inShelter ? 'In shelter' : 'Wasteland';
   const distance = state.shelter ? `, ${Math.round(distanceMeters(state.shelter, position))} m from shelter` : '';
-  return `${zone}${distance}, ${plural(activeSearchedAreas(state, now()).length, 'searched area')}`;
+  const searched = plural(activeSearchedAreas(state, now()).length, 'searched area');
+  return `${zone}${distance}, ${searched}, ${plural(state.landmarks.length, 'landmark')}`;
 }
 
 function exportSave() {
@@ -976,6 +1173,7 @@ ui.actionButton.addEventListener('click', () => {
 ui.backpackHud.addEventListener('click', openBackpackPanel);
 ui.backpackTreat.addEventListener('click', treatCompanion);
 ui.shelterButton.addEventListener('click', openShelterPanel);
+ui.radioListen.addEventListener('click', listenAction);
 ui.departureDialog.addEventListener('close', () => (departed = []));
 $('retry-location').addEventListener('click', () => tracker.start());
 $('zoom-in').addEventListener('click', () => mapView.zoomBy(1 / ZOOM_STEP));

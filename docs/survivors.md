@@ -1,6 +1,6 @@
 # Ocaleni w schronie (Survivors)
 
-Zasady życia ocalałych, którzy trafili do schronu. Znajdowanie ocalałych i eskortowanie ich do schronu opisuje [bootstrap.md](bootstrap.md), a szansę na znalezienie ocalałego [loot.md](loot.md).
+Zasady życia ocalałych, którzy trafili do schronu. Eskortowanie ocalałych do schronu opisuje [bootstrap.md](bootstrap.md), a misje ratunkowe, z których się ich zdobywa, [landmarks.md](landmarks.md).
 
 ## Przybycie
 

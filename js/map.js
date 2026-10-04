@@ -24,6 +24,13 @@ const WOBBLE_PERIOD_METERS = 190;
 const LABEL_FONT = '800 17px "Big Shoulders Stencil", Impact, sans-serif';
 // The shelter icon from the SVG sprite, in its 24x24 box.
 const HUT_ICON = new Path2D('M3 11.5 12 4l9 7.5M5.5 10v10.5h13V10M10 20.5V15h4v5.5');
+const LANDMARK_RADIUS_PX = 15;
+const LANDMARK_ICON_PX = 20;
+// The red pencil ring around the rescue mission's landmark.
+const TARGET_RADIUS_PX = 25;
+// Where the arrow to an off-screen target runs along, clear of the status
+// bar, the legend and the buttons over the map.
+const POINTER_INSET = { top: 150, right: 76, bottom: 160, left: 34 };
 
 // Kept in sync with the palette in style.css.
 const COLORS = {
@@ -148,6 +155,8 @@ export class MapView {
   //   player: { position, good, canSearch } | null,
   //   shelter: { lat, lon, name, radius } | null,
   //   searchedAreas: [{ lat, lon, searchedAt }],
+  //   landmarks: [{ type, lat, lon }],
+  //   target: { lat, lon } | null, the rescue mission's landmark
   // }
   render(scene) {
     this.scene = scene;
@@ -165,9 +174,12 @@ export class MapView {
     const complete = this.drawTerrain(scene.center);
     if (!complete) this.requestFrame();
     this.drawSearchedAreas(scene.center, scene.searchedAreas);
+    this.drawLandmarks(scene.center, scene.landmarks);
+    if (scene.target) this.drawTarget(scene.center, scene.target);
     if (scene.shelter) this.drawShelter(scene.center, scene.shelter);
     this.drawEffects();
     if (scene.player) this.drawPlayer(scene.center, scene.player);
+    if (scene.target) this.drawTargetPointer(scene.center, scene.target);
   }
 
   requestFrame() {
@@ -406,6 +418,103 @@ export class MapView {
     ctx.stroke();
   }
 
+  // Landmarks: small inked symbols on paper discs, the same size at every zoom.
+  drawLandmarks(center, landmarks) {
+    const { ctx, width, height } = this;
+    const margin = LANDMARK_RADIUS_PX + 4;
+    const scale = LANDMARK_ICON_PX / 24;
+    for (const landmark of landmarks) {
+      const { x, y } = this.toScreen(center, landmark);
+      if (x < -margin || y < -margin || x > width + margin || y > height + margin) continue;
+      ctx.beginPath();
+      ctx.arc(x, y, LANDMARK_RADIUS_PX, 0, Math.PI * 2);
+      ctx.fillStyle = COLORS.paper;
+      ctx.shadowColor = COLORS.shadow;
+      ctx.shadowBlur = 3;
+      ctx.shadowOffsetY = 1;
+      ctx.fill();
+      ctx.shadowColor = 'transparent';
+      ctx.strokeStyle = COLORS.ink;
+      ctx.lineWidth = 1.8;
+      ctx.stroke();
+
+      ctx.save();
+      ctx.translate(x - LANDMARK_ICON_PX / 2, y - LANDMARK_ICON_PX / 2);
+      ctx.scale(scale, scale);
+      ctx.lineWidth = 2.2;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.stroke(landmarkIcon(landmark.type));
+      ctx.restore();
+    }
+  }
+
+  // The rescue mission's landmark, circled twice in red pencil.
+  drawTarget(center, target) {
+    const { ctx } = this;
+    const { x, y } = this.toScreen(center, target);
+    ctx.strokeStyle = COLORS.pencil;
+    ctx.lineCap = 'round';
+    for (const [pass, lineWidth] of [[0, 2.6], [1, 1.4]]) {
+      ctx.beginPath();
+      // A hand-drawn loop: slightly oval, wobbling, its ends overshooting.
+      const turns = Math.PI * 2.15;
+      for (let step = 0; step <= 48; step++) {
+        const angle = -2 + pass * 0.7 + (turns * step) / 48;
+        const radius = TARGET_RADIUS_PX + pass * 3 + 1.5 * Math.sin(angle * 3 + pass);
+        const px = x + radius * 1.08 * Math.cos(angle);
+        const py = y + radius * 0.94 * Math.sin(angle);
+        if (step === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.lineWidth = lineWidth;
+      ctx.stroke();
+    }
+  }
+
+  // When the rescue mission's landmark is off screen, a red arrow at the edge
+  // points the way to it.
+  drawTargetPointer(center, target) {
+    const { ctx, width, height } = this;
+    const { x, y } = this.toScreen(center, target);
+    const left = POINTER_INSET.left;
+    const right = width - POINTER_INSET.right;
+    const top = POINTER_INSET.top;
+    const bottom = height - POINTER_INSET.bottom;
+    if (x >= left && x <= right && y >= top && y <= bottom) return;
+
+    // Where the line from the middle of the screen to the target leaves the inset box.
+    const cx = width / 2;
+    const cy = height / 2;
+    const dx = x - cx;
+    const dy = y - cy;
+    const t = Math.min(
+      dx > 0 ? (right - cx) / dx : dx < 0 ? (left - cx) / dx : Infinity,
+      dy > 0 ? (bottom - cy) / dy : dy < 0 ? (top - cy) / dy : Infinity,
+    );
+    const angle = Math.atan2(dy, dx);
+    ctx.save();
+    ctx.translate(cx + dx * t, cy + dy * t);
+    ctx.rotate(angle);
+    ctx.beginPath();
+    ctx.moveTo(18, 0);
+    ctx.lineTo(-10, -14);
+    ctx.lineTo(-4, 0);
+    ctx.lineTo(-10, 14);
+    ctx.closePath();
+    ctx.fillStyle = COLORS.paint;
+    ctx.shadowColor = COLORS.shadow;
+    ctx.shadowBlur = 4;
+    ctx.shadowOffsetY = 1;
+    ctx.fill();
+    ctx.shadowColor = 'transparent';
+    ctx.strokeStyle = COLORS.paper;
+    ctx.lineWidth = 2;
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+    ctx.restore();
+  }
+
   // The shelter: a double ink ring, a stamped hut and its name on a strip of tape.
   drawShelter(center, shelter) {
     const { ctx } = this;
@@ -525,6 +634,20 @@ export class MapView {
     this.scale = { meters, pixels };
     this.onScaleChange?.(meters, pixels);
   }
+}
+
+// Landmark icons are read from the SVG sprite, so the map and the interface
+// share them. They are made of paths only, which Path2D understands.
+const landmarkIcons = new Map();
+
+function landmarkIcon(type) {
+  let icon = landmarkIcons.get(type);
+  if (!icon) {
+    icon = new Path2D();
+    for (const path of document.querySelectorAll(`#i-${type} path`)) icon.addPath(new Path2D(path.getAttribute('d')));
+    landmarkIcons.set(type, icon);
+  }
+  return icon;
 }
 
 function addPolygon(path, points) {
