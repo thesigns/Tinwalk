@@ -118,7 +118,7 @@ Zasoby, ilość łupu i szansa na ocalałego są opisane w [loot.md](loot.md).
 - Ruiny obejmują całe kwartały razem z ulicami, więc na ulicy w osadzie też jest się w ruinach.
 - Osady są rysowane jako wektorowe kształty, a nie próbkowane jak reszta terenu, żeby kwartały i ulice były ostre przy każdym przybliżeniu.
 - Ruiny nie mają ikon. Przy oddaleniu kwartał jest jedną plamą, a przy największych przybliżeniach (do ok. 750 m szerokości widoku) rozpada się na budynki: dwa rzędy wzdłuż dłuższych ulic z podwórzem pośrodku. Część budynków jest uszkodzona (brakuje im rogu), a część zawalona (zostaje tylko przerywany obrys).
-- Każda osada ma stałą, wylosowaną nazwę złożoną z dwóch członów, np. „Rustford” albo „Pinemouth”. Nazwa jest wydrukowana na mapie nad środkiem osady, większa dla większych osad.
+- Każda osada ma stałą, wylosowaną nazwę złożoną z dwóch członów, np. „Rustford” albo „Pinemouth”. Nazwy nie ma na mapie, żeby jej nie zaśmiecać; widać ją tylko pod słowem **Ruins** obok kompasu (zob. Interfejs).
 - Grunt ma bardzo delikatne, rozległe cieniowanie, żeby nie był płaski, ale nie wyglądał na poplamiony.
 - Teren jest generowany deterministycznie z szerokości i długości geograficznej (np. szum simplex), więc to samo miejsce na Ziemi zawsze wygląda tak samo.
 - Szum jest próbkowany we współrzędnych metrycznych (Web Mercator), a nie bezpośrednio w stopniach. Stopień długości geograficznej jest krótszy niż stopień szerokości (w Polsce ok. 65–70 km wobec 111 km), więc próbkowanie w stopniach rozciągałoby teren w poziomie.

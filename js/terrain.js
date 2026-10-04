@@ -92,7 +92,7 @@ const settlementCache = new Map();
 const MAX_CACHED_SETTLEMENTS = 4096;
 
 // The settlement in a grid cell, or null:
-// { name, size, x, y, radius, reach, cos, sin, seed, cx, cy, blocks }, with blocks filled in by blocksOf().
+// { name, x, y, radius, reach, cos, sin, seed, cx, cy, blocks }, with blocks filled in by blocksOf().
 // Its street grid is rotated by an angle of its own; block (i, j) spans
 // [i, i + 1] block lengths by [j, j + 1] block widths in the grid's coordinates.
 function settlementIn(cx, cy) {
@@ -107,7 +107,6 @@ function settlementIn(cx, cy) {
     const end = SETTLEMENT_NAME_ENDS[Math.floor(hash(cx, cy, 708) * SETTLEMENT_NAME_ENDS.length)];
     settlement = {
       name: start + end,
-      size, // 0 for the smallest settlements, 1 for the largest
       x: (cx + 0.15 + 0.7 * hash(cx, cy, 702)) * SETTLEMENT_CELL,
       y: (cy + 0.15 + 0.7 * hash(cx, cy, 703)) * SETTLEMENT_CELL,
       radius,
