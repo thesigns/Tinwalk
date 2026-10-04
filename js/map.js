@@ -1,6 +1,7 @@
 // Draws the map on a canvas: north-up, centered on a given point, in Web Mercator.
 // Handles zooming (pinch, mouse wheel, zoomBy) and reports single taps via onTap.
 
+import { SEARCH_INFLUENCE, SEARCH_RADIUS, searchWeight } from './game.js';
 import { fromMercator, mercatorUnitsPerMeter, toMercator } from './geo.js';
 import { TerrainTiles } from './terrain-tiles.js';
 
@@ -15,6 +16,11 @@ const TILE_RENDER_BUDGET_MS = 12;
 const SCALE_BAR_LENGTHS = [50, 100, 200, 500, 1000, 2000, 5000];
 const MAX_SCALE_BAR_PX = 110;
 const HATCH_SPACING_PX = 7;
+// Grid on which the outline of searched areas is traced.
+const OUTLINE_CELL_PX = 5;
+// Pencil wobble along that outline, in pixels and in meters of its period.
+const WOBBLE_PX = 1.4;
+const WOBBLE_PERIOD_METERS = 190;
 const LABEL_FONT = '800 17px "Big Shoulders Stencil", Impact, sans-serif';
 // The shelter icon from the SVG sprite, in its 24x24 box.
 const HUT_ICON = new Path2D('M3 11.5 12 4l9 7.5M5.5 10v10.5h13V10M10 20.5V15h4v5.5');
@@ -52,6 +58,7 @@ export class MapView {
     this.onScaleChange = null; // (meters, pixels) => void
     this.scale = null;
     this.effects = []; // short animations drawn over the map
+    this.searchedOutline = null; // { key, contours }, traced for the last view
     this.resize();
     this.setUpGestures();
     window.addEventListener('resize', () => {
@@ -140,7 +147,7 @@ export class MapView {
   //   center: { lat, lon } | null,
   //   player: { position, good, canSearch } | null,
   //   shelter: { lat, lon, name, radius } | null,
-  //   searchedAreas: [{ lat, lon, radius }],
+  //   searchedAreas: [{ lat, lon, searchedAt }],
   // }
   render(scene) {
     this.scene = scene;
@@ -157,7 +164,7 @@ export class MapView {
 
     const complete = this.drawTerrain(scene.center);
     if (!complete) this.requestFrame();
-    for (const area of scene.searchedAreas) this.drawSearchedArea(scene.center, area);
+    this.drawSearchedAreas(scene.center, scene.searchedAreas);
     if (scene.shelter) this.drawShelter(scene.center, scene.shelter);
     this.drawEffects();
     if (scene.player) this.drawPlayer(scene.center, scene.player);
@@ -329,26 +336,41 @@ export class MapView {
     }
   }
 
-  // Searched areas are crossed out in red pencil: a wobbly outline, hatching and an X.
-  drawSearchedArea(center, area) {
-    const { ctx } = this;
-    const { x, y } = this.toScreen(center, area);
-    const radius = area.radius / this.metersPerPixel;
-    // Each area gets its own wobble, stable between frames.
-    const phase = (area.searchedAt % 1000) / 159;
+  // Searched areas are crossed out in red pencil: they merge into blobs with a
+  // wobbly outline and hatching, and each search point gets an X.
+  drawSearchedAreas(center, areas) {
+    if (areas.length === 0) return;
+    const { ctx, width, height } = this;
+    const metersPerPixel = this.metersPerPixel;
+    const points = areas.map((area) => this.toScreen(center, area));
+    // Animations redraw the map every frame, mostly without moving it.
+    const key = [center.lat, center.lon, metersPerPixel, width, height, ...areas.map((area) => area.searchedAt)].join();
+    if (this.searchedOutline?.key !== key) {
+      this.searchedOutline = { key, contours: traceSearchedOutline(points, metersPerPixel, width, height) };
+    }
+    const { contours } = this.searchedOutline;
+
+    // Hatching and wobble are pinned to the world, so they don't slide
+    // under the outline as the map moves with the player.
+    const c = toMercator(center);
+    const units = this.unitsPerPixel(center);
+    const worldX = c.x / units - width / 2;
+    const worldY = -c.y / units - height / 2;
+
+    const outline = new Path2D();
+    for (const contour of contours) addPolygon(outline, contour);
 
     ctx.save();
-    ctx.beginPath();
-    ctx.arc(x, y, radius, 0, Math.PI * 2);
     ctx.fillStyle = COLORS.searchedFill;
-    ctx.fill();
-    ctx.clip();
+    ctx.fill(outline, 'evenodd');
+    ctx.clip(outline, 'evenodd');
     ctx.strokeStyle = COLORS.pencilFaint;
     ctx.lineWidth = 1.2;
     ctx.beginPath();
-    for (let offset = -radius * 2; offset < radius * 2; offset += HATCH_SPACING_PX) {
-      ctx.moveTo(x + offset - radius, y + radius);
-      ctx.lineTo(x + offset + radius, y - radius);
+    const phase = HATCH_SPACING_PX - (((worldX + worldY) % HATCH_SPACING_PX) + HATCH_SPACING_PX) % HATCH_SPACING_PX;
+    for (let k = phase; k < width + height; k += HATCH_SPACING_PX) {
+      ctx.moveTo(k, 0);
+      ctx.lineTo(k - height, height);
     }
     ctx.stroke();
     ctx.restore();
@@ -356,27 +378,31 @@ export class MapView {
     ctx.strokeStyle = COLORS.pencil;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    for (const [pass, width] of [[0, 2.2], [1, 1.2]]) {
-      ctx.lineWidth = width;
-      ctx.beginPath();
-      for (let step = 0; step <= 48; step++) {
-        const angle = (step / 48) * Math.PI * 2 + pass * 0.4;
-        const r = radius + 1.4 * Math.sin(3 * angle + phase + pass) + pass * 1.5;
-        const px = x + Math.cos(angle) * r;
-        const py = y + Math.sin(angle) * r;
-        if (step === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
+    const wavesPerPixel = (2 * Math.PI * metersPerPixel) / WOBBLE_PERIOD_METERS;
+    for (const [pass, lineWidth] of [[0, 2.2], [1, 1.2]]) {
+      const wobbled = new Path2D();
+      for (const contour of contours) {
+        addPolygon(
+          wobbled,
+          contour.map(({ x, y }) => ({
+            x: x + WOBBLE_PX * Math.sin((worldY + y) * wavesPerPixel + pass * 2.1) + pass,
+            y: y + WOBBLE_PX * Math.sin((worldX + x) * wavesPerPixel * 1.3 + pass * 1.3) + pass,
+          })),
+        );
       }
-      ctx.stroke();
+      ctx.lineWidth = lineWidth;
+      ctx.stroke(wobbled);
     }
 
-    const arm = Math.min(9, radius * 0.35);
+    const arm = Math.min(9, (0.35 * SEARCH_RADIUS) / metersPerPixel);
     ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.moveTo(x - arm, y - arm);
-    ctx.lineTo(x + arm, y + arm);
-    ctx.moveTo(x + arm, y - arm);
-    ctx.lineTo(x - arm, y + arm);
+    for (const { x, y } of points) {
+      ctx.moveTo(x - arm, y - arm);
+      ctx.lineTo(x + arm, y + arm);
+      ctx.moveTo(x + arm, y - arm);
+      ctx.lineTo(x - arm, y + arm);
+    }
     ctx.stroke();
   }
 
@@ -499,4 +525,116 @@ export class MapView {
     this.scale = { meters, pixels };
     this.onScaleChange?.(meters, pixels);
   }
+}
+
+function addPolygon(path, points) {
+  points.forEach(({ x, y }, index) => (index === 0 ? path.moveTo(x, y) : path.lineTo(x, y)));
+  path.closePath();
+}
+
+// Marching squares: which cell edges the outline crosses, by which corners of
+// the cell are inside (1: top left, 2: top right, 4: bottom right, 8: bottom
+// left). Edges are 0: top, 1: right, 2: bottom, 3: left. The two saddle cases
+// (5 and 10) depend on the middle of the cell and are resolved separately.
+const CELL_SEGMENTS = [
+  [], [[3, 0]], [[0, 1]], [[3, 1]], [[1, 2]], null, [[0, 2]], [[3, 2]],
+  [[2, 3]], [[0, 2]], null, [[1, 2]], [[3, 1]], [[0, 1]], [[3, 0]], [],
+];
+
+// Traces the outline of searched areas around the given screen points, where
+// their influences add up to 1 (see searchWeight). Returns closed polygons in
+// screen pixels; holes are polygons too, so fill them with the even-odd rule.
+function traceSearchedOutline(points, metersPerPixel, width, height) {
+  const cell = OUTLINE_CELL_PX;
+  // The grid reaches past the screen and its border stays empty, so every
+  // outline closes, off-screen where it runs into the border.
+  const left = -2 * cell;
+  const top = -2 * cell;
+  const columns = Math.ceil((width + 4 * cell) / cell) + 1;
+  const rows = Math.ceil((height + 4 * cell) / cell) + 1;
+  const field = new Float32Array(columns * rows);
+  const reach = SEARCH_INFLUENCE / metersPerPixel;
+  const metersSquaredPerPixel = metersPerPixel ** 2;
+
+  for (const point of points) {
+    const i0 = Math.max(1, Math.floor((point.x - reach - left) / cell));
+    const i1 = Math.min(columns - 2, Math.ceil((point.x + reach - left) / cell));
+    const j0 = Math.max(1, Math.floor((point.y - reach - top) / cell));
+    const j1 = Math.min(rows - 2, Math.ceil((point.y + reach - top) / cell));
+    for (let j = j0; j <= j1; j++) {
+      const dy = top + j * cell - point.y;
+      for (let i = i0; i <= i1; i++) {
+        const dx = left + i * cell - point.x;
+        field[j * columns + i] += searchWeight((dx * dx + dy * dy) * metersSquaredPerPixel);
+      }
+    }
+  }
+
+  // Where the outline crosses each grid edge, keyed by the edge, and which
+  // crossings the outline connects it to.
+  const crossings = new Map();
+  const links = new Map();
+  const value = (i, j) => field[j * columns + i];
+  const crossing = (edge, i, j) => {
+    // Horizontal edges get even keys, vertical ones odd keys.
+    const horizontal = edge === 0 || edge === 2;
+    const ei = edge === 1 ? i + 1 : i;
+    const ej = edge === 2 ? j + 1 : j;
+    const key = 2 * (ej * columns + ei) + (horizontal ? 0 : 1);
+    if (!crossings.has(key)) {
+      const a = value(ei, ej);
+      const b = horizontal ? value(ei + 1, ej) : value(ei, ej + 1);
+      const t = (1 - a) / (b - a);
+      crossings.set(key, {
+        x: left + (ei + (horizontal ? t : 0)) * cell,
+        y: top + (ej + (horizontal ? 0 : t)) * cell,
+      });
+    }
+    return key;
+  };
+  const link = (a, b) => {
+    if (!links.has(a)) links.set(a, []);
+    if (!links.has(b)) links.set(b, []);
+    links.get(a).push(b);
+    links.get(b).push(a);
+  };
+
+  const inside = new Uint8Array(field.length);
+  for (let k = 0; k < field.length; k++) inside[k] = field[k] >= 1 ? 1 : 0;
+  for (let j = 0; j < rows - 1; j++) {
+    for (let i = 0; i < columns - 1; i++) {
+      const k = j * columns + i;
+      const index = inside[k] | (inside[k + 1] << 1) | (inside[k + columns + 1] << 2) | (inside[k + columns] << 3);
+      if (index === 0 || index === 15) continue;
+      let segments = CELL_SEGMENTS[index];
+      if (!segments) {
+        const middleInside = (field[k] + field[k + 1] + field[k + columns + 1] + field[k + columns]) / 4 >= 1;
+        // Separate the two outside corners if the middle is inside, the two inside ones otherwise.
+        const cutTopRight = (index === 5) === middleInside;
+        segments = cutTopRight ? [[0, 1], [2, 3]] : [[3, 0], [1, 2]];
+      }
+      for (const [a, b] of segments) link(crossing(a, i, j), crossing(b, i, j));
+    }
+  }
+
+  // Every crossing is shared by two neighboring cells, so following the links
+  // walks around a closed outline.
+  const contours = [];
+  const visited = new Set();
+  for (const start of links.keys()) {
+    if (visited.has(start)) continue;
+    const contour = [];
+    let previous = null;
+    let current = start;
+    while (!visited.has(current)) {
+      visited.add(current);
+      contour.push(crossings.get(current));
+      const [a, b] = links.get(current);
+      const next = a === previous ? b : a;
+      previous = current;
+      current = next;
+    }
+    contours.push(contour);
+  }
+  return contours;
 }

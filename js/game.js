@@ -69,8 +69,14 @@ export const SHELTER_RADIUS = 100;
 // The player leaves the shelter a bit further out than they enter it, so GPS
 // jitter at the edge doesn't flip them in and out.
 export const SHELTER_EXIT_RADIUS = 110;
-export const SEARCH_RADIUS = 100;
-export const MIN_SEARCH_DISTANCE = 200;
+// Searched areas merge like metaballs. Each search spreads an influence that
+// fades to nothing at SEARCH_INFLUENCE meters, and a point counts as searched
+// where the influences add up to at least 1. A lone search covers a disc of
+// SEARCH_RADIUS; searches close to each other flow together into one blob.
+export const SEARCH_RADIUS = 200;
+export const SEARCH_INFLUENCE = 1.5 * SEARCH_RADIUS;
+const SEARCH_THRESHOLD = (1 - (SEARCH_RADIUS / SEARCH_INFLUENCE) ** 2) ** 2;
+export const SHELTER_SEARCH_DISTANCE = 200;
 export const SEARCH_EXPIRY_MS = 12 * 60 * 60 * 1000;
 export const SHELTER_NAME_MAX_LENGTH = 24;
 export const DEFAULT_SHELTER_NAME = 'Shelter';
@@ -150,13 +156,28 @@ export function pruneSearchedAreas(state, time) {
   return changed;
 }
 
+// How much a search contributes to the searched field at the given distance:
+// exactly 1 at SEARCH_RADIUS, more closer in, 0 from SEARCH_INFLUENCE on.
+// Takes the distance squared, so the map can evaluate it on a whole grid
+// without square roots.
+export function searchWeight(distanceSquared) {
+  if (distanceSquared >= SEARCH_INFLUENCE ** 2) return 0;
+  return (1 - distanceSquared / SEARCH_INFLUENCE ** 2) ** 2 / SEARCH_THRESHOLD;
+}
+
+export function isSearched(areas, position) {
+  let field = 0;
+  for (const area of areas) {
+    field += searchWeight(distanceMeters(area, position) ** 2);
+    if (field >= 1) return true;
+  }
+  return false;
+}
+
 // Why the player can't search here: 'shelter', 'searched', or null if they can.
 export function searchBlocker(state, position, time) {
-  if (state.shelter && distanceMeters(state.shelter, position) < MIN_SEARCH_DISTANCE) return 'shelter';
-  const tooClose = activeSearchedAreas(state, time).some(
-    (area) => distanceMeters(area, position) < MIN_SEARCH_DISTANCE,
-  );
-  return tooClose ? 'searched' : null;
+  if (state.shelter && distanceMeters(state.shelter, position) < SHELTER_SEARCH_DISTANCE) return 'shelter';
+  return isSearched(activeSearchedAreas(state, time), position) ? 'searched' : null;
 }
 
 // Searches the area, which counts as searched whatever happens next. Returns

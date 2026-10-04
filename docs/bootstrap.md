@@ -53,15 +53,17 @@ Wszystko w tej sekcji ma zostać zaimplementowane teraz. Rzeczy spoza tej sekcji
 
 ### Przeszukiwanie (Search area)
 
-- Przycisk **Search area** jest dostępny, gdy użytkownik jest na pustkowiu i jego pozycja jest oddalona o co najmniej 200 m od:
-  - środka każdego schronu,
-  - środka każdego aktywnego przeszukanego obszaru.
+- Przycisk **Search area** jest dostępny, gdy użytkownik jest na pustkowiu, jest co najmniej 200 m od środka schronu i nie stoi wewnątrz aktywnego przeszukanego obszaru.
 - Gdy warunek nie jest spełniony, przycisk jest nieaktywny, a aplikacja pokazuje krótką informację zależną od przyczyny:
   - za blisko schronu (od 100 do 200 m od środka): „Too close to your shelter”,
   - za blisko aktywnego przeszukanego obszaru: „This area has already been searched”,
   - za słaby sygnał: „Waiting for a better GPS signal…”.
-- Przeszukanie tworzy przeszukany obszar: okrąg o promieniu 100 m ze środkiem w pozycji użytkownika.
-- Przeszukany obszar wygasa po 12 godzinach od przeszukania i znika z mapy.
+- Każde przeszukanie zostawia punkt w pozycji użytkownika. Punkty działają jak metaballe 2D: pojedynczy punkt to koło o promieniu 200 m (średnica 400 m), a punkty blisko siebie zlewają się w jeden obły kształt. Przeszukany obszar to wnętrze tych kształtów.
+  - Każdy punkt ma wpływ, który maleje z odległością: w(d) = (1 − d²/R²)², gdzie R = 300 m, a od 300 m wynosi zero. Wpływ jest dzielony przez wartość w odległości 200 m, żeby pojedynczy punkt sięgał dokładnie 200 m.
+  - Miejsce jest przeszukane, gdy suma wpływów wszystkich aktywnych punktów wynosi co najmniej 1.
+  - Dwa punkty zlewają się, gdy ich środki dzieli mniej niż ok. 465 m.
+  - Ponieważ przeszukiwać można dopiero za krawędzią, kolejne przeszukania na trasie wypadają co ok. 200 m, czyli na 3 km spaceru jest ich ok. 15.
+- Każdy punkt wygasa po 12 godzinach od przeszukania i znika z mapy, a przeszukany obszar kurczy się razem z nim.
 
 ### Zdobycze
 
@@ -115,10 +117,9 @@ Zasoby, ilość łupu i szansa na ocalałego są opisane w [loot.md](loot.md).
 - Mapa jest zawsze skierowana na północ.
 - Na mapie widoczne są:
   - schron jako okrąg z nazwą,
-  - aktywne przeszukane obszary jako okręgi,
+  - aktywne przeszukane obszary jako zlane kształty, zakreskowane czerwonym ołówkiem, z krzyżykiem w miejscu każdego przeszukania,
   - pozycja użytkownika jako pinezka (z okręgiem dokładności GPS),
-  - wokół pozycji użytkownika (przy dobrym sygnale) pulsujące koło, które rośnie do promienia 100 m. Przeszukane obszary i schron mają promień 100 m, a przeszukanie musi być 200 m od ich środków, więc gdy pulsujące koło nie nachodzi na żaden z nich, można przeszukiwać.
-- Pinezka i pulsujące koło są zielone, gdy użytkownik może przeszukać obszar, a czerwone, gdy nie może (np. jest za blisko schronu lub przeszukanego obszaru albo jest w schronie). Przy słabym sygnale pinezka jest szara, a koła nie ma.
+- Pinezka jest zielona, gdy użytkownik może przeszukać obszar, a czerwona, gdy nie może (np. jest w przeszukanym obszarze, za blisko schronu albo w schronie). Przy słabym sygnale pinezka jest szara.
 - Domyślny widok obejmuje około 1–2 km wokół użytkownika i jest wycentrowany na użytkowniku.
 - Mapę można przybliżać i oddalać (gest szczypania oraz przyciski +/−) w zakresie od ok. 500 m do ok. 5 km szerokości widoku. W prototypie nie można jej przesuwać: zawsze jest wycentrowana na użytkowniku.
 - Biom w miejscu przeszukania wpływa na to, jaki zasób się znajdzie (zob. [loot.md](loot.md)).
