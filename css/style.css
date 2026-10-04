@@ -149,15 +149,12 @@ input {
   touch-action: none;
 }
 
-/* The map is printed on folded, aged paper. */
+/* The map is printed on aged paper. */
 #map-paper {
   position: fixed;
   inset: 0;
   pointer-events: none;
   background:
-    linear-gradient(90deg, transparent calc(33.3% - 4px), rgba(70, 45, 15, 0.1) calc(33.3% - 1px), rgba(255, 250, 235, 0.16) calc(33.3% + 1px), transparent calc(33.3% + 5px)),
-    linear-gradient(90deg, transparent calc(66.6% - 4px), rgba(70, 45, 15, 0.1) calc(66.6% - 1px), rgba(255, 250, 235, 0.16) calc(66.6% + 1px), transparent calc(66.6% + 5px)),
-    linear-gradient(180deg, transparent calc(50% - 4px), rgba(70, 45, 15, 0.08) calc(50% - 1px), rgba(255, 250, 235, 0.14) calc(50% + 1px), transparent calc(50% + 5px)),
     radial-gradient(ellipse 80% 75% at 50% 50%, transparent 55%, rgba(80, 50, 18, 0.38) 100%),
     var(--grain-light);
 }
