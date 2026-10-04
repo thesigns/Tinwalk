@@ -11,6 +11,7 @@ import {
   VICTORY_LOOT_MULTIPLIER,
   activeSearchedAreas,
   backpackCapacity,
+  biomeAtPosition,
   backpackLoad,
   bestWeapon,
   canCraft,
@@ -144,6 +145,7 @@ const ui = {
   departureTitle: $('departure-title'),
   departureText: $('departure-text'),
   scaleLabel: $('scale-label'),
+  locationLabel: $('location-label'),
   scaleLine: $('scale-line'),
   welcomeScreen: $('welcome-screen'),
   menuDialog: $('menu-dialog'),
@@ -237,6 +239,13 @@ function renderStatus() {
   ui.gpsHud.classList.toggle('good', tracker.hasGoodSignal);
   ui.gpsHud.classList.toggle('bad', !tracker.hasGoodSignal);
   ui.gpsHud.setAttribute('aria-label', description);
+
+  const { position } = tracker;
+  ui.locationLabel.hidden = !position;
+  if (position) {
+    ui.locationLabel.textContent = inShelter ? 'Shelter' : biomeAtPosition(position).label;
+    ui.locationLabel.classList.toggle('uncertain', !tracker.hasGoodSignal);
+  }
 }
 
 // Signal bars (0-4), a short label for the status bar and a full description.

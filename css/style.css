@@ -219,6 +219,19 @@ input {
   text-shadow: 0 0 3px var(--paper), 0 0 3px var(--paper);
 }
 
+#location-label {
+  margin-left: 4px;
+  font: 800 24px/1 var(--font-stencil);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-shadow: 0 0 3px var(--paper), 0 0 3px var(--paper), 0 0 6px var(--paper);
+}
+
+/* Like the pin, it fades without a good signal: the position may be off. */
+#location-label.uncertain {
+  opacity: 0.5;
+}
+
 /* Alternating ink and paper segments, like on a printed map. */
 #scale-line {
   height: 7px;

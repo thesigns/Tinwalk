@@ -39,9 +39,9 @@ const EMPTY_LOT_CHANCE = 0.07;
 const INK = '#5b4a35';
 
 export const BIOMES = {
-  plains: { name: 'plains', color: [214, 204, 159], iconDensity: 0.1, iconSize: 7, drawIcon: drawGrass },
-  forest: { name: 'forest', color: [170, 184, 136], iconDensity: 0.75, iconSize: 13, drawIcon: drawTree },
-  ruins: { name: 'ruins', color: [190, 183, 168], iconDensity: 0.35, iconSize: 14, drawIcon: drawRuin },
+  plains: { name: 'plains', label: 'Plains', color: [214, 204, 159], iconDensity: 0.1, iconSize: 7, drawIcon: drawGrass },
+  forest: { name: 'forest', label: 'Forest', color: [170, 184, 136], iconDensity: 0.75, iconSize: 13, drawIcon: drawTree },
+  ruins: { name: 'ruins', label: 'Ruins', color: [190, 183, 168], iconDensity: 0.35, iconSize: 14, drawIcon: drawRuin },
 };
 
 // Octaves of noise, each half the size and 0.45 times as strong, in roughly [-1, 1].

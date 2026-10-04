@@ -191,13 +191,18 @@ export function search(state, position, time, random = Math.random) {
   return { loot: collectLoot(state, position, time, 1, random) };
 }
 
+// The biome at a { lat, lon } position, e.g. BIOMES.forest.
+export function biomeAtPosition(position) {
+  const { x, y } = toMercator(position);
+  return biomeAt(x, y);
+}
+
 // Returns { resource, found, carried, survivor, manual }, where survivor is a
 // name or null and manual a manual id or null. A found survivor joins only
 // after takeSurvivor(), and a found manual is carried only after takeManual().
 export function collectLoot(state, position, time, multiplier = 1, random = Math.random) {
   const tier = lootTier(distanceMeters(state.shelter, position));
-  const { x, y } = toMercator(position);
-  const biome = biomeAt(x, y).name;
+  const biome = biomeAtPosition(position).name;
   const resource = pickWeighted(RESOURCES, BIOME_LOOT_WEIGHTS[biome], random);
   const found = multiplier * (tier.minLoot + Math.floor(random() * (tier.maxLoot - tier.minLoot + 1)));
   const carried = Math.min(found, freeSpace(state, time));
