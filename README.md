@@ -12,7 +12,7 @@ It runs in the browser, needs no account and no server, and your location never 
 
 1. **Set up a shelter.** At home, tap **Create a Shelter** and give it a name. Your shelter is a circle with a 100 m radius around that spot.
 2. **Go for a walk.** Everything outside your shelter is the wasteland.
-3. **Search areas.** Tap **Search area** to scavenge the spot you're standing on. Each search must be at least 200 m from your shelter and from earlier searches. Searched areas recover after 12 hours, so the same daily walk pays off again tomorrow, and loops beat out-and-back routes.
+3. **Search areas.** Tap **Search area** to scavenge the spot you're standing on. Each search marks a 400 m wide area, and nearby searches merge into one blob. You can search anywhere outside these blobs, at least 200 m from your shelter. Searched areas recover after 6 hours, so you can walk your favorite route twice a day, and loops beat out-and-back routes.
 4. **Fill your backpack.** Each search turns up Junk or Food. The further you are from your shelter, the more you find. Your backpack holds 50 units: tap it to see what you carry and drop what you don't need. Anything that doesn't fit is lost.
 5. **Meet survivors.** A search can turn up a survivor, more often far from home. Take them with you and they carry 30 extra units, but you can only escort one at a time.
 6. **Bring it home.** Back in your shelter, tap **Unload** to move your loot into storage and your survivor into the shelter.
@@ -34,7 +34,7 @@ What you find depends on the terrain: ruins are full of Junk, forests of Food, a
 - **A procedurally generated map.** Instead of a real map, you walk across a fictional wasteland of plains, forests and ruins, drawn like an old paper field map. The terrain is generated from your coordinates, so the same place on Earth always looks the same, and a typical walk crosses several kinds of terrain.
 - **Private by design.** There is no server: your progress is saved only in your browser, and your location is never sent anywhere. You can export your save to a file and import it back.
 - **Sound and vibration.** Sound effects are synthesized in the browser, with no audio files. Vibration works on Android; iPhone browsers don't support it. Both can be turned off in the menu.
-- **Light on the battery.** The map is rendered into cached tiles, and the position marker's pulse is a CSS animation, so the map isn't redrawn constantly.
+- **Light on the battery.** The map is rendered into cached tiles, so it isn't redrawn constantly.
 
 ## Running locally
 

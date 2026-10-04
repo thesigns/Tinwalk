@@ -63,7 +63,7 @@ Wszystko w tej sekcji ma zostać zaimplementowane teraz. Rzeczy spoza tej sekcji
   - Miejsce jest przeszukane, gdy suma wpływów wszystkich aktywnych punktów wynosi co najmniej 1.
   - Dwa punkty zlewają się, gdy ich środki dzieli mniej niż ok. 465 m.
   - Ponieważ przeszukiwać można dopiero za krawędzią, kolejne przeszukania na trasie wypadają co ok. 200 m, czyli na 3 km spaceru jest ich ok. 15.
-- Każdy punkt wygasa po 12 godzinach od przeszukania i znika z mapy, a przeszukany obszar kurczy się razem z nim.
+- Każdy punkt wygasa po 6 godzinach od przeszukania i znika z mapy, a przeszukany obszar kurczy się razem z nim. Dzięki temu tę samą ulubioną trasę można przejść z pożytkiem dwa razy dziennie.
 
 ### Zdobycze
 

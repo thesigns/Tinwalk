@@ -26,7 +26,7 @@ Open `http://localhost:8000/?debug`. Geolocation requires HTTPS, but `localhost`
 
 Chrome caches ES modules aggressively: after editing JS or CSS, hard-reload (Ctrl+Shift+R), or you may test stale code.
 
-Debug mode (`?debug`) shows a GPS diagnostics panel, lets you set the user's position by tapping the map, and can speed up game time (1×, 60×, 3600×) to test the 12-hour expiry of searched areas.
+Debug mode (`?debug`) shows a GPS diagnostics panel, lets you set the user's position by tapping the map, and can speed up game time (1×, 60×, 3600×) to test the 6-hour expiry of searched areas.
 
 ## Architecture
 

@@ -77,7 +77,8 @@ export const SEARCH_RADIUS = 200;
 export const SEARCH_INFLUENCE = 1.5 * SEARCH_RADIUS;
 const SEARCH_THRESHOLD = (1 - (SEARCH_RADIUS / SEARCH_INFLUENCE) ** 2) ** 2;
 export const SHELTER_SEARCH_DISTANCE = 200;
-export const SEARCH_EXPIRY_MS = 12 * 60 * 60 * 1000;
+// Short enough that a favorite route can be walked again later the same day.
+export const SEARCH_EXPIRY_MS = 6 * 60 * 60 * 1000;
 export const SHELTER_NAME_MAX_LENGTH = 24;
 export const DEFAULT_SHELTER_NAME = 'Shelter';
 
