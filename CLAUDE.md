@@ -76,4 +76,6 @@ There is no test framework.
 
 ## Deployment
 
-Static hosting over HTTPS (GitHub Pages is planned). Deploy `index.html`, `css/`, `js/` and `fonts/`. The server must serve `.js` files with a JavaScript MIME type, since module scripts with the wrong type are rejected. Ideally send `Cache-Control: no-cache` for HTML, JS and CSS, so users don't end up with a mix of old and new files after an update.
+The app is live on GitHub Pages at https://thesigns.github.io/Tinwalk/, published straight from the repository (no build, no workflow), so pushing `main` deploys it. The site is served under `/Tinwalk/`, so keep all paths relative.
+
+GitHub Pages serves `.js` with a JavaScript MIME type (module scripts with the wrong type are rejected), but sends `Cache-Control: max-age=600`, which can't be changed. For up to 10 minutes after a push, a player may get a mix of old and new files; a reload fixes it.
