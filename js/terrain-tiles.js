@@ -5,13 +5,25 @@
 // current scale and stretches the tiles slightly to fit.
 
 import { hash } from './noise.js';
-import { BIOMES, BLOCK_LENGTH, BLOCK_WIDTH, biomeAt, blocksOf, fromGrid, groundShadeAt, isEmptyLot, landAt, settlementsIn } from './terrain.js';
+import {
+  BIOMES,
+  BLOCK_LENGTH,
+  BLOCK_WIDTH,
+  biomeAt,
+  blocksOf,
+  forestFieldAt,
+  fromGrid,
+  groundShadeAt,
+  isEmptyLot,
+  settlementsIn,
+} from './terrain.js';
 
 export const TILE_SIZE = 256;
-const GROUND_STEP = 4; // tile pixels between ground color samples
+const GROUND_STEP = 4; // tile pixels between ground samples
 const ICON_CELL = 22; // tile pixels between possible icon positions
 // Ground along biome borders is darkened, like a hand-tinted map.
 const BORDER_SHADE = 0.84;
+const BORDER_WIDTH = 3; // tile pixels on each side of the border
 // Ruined buildings fill each block but its share of the streets around it.
 // Every few streets is a wider main road.
 const STREET_INSET = 10;
@@ -29,11 +41,10 @@ export class TerrainTiles {
     this.cache = new Map(); // key -> canvas, oldest first
     this.capacity = MIN_CACHED_TILES;
     this.pixelRatio = 1;
-    const samples = TILE_SIZE / GROUND_STEP + 1;
     this.groundCanvas = document.createElement('canvas');
-    this.groundCanvas.width = samples;
-    this.groundCanvas.height = samples;
+    this.groundCanvas.width = this.groundCanvas.height = TILE_SIZE;
     this.groundCtx = this.groundCanvas.getContext('2d');
+    this.groundImage = this.groundCtx.createImageData(TILE_SIZE, TILE_SIZE);
   }
 
   static levelFor(unitsPerPixel) {
@@ -86,44 +97,83 @@ export class TerrainTiles {
     return canvas;
   }
 
-  // Samples ground colors on a coarse grid that includes the tile edges, and
-  // stretches it with smoothing, so neighboring tiles blend without seams.
+  // Samples the forest field and ground shade on a coarse grid that includes
+  // the tile edges, then interpolates them for every tile pixel and only then
+  // tells forest from plains. Borders come out smooth and sharp, and
+  // neighboring tiles meet without seams. On dense screens the result is
+  // scaled up, which keeps the per-pixel work down.
   drawGround(ctx, left, top, unitsPerPixel) {
-    const samples = this.groundCanvas.width;
-    const image = this.groundCtx.createImageData(samples, samples);
+    const samples = TILE_SIZE / GROUND_STEP + 1;
     const step = GROUND_STEP * unitsPerPixel;
-
-    // Biomes on a grid one sample larger on each side, so samples on the tile
-    // edge know their outside neighbors and borders match across tiles.
-    const span = samples + 2;
-    const biomes = new Array(span * span);
-    for (let row = 0; row < span; row++) {
-      for (let col = 0; col < span; col++) {
-        biomes[row * span + col] = landAt(left + (col - 1) * step, top - (row - 1) * step);
-      }
-    }
-
+    const field = new Float32Array(samples * samples);
+    const shades = new Float32Array(samples * samples);
     for (let row = 0; row < samples; row++) {
       for (let col = 0; col < samples; col++) {
-        const center = (row + 1) * span + col + 1;
-        const biome = biomes[center];
-        const onBorder =
-          biomes[center - 1] !== biome ||
-          biomes[center + 1] !== biome ||
-          biomes[center - span] !== biome ||
-          biomes[center + span] !== biome;
-        const shade = groundShadeAt(left + col * step, top - row * step) * (onBorder ? BORDER_SHADE : 1);
-        const i = (row * samples + col) * 4;
-        image.data[i] = Math.min(255, biome.color[0] * shade);
-        image.data[i + 1] = Math.min(255, biome.color[1] * shade);
-        image.data[i + 2] = Math.min(255, biome.color[2] * shade);
-        image.data[i + 3] = 255;
+        const x = left + col * step;
+        const y = top - row * step;
+        field[row * samples + col] = forestFieldAt(x, y);
+        shades[row * samples + col] = groundShadeAt(x, y);
       }
     }
-    this.groundCtx.putImageData(image, 0, 0);
+
+    const { groundImage } = this;
+    // Little-endian RGBA: one write per pixel.
+    const pixels = new Uint32Array(groundImage.data.buffer);
+    const plains = BIOMES.plains.color;
+    const forest = BIOMES.forest.color;
+    const colorOf = (coverage, shade) =>
+      (255 << 24) |
+      ((plains[2] + (forest[2] - plains[2]) * coverage) * shade) << 16 |
+      ((plains[1] + (forest[1] - plains[1]) * coverage) * shade) << 8 |
+      ((plains[0] + (forest[0] - plains[0]) * coverage) * shade);
+
+    for (let row = 0; row < samples - 1; row++) {
+      for (let col = 0; col < samples - 1; col++) {
+        const k = row * samples + col;
+        const f00 = field[k];
+        const f10 = field[k + 1];
+        const f01 = field[k + samples];
+        const f11 = field[k + samples + 1];
+        const s00 = shades[k];
+        const s10 = shades[k + 1];
+        const s01 = shades[k + samples];
+        const s11 = shades[k + samples + 1];
+        // Far from any border, the cell is plain ground with shading.
+        const steepest = Math.max(Math.abs(f10 - f00), Math.abs(f11 - f01), Math.abs(f01 - f00), Math.abs(f11 - f10));
+        const nearest = Math.min(Math.abs(f00), Math.abs(f10), Math.abs(f01), Math.abs(f11));
+        const sameSide = (f00 > 0) === (f10 > 0) && (f00 > 0) === (f01 > 0) && (f00 > 0) === (f11 > 0);
+        const uniform = sameSide && nearest > (steepest * (BORDER_WIDTH + 2)) / GROUND_STEP;
+        const coverage = f00 > 0 ? 1 : 0;
+
+        for (let y = 0; y < GROUND_STEP; y++) {
+          const ty = (y + 0.5) / GROUND_STEP;
+          const shadeLeft = s00 + (s01 - s00) * ty;
+          const shadeRight = s10 + (s11 - s10) * ty;
+          const fieldLeft = f00 + (f01 - f00) * ty;
+          const fieldRight = f10 + (f11 - f10) * ty;
+          let i = (row * GROUND_STEP + y) * TILE_SIZE + col * GROUND_STEP;
+          for (let x = 0; x < GROUND_STEP; x++, i++) {
+            const tx = (x + 0.5) / GROUND_STEP;
+            const shade = shadeLeft + (shadeRight - shadeLeft) * tx;
+            if (uniform) {
+              pixels[i] = colorOf(coverage, shade);
+              continue;
+            }
+            const f = fieldLeft + (fieldRight - fieldLeft) * tx;
+            // Distance to the border in pixels, from the field's slope here.
+            const dx = (fieldRight - fieldLeft) / GROUND_STEP;
+            const dy = (f01 - f00 + (f11 - f01 - f10 + f00) * tx) / GROUND_STEP;
+            const slope = Math.sqrt(dx * dx + dy * dy);
+            const distance = slope > 0 ? f / slope : f > 0 ? Infinity : -Infinity;
+            const border = Math.max(0, 1 - Math.abs(distance) / BORDER_WIDTH);
+            pixels[i] = colorOf(Math.min(1, Math.max(0, 0.5 + distance)), shade * (1 - (1 - BORDER_SHADE) * border));
+          }
+        }
+      }
+    }
+    this.groundCtx.putImageData(groundImage, 0, 0);
     ctx.imageSmoothingEnabled = true;
-    // Source offset by half a pixel puts the sample centers exactly on the tile edges.
-    ctx.drawImage(this.groundCanvas, 0.5, 0.5, samples - 1, samples - 1, 0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.drawImage(this.groundCanvas, 0, 0, ctx.canvas.width, ctx.canvas.height);
   }
 
   // Settlements are drawn as shapes on top of the ground, not sampled like

@@ -57,14 +57,20 @@ function fbm(x, y, octaves) {
   return sum / total;
 }
 
-// Forest or plains, ignoring settlements.
-export function landAt(x, y) {
+// Positive in forests, negative on plains, and changing smoothly, so the
+// map can interpolate it and draw sharp borders from a few samples.
+export function forestFieldAt(x, y) {
   const fx = x * FOREST_FREQUENCY - 391.5;
   const fy = y * FOREST_FREQUENCY + 145.2;
   // Domain warping bends the noise, so forests don't come out as round blobs.
   const wx = fx + FOREST_WARP * noise(fx + 11.3, fy - 4.1);
   const wy = fy + FOREST_WARP * noise(fx - 21.9, fy + 8.4);
-  return fbm(wx, wy, 3) > FOREST_THRESHOLD ? BIOMES.forest : BIOMES.plains;
+  return fbm(wx, wy, 3) - FOREST_THRESHOLD;
+}
+
+// Forest or plains, ignoring settlements.
+export function landAt(x, y) {
+  return forestFieldAt(x, y) > 0 ? BIOMES.forest : BIOMES.plains;
 }
 
 export function biomeAt(x, y) {

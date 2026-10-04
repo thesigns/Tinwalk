@@ -120,6 +120,7 @@ Zasoby, ilość łupu i szansa na ocalałego są opisane w [loot.md](loot.md).
 - Teren jest generowany deterministycznie z szerokości i długości geograficznej (np. szum simplex), więc to samo miejsce na Ziemi zawsze wygląda tak samo.
 - Szum jest próbkowany we współrzędnych metrycznych (Web Mercator), a nie bezpośrednio w stopniach. Stopień długości geograficznej jest krótszy niż stopień szerokości (w Polsce ok. 65–70 km wobec 111 km), więc próbkowanie w stopniach rozciągałoby teren w poziomie.
 - Teren jest renderowany w kafelkach na niewidocznych płótnach (offscreen canvas) i trzymany w pamięci podręcznej, żeby nie rysować wszystkich ikon w każdej klatce.
+- Szum lasu jest próbkowany na rzadkiej siatce, ale granica lasu jest wyznaczana dopiero z wartości interpolowanej dla każdego piksela kafelka. Dzięki temu jest gładka i ostra, a nie schodkowa.
 - Regiony terenu mają skalę od kilkuset metrów do około kilometra, tak żeby typowy spacer przechodził przez kilka różnych terenów. Na prostym odcinku 3 km teren zmienia się średnio ok. 6 razy.
 - Mapa jest zawsze skierowana na północ.
 - Na mapie widoczne są:
