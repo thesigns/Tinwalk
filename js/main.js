@@ -65,7 +65,7 @@ import {
   unload,
   woundHealsAt,
 } from './game.js';
-import { flyIcon, iconElement, replayAnimation, wait } from './fx.js';
+import { flyIcon, iconElement, prefersReducedMotion, replayAnimation, wait } from './fx.js';
 import { averagePosition, bearingDegrees, distanceMeters } from './geo.js';
 import { LocationTracker } from './gps.js';
 import { Haptics, canVibrate } from './haptics.js';
@@ -87,6 +87,10 @@ const STEP_REPEAT_DELAY_MS = 400;
 const STEP_REPEAT_MS = 90;
 // How long the Geiger counter crackles at a time.
 const CRACKLE_MS = 1_200;
+// Rings per second rippling out of the radiation icon at the edge of the
+// fallout and in its hottest core.
+const RING_MIN_RATE = 0.8;
+const RING_MAX_RATE = 5;
 // Frequent enough for searched areas to expire smoothly when debug time runs fast.
 const TICK_MS = 1_000;
 const WELCOMED_KEY = 'tinwalk.welcomed';
@@ -261,6 +265,7 @@ let sickened = [];
 // the backpack tells it: 0 when clean or without a counter.
 let falloutLevel = 0;
 let crackleUntil = 0;
+let ringTimer = null;
 // What is marked to be dropped in the open backpack panel: resource units by
 // id, backpack items and manual ids.
 let dropping = { resources: emptyResources(), items: [], manuals: [] };
@@ -271,6 +276,25 @@ const survivorBadges = new WeakMap();
 function feedback(name) {
   sound.play(name);
   haptics.play(name);
+}
+
+// Rings ripple out of the radiation icon at random, like the counter's clicks,
+// and faster the hotter it is, so the icon tells how deep in the fallout the
+// player is even with the sound off. They stop once the player is out of it.
+function scheduleRing() {
+  clearTimeout(ringTimer);
+  if (falloutLevel === 0 || prefersReducedMotion()) return;
+  const rate = RING_MIN_RATE + (RING_MAX_RATE - RING_MIN_RATE) * falloutLevel;
+  const delay = (-Math.log(1 - Math.random()) / rate) * 1000;
+  ringTimer = setTimeout(() => {
+    if (falloutLevel > 0) {
+      const ring = document.createElement('span');
+      ring.className = 'fallout-ring';
+      ring.addEventListener('animationend', () => ring.remove());
+      ui.fallout.append(ring);
+    }
+    scheduleRing();
+  }, delay);
 }
 
 // The Geiger counter crackles in the fallout: on the way in, on a search and
@@ -352,7 +376,10 @@ function renderStatus() {
   const entered = level > 0 && falloutLevel === 0;
   falloutLevel = level;
   ui.fallout.hidden = level === 0;
-  if (entered) crackle();
+  if (entered) {
+    crackle();
+    scheduleRing();
+  }
 
   const { mission } = state;
   ui.missionNote.hidden = !mission;

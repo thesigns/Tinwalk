@@ -27,6 +27,7 @@ Licznik działa, gdy jest w plecaku. Nie trzeba go włączać.
   - przy każdym dotknięciu ekranu w strefie.
 - Trzaski są losowe jak rozpady, które liczy prawdziwy licznik, i tym częstsze, im głębiej w strefie: od ok. 6 na sekundę przy brzegu do ok. 60 w rdzeniu. Wibracje są rzadsze (3–12 na sekundę), bo telefon nie wibruje tak szybko.
 - Trzaski zależą od ustawień dźwięku i wibracji. Przy obu wyłączonych zostaje sama ikonka.
+- Z ikonki wypływają okręgi, w losowych odstępach jak trzaski i tym częściej, im głębiej w strefie: od ok. 0,8 na sekundę przy brzegu do ok. 5 w rdzeniu. Dzięki temu ikonka pokazuje natężenie także przy wyłączonym dźwięku. Przy ograniczonych animacjach (`prefers-reduced-motion`) okręgów nie ma.
 - Wykrywanie nie zużywa licznika.
 
 ### Przeszukanie w strefie z licznikiem

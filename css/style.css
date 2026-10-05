@@ -248,6 +248,7 @@ input {
 
 /* A hazard sticker on the Geiger counter: the ground here is hot. */
 #fallout {
+  position: relative;
   display: grid;
   place-items: center;
   align-self: center;
@@ -262,6 +263,21 @@ input {
 
 #fallout[hidden] {
   display: none;
+}
+
+/* A ring rippling out at each count, faster deeper in the fallout. */
+.fallout-ring {
+  position: absolute;
+  inset: -2px;
+  border: 2px solid var(--hungry);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: fallout-ring 1s ease-out forwards;
+}
+
+@keyframes fallout-ring {
+  from { transform: scale(1); opacity: 0.9; }
+  to { transform: scale(2.4); opacity: 0; }
 }
 
 #fallout .icon {
