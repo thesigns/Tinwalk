@@ -240,6 +240,35 @@ input {
   font-size: 14px;
 }
 
+/* "Day · dark in 3 h": searching in the dark finds less. */
+#location-daylight {
+  margin-top: 3px;
+  font-size: 12px;
+}
+
+/* A hazard sticker on the Geiger counter: the ground here is hot. */
+#fallout {
+  display: grid;
+  place-items: center;
+  align-self: center;
+  width: 34px;
+  height: 34px;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--hungry);
+  color: var(--ink);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+#fallout[hidden] {
+  display: none;
+}
+
+#fallout .icon {
+  width: 24px;
+  height: 24px;
+}
+
 /* Like the pin, it fades without a good signal: the position may be off. */
 #location.uncertain {
   opacity: 0.5;

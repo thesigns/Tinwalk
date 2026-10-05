@@ -63,7 +63,7 @@ Zasada ogólna: kara nigdy nie blokuje chodzenia ani przeszukiwania. Użytkownik
 
 ### Leczenie
 
-- Apteczka (First aid kit) leczy ranę od razu. Jedno użycie leczy jedną ranę.
+- Apteczka (First aid kit) leczy ranę od razu. Jedno użycie leczy jedną ranę, a u chorego ocalałego naraz także chorobę (zob. [radiation.md](radiation.md#choroba-sick)).
 - Leczy się ręcznie, przyciskiem **Treat**:
   - ocalałego idącego z użytkownikiem apteczką z plecaka, w panelu plecaka,
   - ocalałego w schronie apteczką z magazynu, na jego plakietce w panelu schronu. Tu nie trzeba być w schronie.

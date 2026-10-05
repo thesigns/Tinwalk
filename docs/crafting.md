@@ -1,6 +1,6 @@
 # Wytwarzanie (Crafting)
 
-Przedmioty i wyposażenie schronu wytwarza się z Junk w schronie. Każdy przepis wymaga odpowiedniego podręcznika, który trzeba najpierw znaleźć na pustkowiu i donieść do schronu. Walkę, w której przydają się przedmioty, opisuje [combat.md](combat.md).
+Przedmioty i wyposażenie schronu wytwarza się w schronie z zasobów z magazynu (głównie z Junk, a urządzenia elektryczne także z Cells). Każdy przepis wymaga odpowiedniego podręcznika, który trzeba najpierw znaleźć na pustkowiu i donieść do schronu. Walkę, w której przydają się przedmioty, opisuje [combat.md](combat.md).
 
 ## Podręczniki (Manuals)
 
@@ -9,6 +9,7 @@ Przedmioty i wyposażenie schronu wytwarza się z Junk w schronie. Każdy przepi
 | Knifemaking Manual   | Knife, Combat knife       |
 | Pharmacology Manual  | First aid kit             |
 | Radio Manual         | Radio                     |
+| Electric Tools Manual | Flashlight, Geiger counter |
 
 ### Znajdowanie
 
@@ -23,6 +24,7 @@ Przedmioty i wyposażenie schronu wytwarza się z Junk w schronie. Każdy przepi
 |----------------------|--------|--------|-------|
 | Knifemaking Manual   | 1      | 1      | 1     |
 | Pharmacology Manual  | 1      | 1      | 2     |
+| Electric Tools Manual | 1     | 1      | 2     |
 
 ### Zabieranie
 
@@ -38,9 +40,11 @@ Przedmioty i wyposażenie schronu wytwarza się z Junk w schronie. Każdy przepi
 | Knife          | Knifemaking Manual   | 5 Junk   | 6      | 2                 |
 | Combat knife   | Knifemaking Manual   | 15 Junk  | 12     | 3                 |
 | First aid kit  | Pharmacology Manual  | 7 Junk   | 3      | 2                 |
+| Flashlight     | Electric Tools Manual | 10 Junk + 1 Cell | 10 | 2              |
+| Geiger counter | Electric Tools Manual | 10 Junk + 1 Cell | 10 | 2              |
 | Radio          | Radio Manual         | 30 Junk  | –      | –                 |
 
-- Wytwarzać można tylko w schronie (tak jak rozładowywać). Junk jest pobierany z magazynu schronu, nie z plecaka.
+- Wytwarzać można tylko w schronie (tak jak rozładowywać). Zasoby są pobierane z magazynu schronu, nie z plecaka.
 - Wytworzony przedmiot trafia do magazynu schronu.
 - Wytworzenie jest natychmiastowe.
 
@@ -49,13 +53,20 @@ Przedmioty i wyposażenie schronu wytwarza się z Junk w schronie. Każdy przepi
 - Radio nie jest przedmiotem, tylko wyposażeniem schronu. Wytwarza się je raz i zostaje w schronie na zawsze.
 - Nie ma liczby użyć, nie zajmuje miejsca w magazynie i nie można go zabrać do plecaka.
 - Duży koszt jest zamierzony: zbudowanie radia to cel sam w sobie.
+- Radio działa na baterie (Cells), których nie dostaje się razem z nim (zob. [landmarks.md](landmarks.md#radio)).
 - Do czego służy radio, opisuje [landmarks.md](landmarks.md#radio).
 
 ## Przedmioty
 
 - Każdy przedmiot ma liczbę pozostałych użyć. Przedmiot, któremu skończyły się użycia, znika.
 - Przedmioty tego samego rodzaju mogą mieć różną liczbę użyć (np. jeden nóż 4/6, drugi 6/6), więc są pokazywane osobno.
-- Do czego służą noże, opisuje [combat.md](combat.md), a apteczki [combat.md](combat.md#rany).
+- Do czego służą noże, opisuje [combat.md](combat.md), apteczki [combat.md](combat.md#rany), a latarka [night.md](night.md).
+- Licznik Geigera wykrywa strefy radiacji i pozwala w nich znajdować Isotopes (zob. [radiation.md](radiation.md)).
+
+### Przedmioty elektryczne
+
+- Latarka i licznik Geigera mają baterię w koszcie wytworzenia. Ich użycia to zapas energii z tej baterii.
+- Przedmiotów elektrycznych nie ładuje się. Gdy skończą się użycia, przedmiot znika, tak jak nóż.
 
 ### Plecak
 
@@ -66,7 +77,7 @@ Przedmioty i wyposażenie schronu wytwarza się z Junk w schronie. Każdy przepi
 
 ## Interfejs
 
-- Panel schronu ma sekcję **Workshop**: listę przepisów z posiadanych podręczników, z kosztem i przyciskiem **Craft**. Przycisk jest nieaktywny, gdy brakuje Junk albo użytkownik nie jest w schronie. Przy zbudowanym radiu zamiast przycisku jest napis „Built”.
+- Panel schronu ma sekcję **Workshop**: listę przepisów z posiadanych podręczników, z kosztem (np. „10 Junk + 1 Cell”) i przyciskiem **Craft**. Przycisk jest nieaktywny, gdy brakuje zasobów albo użytkownik nie jest w schronie. Przy zbudowanym radiu zamiast przycisku jest napis „Built”.
 - Bez żadnego podręcznika sekcja pokazuje krótką informację, że przepisy pochodzą z podręczników znajdowanych na pustkowiu.
 - Panel schronu pokazuje posiadane podręczniki oraz przedmioty w magazynie z liczbą użyć. Przy przedmiocie jest przycisk **Pack**, który przenosi go do plecaka (aktywny tylko w schronie i gdy jest miejsce).
 - Panel plecaka pokazuje przedmioty z liczbą użyć i zajmowanym miejscem.

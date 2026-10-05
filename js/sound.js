@@ -4,6 +4,9 @@ import { isSettingOn, saveSetting } from './settings.js';
 
 const SETTING_KEY = 'tinwalk.sound';
 const MASTER_VOLUME = 0.6;
+// Geiger counter clicks per second at the edge of the fallout and in its hottest core.
+const CRACKLE_MIN_RATE = 6;
+const CRACKLE_MAX_RATE = 60;
 
 export class SoundEffects {
   constructor() {
@@ -33,6 +36,23 @@ export class SoundEffects {
   play(name) {
     if (!this.enabled || !this.context) return;
     SOUNDS[name]?.(this, this.context.currentTime);
+  }
+
+  // A Geiger counter's clicks for `duration` seconds, at random like the decays
+  // it counts, and faster the hotter the fallout (intensity from 0 to 1).
+  crackle(intensity, duration) {
+    if (!this.enabled || !this.context) return;
+    const start = this.context.currentTime;
+    const rate = CRACKLE_MIN_RATE + (CRACKLE_MAX_RATE - CRACKLE_MIN_RATE) * intensity;
+    for (let t = randomInterval(rate); t < duration; t += randomInterval(rate)) {
+      this.noise(start + t, {
+        duration: 0.004 + Math.random() * 0.004,
+        volume: 0.5 + Math.random() * 0.4,
+        frequency: 2500 + Math.random() * 1500,
+        filter: 'highpass',
+        q: 0.7,
+      });
+    }
   }
 
   // A single oscillator note with a sharp attack and an exponential fade.
@@ -87,6 +107,11 @@ export class SoundEffects {
     source.start(time);
     source.stop(time + duration + 0.05);
   }
+}
+
+// Time to the next of events happening at random at `rate` per second.
+function randomInterval(rate) {
+  return -Math.log(1 - Math.random()) / rate;
 }
 
 function createNoiseBuffer(context) {

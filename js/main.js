@@ -33,8 +33,11 @@ import {
   expireMission,
   fight,
   freeSpace,
+  hasGeigerCounter,
   hungerOf,
   isInShelter,
+  isNight,
+  isSick,
   isWounded,
   knownRecipes,
   knowsRadio,
@@ -43,13 +46,16 @@ import {
   listenReadyAt,
   manualRecipes,
   missionEndsAt,
+  nextDaylightChange,
   packItem,
   pruneSearchedAreas,
+  radiationAtPosition,
   runAway,
   search,
   searchBlocker,
   settleMeals,
   settlementAtPosition,
+  sicknessHealsAt,
   takeManual,
   takeSurvivor,
   totalResources,
@@ -77,6 +83,8 @@ const TOAST_DURATION_MS = 4_000;
 // Holding a +/- button in the backpack keeps stepping after a short pause.
 const STEP_REPEAT_DELAY_MS = 400;
 const STEP_REPEAT_MS = 90;
+// How long the Geiger counter crackles at a time.
+const CRACKLE_MS = 1_200;
 // Frequent enough for searched areas to expire smoothly when debug time runs fast.
 const TICK_MS = 1_000;
 const WELCOMED_KEY = 'tinwalk.welcomed';
@@ -178,12 +186,17 @@ const ui = {
   shelterNoSurvivors: $('shelter-no-survivors'),
   survivorBadge: $('survivor-badge'),
   departureDialog: $('departure-dialog'),
+  sicknessDialog: $('sickness-dialog'),
+  sicknessTitle: $('sickness-title'),
+  sicknessText: $('sickness-text'),
+  fallout: $('fallout'),
   departureTitle: $('departure-title'),
   departureText: $('departure-text'),
   scaleLabel: $('scale-label'),
   location: $('location'),
   locationLabel: $('location-label'),
   locationPlace: $('location-place'),
+  locationDaylight: $('location-daylight'),
   scaleLine: $('scale-line'),
   welcomeScreen: $('welcome-screen'),
   menuDialog: $('menu-dialog'),
@@ -216,6 +229,12 @@ let holdBackpack = false;
 let toastTimer = null;
 // Survivors listed in the open departure dialog.
 let departed = [];
+// Survivors listed in the open sickness dialog.
+let sickened = [];
+// How hot the fallout is where the player stands, as the Geiger counter in
+// the backpack tells it: 0 when clean or without a counter.
+let falloutLevel = 0;
+let crackleUntil = 0;
 // What is marked to be dropped in the open backpack panel: resource units by
 // id, backpack items and manual ids.
 let dropping = { resources: emptyResources(), items: [], manuals: [] };
@@ -226,6 +245,15 @@ const survivorBadges = new WeakMap();
 function feedback(name) {
   sound.play(name);
   haptics.play(name);
+}
+
+// The Geiger counter crackles in the fallout: on the way in, on a search and
+// at every tap, faster the hotter it is. Bursts don't overlap.
+function crackle() {
+  if (falloutLevel === 0 || performance.now() < crackleUntil) return;
+  crackleUntil = performance.now() + CRACKLE_MS;
+  sound.crackle(falloutLevel, CRACKLE_MS / 1000);
+  haptics.crackle(falloutLevel, CRACKLE_MS / 1000);
 }
 
 function update() {
@@ -243,10 +271,11 @@ function update() {
 function tick() {
   const time = now();
   const pruned = pruneSearchedAreas(state, time);
-  const { meals, left } = settleMeals(state, time);
+  const { meals, left, sickened: sick } = settleMeals(state, time);
   const failed = expireMission(state, time);
   if (pruned || meals > 0 || left.length > 0 || failed) saveState(state);
   if (left.length > 0) showDepartures(left);
+  if (sick.length > 0) showSickness(sick);
   if (failed) showLostSignal(failed);
   if (ui.shelterPanel.open) renderShelterPanel();
   update();
@@ -289,8 +318,15 @@ function renderStatus() {
     ui.locationLabel.textContent = inShelter ? 'Shelter' : biomeAtPosition(position).label;
     ui.locationPlace.hidden = !settlement;
     ui.locationPlace.textContent = settlement?.name ?? '';
+    ui.locationDaylight.textContent = describeDaylight(position, time);
     ui.location.classList.toggle('uncertain', !tracker.hasGoodSignal);
   }
+
+  const level = position && hasGeigerCounter(state) ? radiationAtPosition(state, position) : 0;
+  const entered = level > 0 && falloutLevel === 0;
+  falloutLevel = level;
+  ui.fallout.hidden = level === 0;
+  if (entered) crackle();
 
   const { mission } = state;
   ui.missionNote.hidden = !mission;
@@ -302,6 +338,14 @@ function renderStatus() {
       `${formatDistance(distanceMeters(from, landmark))} ${compassPoint(from, landmark).short}` +
       ` · ${formatDuration(missionEndsAt(mission) - time)} left`;
   }
+}
+
+// "Day · dark in 3 h", so the player can plan a walk around nightfall.
+function describeDaylight(position, time) {
+  const night = isNight(position, time);
+  const change = nextDaylightChange(position, time);
+  const phase = night ? 'Night' : 'Day';
+  return change === null ? phase : `${phase} · ${night ? 'light' : 'dark'} in ${formatDuration(change - time)}`;
 }
 
 function compassPoint(from, to) {
@@ -487,6 +531,7 @@ async function searchAction() {
   searching = true;
   update();
   sound.play('search');
+  crackle();
   await mapView.playSweep(position, SEARCH_RADIUS, SEARCH_ANIMATION_MS);
   searching = false;
 
@@ -506,10 +551,15 @@ async function searchAction() {
     saveAndUpdate();
   }
 
-  const { resource, found, carried, manual, landmark } = loot;
-  let message = `You've found ${found} ${resource.label}`;
+  const { resource, found, carried, manual, landmark, dark, flashlight, geiger } = loot;
+  let message = `You've found ${amountOf(resource, found)}`;
   if (carried === 0) message += ', but your backpack is full';
   else if (carried < found) message += `, but could only carry ${carried}`;
+  if (geiger) {
+    message += `. Your ${ITEMS['geiger-counter'].label} showed everything else here was too hot to keep`;
+    message += geiger.wornOut ? ', then went dead.' : '.';
+  } else if (flashlight) message += `. Your ${ITEMS.flashlight.label} lit up dark corners${flashlight.wornOut ? ' and went dead' : ''}.`;
+  else if (dark) message += '. It was too dark to search well.';
   if (victory) message = `${victory} ${message}`;
   feedback(carried > 0 ? 'found' : 'full');
   await showReward({
@@ -595,7 +645,17 @@ async function encounter(enemy) {
 
 // "3 Junk and 1 Food", leaving out resources with no units.
 function describeResources(amounts) {
-  return listNames(RESOURCES.filter(({ id }) => amounts[id] > 0).map(({ id, label }) => `${amounts[id]} ${label}`));
+  return listNames(RESOURCES.filter(({ id }) => amounts[id] > 0).map((resource) => amountOf(resource, amounts[resource.id])));
+}
+
+// "1 Cell", "3 Cells".
+function amountOf(resource, count) {
+  return `${count} ${count === 1 ? resource.one : resource.label}`;
+}
+
+// A crafting cost such as { junk: 10, cells: 1 }: "10 Junk + 1 Cell".
+function describeCost(cost) {
+  return RESOURCES.filter(({ id }) => cost[id]).map((resource) => amountOf(resource, cost[resource.id])).join(' + ');
 }
 
 async function offerSurvivor(survivor) {
@@ -646,9 +706,10 @@ async function offerManual(id) {
 }
 
 async function unloadAction() {
-  const { items, manuals, survivor, left } = unload(state, now());
+  const { items, manuals, survivor, left, sickened: sick } = unload(state, now());
   saveAndUpdate();
   if (left.length > 0) showDepartures(left);
+  if (sick.length > 0) showSickness(sick);
   feedback('unload');
   mapView.playRipple(state.shelter, SHELTER_RADIUS, RIPPLE_MS);
 
@@ -671,9 +732,9 @@ async function openBackpackPanel() {
 
   if ((await ask(ui.backpackPanel)) !== 'drop') return;
   const parts = [
-    ...RESOURCES.filter(({ id }) => dropping.resources[id] > 0).map(({ id, label }) => ({
-      text: `${dropping.resources[id]} ${label}`,
-      icon: id,
+    ...RESOURCES.filter(({ id }) => dropping.resources[id] > 0).map((resource) => ({
+      text: amountOf(resource, dropping.resources[resource.id]),
+      icon: resource.id,
     })),
     ...dropping.items.map((item) => ({ text: `your ${ITEMS[item.id].label}`, icon: item.id })),
     ...dropping.manuals.map((id) => ({ text: `the ${MANUALS[id].label}`, icon: 'manual' })),
@@ -799,10 +860,11 @@ function treatCompanion() {
 }
 
 function treatSurvivor(survivor) {
+  const sick = isSick(survivor, now());
   if (!treat(state, survivor, now())) return;
   saveAndUpdate();
   feedback('heal');
-  showToast(`${survivor.name}'s wound has been dressed`, 'first-aid-kit');
+  showToast(sick ? `${survivor.name} has been treated` : `${survivor.name}'s wound has been dressed`, 'first-aid-kit');
   renderShelterPanel();
 }
 
@@ -878,13 +940,13 @@ function renderShelterPanel() {
       return chip;
     }),
   );
-  renderOnChange(ui.shelterRecipes, [shelter.manuals, shelter.storage.junk, inShelter, shelter.radio !== null], () => [
+  renderOnChange(ui.shelterRecipes, [shelter.manuals, shelter.storage, inShelter, shelter.radio !== null], () => [
     ...(knowsRadio(state) ? [radioRow()] : []),
     ...knownRecipes(state).map(([id, { label, cost, uses, size }]) =>
       itemRow({
         icon: id,
         label,
-        detail: `${cost} Junk · ${uses} uses · ${size} space`,
+        detail: `${describeCost(cost)} · ${uses} uses · ${size} space`,
         action: 'Craft',
         enabled: inShelter && canCraft(state, id),
         onClick: () => craftAction(id),
@@ -912,7 +974,7 @@ function radioRow() {
   return itemRow({
     icon: 'radio',
     label: RADIO.label,
-    detail: `${RADIO.cost} Junk · stays in the shelter`,
+    detail: `${describeCost(RADIO.cost)} · stays in the shelter`,
     action: 'Build',
     enabled: inShelter && canBuildRadio(state),
     onClick: buildRadioAction,
@@ -951,6 +1013,8 @@ function radioText(blocker, time) {
       const heardStatic = radio.lastListenAt > radio.quietSince;
       return `${heardStatic ? 'Only static.' : 'The airwaves are quiet.'} Listen again in ${wait}.`;
     }
+    case 'cells':
+      return 'The radio is dead. Bring Cells to the shelter to power it.';
     case 'landmarks':
       return 'Survivors call from places you know. Discover landmarks in the wasteland.';
     default:
@@ -1075,7 +1139,7 @@ function renderSurvivorBadges(time) {
 }
 
 // A survivor's name tag, with a bar running down to the end of their current
-// hunger stage, and their wound if they have one.
+// hunger stage, and their wound or sickness if they have one.
 function updateSurvivorBadge(badge, survivor, time) {
   const { stage, startedAt, endsAt } = hungerOf(survivor, time);
   const text = HUNGER_TEXT[stage];
@@ -1086,9 +1150,13 @@ function updateSurvivorBadge(badge, survivor, time) {
   badge.querySelector('.hunger-time').textContent =
     `${text.next(state.shelter.storage.food > 0)} ${formatDuration(endsAt - time)}`;
   const wounded = isWounded(survivor, time);
-  badge.querySelector('.wound').hidden = !wounded;
-  if (!wounded) return;
-  badge.querySelector('.wound-time').textContent = `heals in ${formatDuration(woundHealsAt(survivor) - time)}`;
+  const sick = isSick(survivor, time);
+  badge.querySelector('.wound').hidden = !wounded && !sick;
+  if (!wounded && !sick) return;
+  badge.querySelector('.wound use').setAttribute('href', wounded ? '#i-wound' : '#i-radiation');
+  badge.querySelector('.wound-label').textContent = wounded && sick ? 'Wounded & sick' : wounded ? 'Wounded' : 'Sick';
+  const healsAt = Math.max(wounded ? woundHealsAt(survivor) : 0, sick ? sicknessHealsAt(survivor) : 0);
+  badge.querySelector('.wound-time').textContent = `heals in ${formatDuration(healsAt - time)}`;
   const treatButton = badge.querySelector('.treat');
   treatButton.disabled = !canTreat(state, survivor, time);
   treatButton.setAttribute('aria-label', `Treat ${survivor.name}`);
@@ -1109,6 +1177,17 @@ function showDepartures(names) {
   feedback('full');
 }
 
+// Tells the player who got sick from contaminated food, adding to the dialog if it is open.
+function showSickness(names) {
+  sickened.push(...names.filter((name) => !sickened.includes(name)));
+  ui.sicknessTitle.textContent =
+    sickened.length === 1 ? `${sickened[0]} is sick` : `${sickened.length} survivors are sick`;
+  ui.sicknessText.textContent =
+    `${listNames(sickened)} got sick: the food was contaminated. A first aid kit will help.`;
+  if (!ui.sicknessDialog.open) ui.sicknessDialog.showModal();
+  feedback('lost');
+}
+
 // "Ada", "Ada and Bo", "Ada, Bo and Cy".
 function listNames(names) {
   return names.length === 1 ? names[0] : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`;
@@ -1120,7 +1199,9 @@ function describeGame() {
   const zone = inShelter ? 'In shelter' : 'Wasteland';
   const distance = state.shelter ? `, ${Math.round(distanceMeters(state.shelter, position))} m from shelter` : '';
   const searched = plural(activeSearchedAreas(state, now()).length, 'searched area');
-  return `${zone}${distance}, ${searched}, ${plural(state.landmarks.length, 'landmark')}`;
+  const radiation = radiationAtPosition(state, position);
+  const fallout = radiation > 0 ? `, radiation ${radiation.toFixed(2)}` : '';
+  return `${zone}${distance}, ${searched}, ${plural(state.landmarks.length, 'landmark')}${fallout}`;
 }
 
 function exportSave() {
@@ -1175,6 +1256,7 @@ ui.backpackTreat.addEventListener('click', treatCompanion);
 ui.shelterButton.addEventListener('click', openShelterPanel);
 ui.radioListen.addEventListener('click', listenAction);
 ui.departureDialog.addEventListener('close', () => (departed = []));
+ui.sicknessDialog.addEventListener('close', () => (sickened = []));
 $('retry-location').addEventListener('click', () => tracker.start());
 $('zoom-in').addEventListener('click', () => mapView.zoomBy(1 / ZOOM_STEP));
 $('zoom-out').addEventListener('click', () => mapView.zoomBy(ZOOM_STEP));
@@ -1226,7 +1308,14 @@ setUpToggle(ui.vibrationToggle, haptics, () => haptics.play('found'));
 ui.vibrationToggle.hidden = !canVibrate;
 
 // Browsers only let audio start after the player taps something.
-document.addEventListener('click', () => sound.unlock(), { capture: true });
+document.addEventListener(
+  'click',
+  () => {
+    sound.unlock();
+    crackle();
+  },
+  { capture: true },
+);
 
 // Enter in the name field should create the shelter, not hit the first (Cancel) button.
 ui.shelterName.addEventListener('keydown', (event) => {

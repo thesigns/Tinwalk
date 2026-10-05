@@ -4,7 +4,7 @@ import { now } from './clock.js';
 import { ITEMS, LANDMARKS, MANUALS, RESOURCES, emptyResources, landmarkCorner } from './game.js';
 
 const STORAGE_KEY = 'tinwalk.state';
-export const STATE_VERSION = 6;
+export const STATE_VERSION = 8;
 
 const INVALID_SAVE = "This file isn't a valid Tinwalk save";
 const OTHER_VERSION = 'This save comes from a different version of Tinwalk';
@@ -67,6 +67,27 @@ const MIGRATIONS = {
     }
     save.version = 6;
   },
+  // Cells, a new resource that powers the radio. No one has any yet.
+  6(save) {
+    for (const resources of [save.backpack, save.shelter?.storage]) {
+      if (isObject(resources)) resources.cells = 0;
+    }
+    save.version = 7;
+  },
+  // Fallout: Isotopes, contaminated food and sickness. Nothing is contaminated yet.
+  7(save) {
+    for (const resources of [save.backpack, save.shelter?.storage]) {
+      if (isObject(resources)) resources.isotopes = 0;
+    }
+    save.backpackContaminatedFood = 0;
+    if (isObject(save.shelter)) {
+      save.shelter.contaminatedFood = 0;
+      for (const survivor of save.shelter.survivors ?? []) {
+        if (isObject(survivor)) survivor.sickAt = null;
+      }
+    }
+    save.version = 8;
+  },
 };
 // Half the grid side: closer to this corner than to any other could be.
 const LEGACY_CORNER_DISTANCE = 350;
@@ -79,9 +100,9 @@ function migrate(save) {
 export function createInitialState() {
   return {
     version: STATE_VERSION,
-    // { name, lat, lon, createdAt, storage, items, manuals,
+    // { name, lat, lon, createdAt, storage, contaminatedFood, items, manuals,
     //   radio: { builtAt, lastListenAt, quietSince } | null,
-    //   survivors: [{ name, arrivedAt, lastMealAt, woundedAt }],
+    //   survivors: [{ name, arrivedAt, lastMealAt, woundedAt, sickAt }],
     //   departedSurvivors: [{ name, arrivedAt, leftAt, reason }] }
     shelter: null,
     searchedAreas: [], // [{ lat, lon, searchedAt }]
@@ -91,6 +112,8 @@ export function createInitialState() {
     // The rescue mission under way: { survivor, landmark: { type, lat, lon }, calledAt }
     mission: null,
     backpack: emptyResources(),
+    // How many of the Food units in the backpack are contaminated. Hidden from the player.
+    backpackContaminatedFood: 0,
     backpackItems: [], // [{ id, uses }]
     backpackManuals: [], // manual ids
     companion: null, // { name, woundedAt }
@@ -156,7 +179,10 @@ const isPoint = (value) => isObject(value) && isNumber(value.lat) && isNumber(va
 const isPerson = (value) => isObject(value) && typeof value.name === 'string';
 const isLivingPerson = (value) => isPerson(value) && (value.woundedAt === null || isNumber(value.woundedAt));
 const isShelterSurvivor = (value) =>
-  isLivingPerson(value) && isNumber(value.arrivedAt) && isNumber(value.lastMealAt);
+  isLivingPerson(value) &&
+  isNumber(value.arrivedAt) &&
+  isNumber(value.lastMealAt) &&
+  (value.sickAt === null || isNumber(value.sickAt));
 const isDepartedSurvivor = (value) =>
   isPerson(value) && isNumber(value.arrivedAt) && isNumber(value.leftAt) && typeof value.reason === 'string';
 const isResources = (value) => isObject(value) && RESOURCES.every(({ id }) => isCount(value[id]));
@@ -184,6 +210,8 @@ function isValidShelter(shelter) {
     typeof shelter.name === 'string' &&
     isNumber(shelter.createdAt) &&
     isResources(shelter.storage) &&
+    isCount(shelter.contaminatedFood) &&
+    shelter.contaminatedFood <= shelter.storage.food &&
     isItemList(shelter.items) &&
     isManualList(shelter.manuals) &&
     (shelter.radio === null || isRadio(shelter.radio)) &&
@@ -206,6 +234,8 @@ function isValidState(state) {
     // A mission needs a radio, which is in the shelter.
     (state.mission === null || (isMission(state.mission) && state.shelter?.radio != null)) &&
     isResources(state.backpack) &&
+    isCount(state.backpackContaminatedFood) &&
+    state.backpackContaminatedFood <= state.backpack.food &&
     isItemList(state.backpackItems) &&
     isManualList(state.backpackManuals) &&
     isCount(state.searchesWithoutManual) &&

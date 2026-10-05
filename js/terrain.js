@@ -9,11 +9,15 @@
 //
 // Plains cover about half of the world, forests and ruins a quarter each. A
 // straight 3 km walk crosses about 6 borders between them.
+//
+// Radiation is a separate, invisible layer over the biomes: patches of fallout
+// covering about a fifth of the world, regardless of the biome underneath.
 
 import { SETTLEMENT_NAME_ENDS, SETTLEMENT_NAME_STARTS } from './names.js';
 import { createSimplex, hash } from './noise.js';
 
 const noise = createSimplex(20261001);
+const radiationNoise = createSimplex(20261005);
 
 // Sizes are in Mercator units. One Mercator unit is ~0.62 m at 52°N.
 const FOREST_FREQUENCY = 1 / 3200;
@@ -38,6 +42,14 @@ const EDGE_FREQUENCY = 1 / 700;
 // Some blocks inside a settlement are empty lots: still ruins, just with no building.
 const EMPTY_LOT_CHANCE = 0.07;
 
+// Patches of a few hundred meters to a kilometer, like forests. The threshold
+// makes them cover about 20% of the world; intensity reaches 1 in their hottest
+// cores, RADIATION_RANGE above the threshold.
+const RADIATION_FREQUENCY = 1 / 3200;
+const RADIATION_WARP = 0.4;
+const RADIATION_THRESHOLD = 0.305;
+const RADIATION_RANGE = 0.3;
+
 const INK = '#5b4a35';
 const GRASS_INK = 'rgba(91, 74, 53, 0.55)';
 
@@ -49,12 +61,12 @@ export const BIOMES = {
 };
 
 // Octaves of noise, each half the size and 0.45 times as strong, in roughly [-1, 1].
-function fbm(x, y, octaves) {
+function fbm(x, y, octaves, source = noise) {
   let sum = 0;
   let amplitude = 1;
   let total = 0;
   for (let octave = 0; octave < octaves; octave++) {
-    sum += amplitude * noise(x * 2 ** octave + 31.7 * octave, y * 2 ** octave - 17.3 * octave);
+    sum += amplitude * source(x * 2 ** octave + 31.7 * octave, y * 2 ** octave - 17.3 * octave);
     total += amplitude;
     amplitude *= 0.45;
   }
@@ -79,6 +91,17 @@ export function landAt(x, y) {
 
 export function biomeAt(x, y) {
   return settlementAt(x, y) ? BIOMES.ruins : landAt(x, y);
+}
+
+// How radioactive a place is: 0 outside the fallout, rising towards 1 deeper in.
+export function radiationAt(x, y) {
+  const fx = x * RADIATION_FREQUENCY + 211.7;
+  const fy = y * RADIATION_FREQUENCY - 87.3;
+  // Warped like forests, so the patches aren't round blobs.
+  const wx = fx + RADIATION_WARP * radiationNoise(fx + 5.2, fy - 13.6);
+  const wy = fy + RADIATION_WARP * radiationNoise(fx - 9.8, fy + 2.7);
+  const level = fbm(wx, wy, 3, radiationNoise) - RADIATION_THRESHOLD;
+  return level > 0 ? Math.min(1, level / RADIATION_RANGE) : 0;
 }
 
 // Brightness factor around 1, for a little small-scale variation inside a biome.

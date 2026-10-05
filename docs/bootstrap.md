@@ -73,16 +73,20 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
 |-------|----------------------------------------------------------|
 | Junk  | rozbudowa schronu i wytwarzanie przedmiotów, np. amunicji |
 | Food  | utrzymanie ocalałych w schronie                          |
+| Cells | zasilanie radia, a docelowo innych urządzeń elektrycznych |
+| Isotopes | docelowo produkcja Reactor Fuel; tylko ze stref radiacji (zob. [radiation.md](radiation.md)) |
 
 - Komunikat po przeszukaniu, np. „You've found 3 Junk”.
 - Przeszukanie może dać podręcznik, który odblokowuje wytwarzanie przedmiotów (zob. [crafting.md](crafting.md)).
+- Po ciemku przeszukanie daje mniej, chyba że użytkownik ma latarkę (zob. [night.md](night.md)).
+- Część pustkowia jest skażona radiacją. Strefy są niewidoczne i wykrywa je licznik Geigera (zob. [radiation.md](radiation.md)).
 - Przeszukanie może zakończyć się spotkaniem z wrogiem (zob. [combat.md](combat.md)).
 - Przeszukanie może czasem odkryć landmark, który zostaje na mapie na zawsze (zob. [landmarks.md](landmarks.md)).
 - W prototypie nie ma budowania.
 
 ### Plecak
 
-- Plecak mieści łącznie 50 jednostek wszystkich zasobów i przedmiotów (np. 25 Junk i 25 Food). Ile miejsca zajmuje przedmiot albo podręcznik, opisuje [crafting.md](crafting.md).
+- Plecak mieści łącznie 50 jednostek wszystkich zasobów i przedmiotów (np. 25 Junk i 25 Food). Każdy zasób zajmuje 1 jednostkę. Ile miejsca zajmuje przedmiot albo podręcznik, opisuje [crafting.md](crafting.md).
 - Gdy znalezisko nie mieści się w całości, użytkownik zabiera tyle, ile się zmieści, a reszta przepada. Komunikat, np. „You've found 3 Junk, but could only carry 1”.
 - Z pełnym plecakiem nadal można przeszukiwać (np. w nadziei na landmark albo żeby uratować ocalałego).
 - Dotknięcie plecaka na pasku stanu otwiera jego zawartość: ile jednostek każdego zasobu niesie użytkownik, jakie przedmioty i ile miejsca zostało.
@@ -136,13 +140,14 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
 - Domyślny widok obejmuje około 1–2 km wokół użytkownika i jest wycentrowany na użytkowniku.
 - Mapę można przybliżać i oddalać (gest szczypania oraz przyciski +/−) w zakresie od ok. 500 m do ok. 5 km szerokości widoku. W prototypie nie można jej przesuwać: zawsze jest wycentrowana na użytkowniku.
 - Biom w miejscu przeszukania wpływa na to, jaki zasób się znajdzie (zob. [loot.md](loot.md)).
+- Oprócz biomów jest niewidoczna warstwa stref radiacji (zob. [radiation.md](radiation.md)). Mapa jej nie pokazuje.
 
 ### Interfejs
 
 - Główny ekran to mapa.
 - Pasek stanu pokazuje: zawartość plecaka (np. „Backpack 12/50”), czy idzie z nami ocalały, oraz jakość sygnału GPS. Dotknięcie plecaka otwiera panel plecaka.
 - Przyciski zależą od kontekstu: **Create a Shelter**, **Search area**, **Unload**.
-- Obok kompasu i podziałki mapy jedno słowo mówi, gdzie stoi użytkownik: **Shelter**, **Plains**, **Forest** albo **Ruins**. W ruinach pod spodem jest mniejszym drukiem nazwa osady. Dzięki temu na granicy biomów nie trzeba zgadywać z mapy, jaki łup da przeszukanie. Bez pozycji słowa nie ma, a przy słabym sygnale jest przygaszone, tak jak pinezka.
+- Obok kompasu i podziałki mapy jedno słowo mówi, gdzie stoi użytkownik: **Shelter**, **Plains**, **Forest** albo **Ruins**. W ruinach pod spodem jest mniejszym drukiem nazwa osady. Najniżej jest pora dnia i czas do jej zmiany, np. „Day · dark in 3 h” (zob. [night.md](night.md)). Dzięki temu na granicy biomów nie trzeba zgadywać z mapy, jaki łup da przeszukanie. Bez pozycji słowa nie ma, a przy słabym sygnale jest przygaszone, tak jak pinezka.
 - Panel schronu pokazuje nazwę schronu, stan magazynu, przedmioty i podręczniki, warsztat (zob. [crafting.md](crafting.md)), radio (zob. [landmarks.md](landmarks.md#radio)) oraz ocalałych z ich etapem głodu i ranami (zob. [survivors.md](survivors.md)).
 
 #### Pierwsze uruchomienie
@@ -186,3 +191,8 @@ Tych rzeczy nie implementujemy w prototypie.
 - Podstawowa ochrona przed oszukiwaniem, np. limit prędkości przemieszczania się.
 - Inne misje do landmarków, np. „czeka tam coś specjalnego”.
 - Łup zależny od rodzaju landmarku, np. apteka częściej daje apteczki.
+- Wytwarzanie Cells w schronie:
+  - mini-reaktor produkujący Cells z Reactor Fuel; Reactor Fuel wytwarza się z Isotopes (zob. [radiation.md](radiation.md)),
+  - panele słoneczne.
+- Kolejne urządzenia w schronie zasilane z Cells i przedmioty z baterią w koszcie, np. karabin laserowy, dron zwiadowczy. Przedmiotów nie ładuje się: zużyty znika.
+- Psucie się niektórych rzeczy i naprawy z Junk.

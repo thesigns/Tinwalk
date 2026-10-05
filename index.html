@@ -29,9 +29,14 @@
     <symbol id="i-vibrate" viewBox="0 0 24 24"><rect x="8" y="4" width="8" height="16" rx="1.5"/><path d="M4.5 9v6M19.5 9v6M2 10.5v3M22 10.5v3"/></symbol>
     <symbol id="i-junk" viewBox="0 0 24 24"><path d="M12 3.5 19.4 7.75v8.5L12 20.5l-7.4-4.25v-8.5z"/><circle cx="12" cy="12" r="3.2"/></symbol>
     <symbol id="i-food" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="6" ry="2.2"/><path d="M6 6v12c0 1.2 2.7 2.2 6 2.2s6-1 6-2.2V6"/><path d="M6 10.5c0 1.2 2.7 2.2 6 2.2s6-1 6-2.2"/></symbol>
+    <symbol id="i-cells" viewBox="0 0 24 24"><rect x="6.5" y="5" width="11" height="16" rx="1.5"/><path d="M10 5V3h4v2"/><path d="M13 8.5 10 13h4l-3 4.5"/></symbol>
+    <symbol id="i-isotopes" viewBox="0 0 24 24"><path d="M9 3.5h6M10 3.5v5.5L5.2 18.2a1.6 1.6 0 0 0 1.4 2.3h10.8a1.6 1.6 0 0 0 1.4-2.3L14 9V3.5"/><path d="M7.5 14.5h9"/><path d="M11 17.5h.01M13.5 16.8h.01"/></symbol>
+    <symbol id="i-radiation" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><path fill="currentColor" stroke="none" d="M13.65 14.86L16.90 20.49A9.8 9.8 0 0 1 7.10 20.49L10.35 14.86A3.3 3.3 0 0 0 13.65 14.86zM13.65 9.14L16.90 3.51A9.8 9.8 0 0 1 21.80 12.00L15.30 12.00A3.3 3.3 0 0 0 13.65 9.14zM8.70 12.00L2.20 12.00A9.8 9.8 0 0 1 7.10 3.51L10.35 9.14A3.3 3.3 0 0 0 8.70 12.00z"/></symbol>
     <symbol id="i-knife" viewBox="0 0 24 24"><path d="M9 15 19.5 4.5c.6 3.2-.8 6.6-4 9.8L13 16.8"/><path d="m6.5 12.5 5 5"/><path d="m4 20 4-4"/></symbol>
     <symbol id="i-combat-knife" viewBox="0 0 24 24"><path d="M9 15 20.5 3.5c.7 3.8-.9 7.7-4.5 11.3L13 17.8"/><path d="m5.5 11.5 7 7"/><path d="m3.5 20.5 4-4"/><path d="m13.5 10.5 1.5 1.5M16 8l1.5 1.5"/></symbol>
     <symbol id="i-first-aid-kit" viewBox="0 0 24 24"><rect x="3.5" y="7" width="17" height="13" rx="1.5"/><path d="M9 7V4.5h6V7"/><path d="M12 10.5v6M9 13.5h6"/></symbol>
+    <symbol id="i-flashlight" viewBox="0 0 24 24"><path d="M2.5 10h9.5v4H2.5z"/><path d="M12 10l3.5-2.5v9L12 14"/><path d="M6 10V8.5h2.5V10"/><path d="M18 9.5l3-1.5M18 12h3.5M18 14.5l3 1.5"/></symbol>
+    <symbol id="i-geiger-counter" viewBox="0 0 24 24"><rect x="2.5" y="9" width="12" height="11.5" rx="1.5"/><path d="M5.5 16.5a3 3 0 0 1 6 0"/><path d="M8.5 16.5l1.6-2"/><path d="M5.5 9V6.5h6V9"/><path d="M14.5 17h3a1.5 1.5 0 0 0 1.5-1.5V8"/><path d="M17 3.5h4V8h-4z"/></symbol>
     <symbol id="i-manual" viewBox="0 0 24 24"><path d="M5 19.5V5.5A1.5 1.5 0 0 1 6.5 4H19v13H6.5A1.5 1.5 0 0 0 5 18.5 1.5 1.5 0 0 0 6.5 20H19"/><path d="M9 8h6M9 11h4"/></symbol>
     <symbol id="i-giant-rat" viewBox="0 0 24 24"><path d="M4.5 16.5c0-4.2 3.2-7.5 7.6-7.5 2.8 0 4.7 1.4 6 3.3l2.4 2.2c-.4 1.2-1.7 2-3.3 2z"/><circle cx="14.5" cy="9.3" r="1.9"/><circle cx="17.4" cy="12.6" r=".5" fill="currentColor"/><path d="M4.5 16.5c-1.8.2-2.4 1.8-1.3 2.8s3.3.6 5.3.2"/><path d="M8.5 16.5v2M14 16.5v2"/></symbol>
     <symbol id="i-radio" viewBox="0 0 24 24"><path d="M3.5 9.5h17v10.5h-17z"/><path d="M7 9.5 16.5 3.5"/><path d="M6.5 13.5h5M6.5 16.5h5"/><path d="M14.5 15a2 2 0 1 0 4 0 2 2 0 1 0-4 0"/></symbol>
@@ -121,6 +126,11 @@
       <div id="location" hidden>
         <span id="location-label"></span>
         <span id="location-place" hidden></span>
+        <span id="location-daylight"></span>
+      </div>
+      <!-- The Geiger counter's warning, shown only with one in the backpack. -->
+      <div id="fallout" hidden aria-label="Radiation">
+        <svg class="icon"><use href="#i-radiation"/></svg>
       </div>
     </div>
     <!-- The rescue mission under way: who is waiting, where, and for how long. -->
@@ -325,6 +335,16 @@
       <p id="radio-note" class="muted"></p>
       <div class="dialog-buttons">
         <button class="btn btn-paint" value="close" autofocus>OK</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="sickness-dialog" class="paper">
+    <form method="dialog">
+      <h2 id="sickness-title"></h2>
+      <p id="sickness-text"></p>
+      <div class="dialog-buttons">
+        <button class="btn btn-paint" value="close">OK</button>
       </div>
     </form>
   </dialog>

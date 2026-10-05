@@ -30,6 +30,11 @@ const PATTERNS = {
 
 export const canVibrate = typeof navigator.vibrate === 'function';
 
+// A phone can't buzz as fast as a Geiger counter clicks, so it ticks slower.
+const CRACKLE_MIN_RATE = 3;
+const CRACKLE_MAX_RATE = 12;
+const CRACKLE_TICK_MS = 8;
+
 export class Haptics {
   constructor() {
     this.enabled = isSettingOn(SETTING_KEY);
@@ -42,5 +47,19 @@ export class Haptics {
 
   play(name) {
     if (this.enabled && canVibrate && PATTERNS[name]) navigator.vibrate(PATTERNS[name]);
+  }
+
+  // Ticks at random for `duration` seconds, faster the hotter the fallout (0 to 1).
+  crackle(intensity, duration) {
+    if (!this.enabled || !canVibrate) return;
+    const rate = CRACKLE_MIN_RATE + (CRACKLE_MAX_RATE - CRACKLE_MIN_RATE) * intensity;
+    const pattern = [];
+    for (let elapsed = 0; elapsed < duration * 1000; ) {
+      const pause = Math.round((-Math.log(1 - Math.random()) / rate) * 1000);
+      pattern.push(pause, CRACKLE_TICK_MS);
+      elapsed += pause + CRACKLE_TICK_MS;
+    }
+    // A pattern starts with a vibration, so a zero-length one goes first.
+    navigator.vibrate([0, ...pattern]);
   }
 }

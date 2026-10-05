@@ -13,7 +13,8 @@ Zasady życia ocalałych, którzy trafili do schronu. Eskortowanie ocalałych do
 - Każdy ocalały w schronie zjada 1 Food raz na 24 godziny.
 - Liczy się tylko jedzenie w magazynie schronu. Food w plecaku trzeba najpierw rozładować.
 - Ocalały idący z użytkownikiem nie je. Jego licznik zaczyna się dopiero po przybyciu do schronu.
-- Ranny ocalały (zob. [combat.md](combat.md#rany)) przy każdym posiłku zjada 2 Food zamiast 1. Jeśli w magazynie jest tylko 1 Food, zjada je i też zostaje najedzony.
+- Ranny albo chory ocalały (zob. [combat.md](combat.md#rany) i [radiation.md](radiation.md#choroba-sick)) przy każdym posiłku zjada 2 Food zamiast 1, także gdy jest naraz ranny i chory. Jeśli w magazynie jest tylko 1 Food, zjada je i też zostaje najedzony.
+- Część jedzenia w magazynie może być skażona, choć tego nie widać. Ocalały, który zje skażone Food, choruje (zob. [radiation.md](radiation.md#skażone-jedzenie)).
 
 ## Etapy głodu
 
@@ -49,5 +50,5 @@ Każdy etap trwa 24 godziny:
   - głodny: „starving in 20 h”,
   - głodujący: „leaves in 5 h”.
 - Kolor paska i etapu zależy od etapu: zielony, pomarańczowy, czerwony.
-- Ranny ocalały ma na plakietce także oznaczenie rany i przycisk **Treat** (zob. [combat.md](combat.md#rany)).
+- Ranny albo chory ocalały ma na plakietce także oznaczenie rany albo choroby i przycisk **Treat** (zob. [combat.md](combat.md#rany) i [radiation.md](radiation.md#interfejs)).
 - Gdy któryś ocalały jest głodny, przycisk **Shelter** ma pomarańczową kropkę, a gdy któryś głoduje, czerwoną, pulsującą. Dzięki temu widać to także podczas spaceru.

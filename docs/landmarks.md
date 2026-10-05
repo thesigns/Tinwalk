@@ -1,6 +1,6 @@
 # Landmarki i misje ratunkowe (Landmarks)
 
-Przy przeszukiwaniu można czasem odkryć landmark, np. opuszczoną kopalnię albo wieżę obserwacyjną. Landmark zostaje na mapie na zawsze. Gdy w schronie stoi radio, można nasłuchiwać wezwań o pomoc od rannych ocalałych, którzy czekają przy landmarkach. To jedyny sposób na zdobycie ocalałych.
+Przy przeszukiwaniu można czasem odkryć landmark, np. opuszczoną kopalnię albo wieżę obserwacyjną. Landmark zostaje na mapie na zawsze. Gdy w schronie stoi radio i są baterie (Cells), można nasłuchiwać wezwań o pomoc od rannych ocalałych, którzy czekają przy landmarkach. To jedyny sposób na zdobycie ocalałych.
 
 ## Landmarki
 
@@ -52,6 +52,8 @@ Każdy rodzaj ma własną ikonę.
 
 Radio wytwarza się w schronie z Radio Manual (zob. [crafting.md](crafting.md)). Zostaje w schronie na zawsze.
 
+Radio działa na baterie (Cells, zob. [loot.md](loot.md)). Zbudowanie radia nie daje baterii: trzeba je znaleźć na pustkowiu i rozładować w schronie.
+
 ### Nasłuch
 
 - Gdy radio jest zbudowane, panel schronu ma sekcję **Radio** z przyciskiem **Listen**.
@@ -60,8 +62,10 @@ Radio wytwarza się w schronie z Radio Manual (zob. [crafting.md](crafting.md)).
   - z użytkownikiem nie idzie żaden ocalały,
   - nie trwa żadna misja ratunkowa,
   - od poprzedniego nasłuchu minęły co najmniej 4 godziny,
+  - w magazynie schronu jest co najmniej 1 Cell (baterie w plecaku trzeba najpierw rozładować),
   - użytkownik zna co najmniej jeden landmark, który nie jest przeszukany.
-- Gdy przycisk jest nieaktywny, aplikacja krótko mówi dlaczego, np. „Try again in 2 h” albo „You know no landmarks to hear from”.
+- Gdy przycisk jest nieaktywny, aplikacja krótko mówi dlaczego, np. „Try again in 2 h”, „The radio is dead. Bring Cells to the shelter to power it.” albo „You know no landmarks to hear from”.
+- Każdy nasłuch zużywa 1 Cell z magazynu, także ten, który kończy się „Only static”. To zamierzone: gra ma być wymagająca.
 - Nasłuch trwa kilka sekund. Słychać szum, a potem przychodzi wynik: wezwanie albo „Only static”.
 
 ### Szansa na wezwanie

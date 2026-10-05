@@ -5,7 +5,7 @@ An app that gamifies walks, with a survival/scavenging theme. The user sets up a
 ## Source of truth
 
 - `docs/bootstrap.md` is the app spec (in Polish). Its "Zakres prototypu" section is what's implemented; "Na przyszłość" lists ideas that are deliberately **not** implemented yet. Check the spec before changing game rules.
-- Rules on a specific topic live in their own files in `docs/`, linked from `bootstrap.md` (e.g. `docs/loot.md`: resources, loot by distance and biome; `docs/landmarks.md`: landmarks, the radio and rescue missions (the only source of survivors); `docs/survivors.md`: survivors in the shelter, meals and hunger; `docs/crafting.md`: manuals, recipes, items; `docs/combat.md`: enemies, fight or run, wounds). The project author prefers this to growing `bootstrap.md`.
+- Rules on a specific topic live in their own files in `docs/`, linked from `bootstrap.md` (e.g. `docs/loot.md`: resources, loot by distance and biome; `docs/landmarks.md`: landmarks, the radio and rescue missions (the only source of survivors); `docs/survivors.md`: survivors in the shelter, meals and hunger; `docs/crafting.md`: manuals, recipes, items; `docs/combat.md`: enemies, fight or run, wounds; `docs/night.md`: day and night, the flashlight; `docs/radiation.md`: invisible fallout zones, the Geiger counter, Isotopes, contaminated food and sickness). The project author prefers this to growing `bootstrap.md`.
 - The project author communicates in Polish; reply in Polish.
 
 ## Project rules
@@ -26,7 +26,7 @@ Open `http://localhost:8000/?debug`. Geolocation requires HTTPS, but `localhost`
 
 Chrome caches ES modules aggressively: after editing JS or CSS, hard-reload (Ctrl+Shift+R), or you may test stale code.
 
-Debug mode (`?debug`) shows a GPS diagnostics panel, lets you set the user's position by tapping the map, and can speed up game time (1×, 60×, 3600×) to test the 6-hour expiry of searched areas.
+Debug mode (`?debug`) shows a GPS diagnostics panel, lets you set the user's position by tapping the map, and can speed up game time (1×, 60×, 3600×) to test the 6-hour expiry of searched areas and nightfall.
 
 ## Architecture
 
@@ -39,9 +39,10 @@ All code is in `js/`, loaded from `index.html` via `js/main.js`.
 | `state.js` | State shape, `STATE_VERSION`, load/save to `localStorage`, export/import with validation |
 | `gps.js` | `LocationTracker`: Geolocation API, accuracy/staleness filtering, signal state, manual position for debug |
 | `geo.js` | Haversine distances, Web Mercator projection, weighted position averaging |
+| `sun.js` | Sun elevation from time and position (simplified NOAA formulas), for telling day from night |
 | `clock.js` | Game time (`now()`), which debug mode can speed up |
 | `map.js` | `MapView`: canvas rendering, zoom gestures, markers (shelter, landmarks, the rescue target and an arrow to it), short map animations (`playSweep`, `playRipple`) |
-| `terrain.js` | Procedural biomes (warped-noise forests, settlements with street grids), ground colors and icon drawing, as pure functions of Mercator coordinates |
+| `terrain.js` | Procedural biomes (warped-noise forests, settlements with street grids), the invisible radiation layer, ground colors and icon drawing, as pure functions of Mercator coordinates |
 | `terrain-tiles.js` | Renders terrain into cached tiles per zoom level: sampled ground, settlements drawn as shapes, icons |
 | `noise.js` | Seeded simplex noise and integer hashing |
 | `fx.js` | DOM helpers: `iconElement`, flying icons, replaying CSS animations |
