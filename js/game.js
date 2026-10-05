@@ -2,8 +2,9 @@
 // missions, survivors, unloading and meals, crafting, fights and wounds.
 // Functions take the game state and mutate it; saving is up to the caller.
 
-import { distanceMeters, toMercator } from './geo.js';
+import { distanceMeters, mercatorUnitsPerMeter, toMercator } from './geo.js';
 import { SURVIVOR_NAMES } from './names.js';
+import { hash } from './noise.js';
 import { biomeAt, settlementAt } from './terrain.js';
 
 export const RESOURCES = [
@@ -91,11 +92,15 @@ export const LANDMARKS = {
   'water-tower': { label: 'Water Tower', biome: 'ruins' },
   church: { label: 'Church', biome: 'ruins' },
 };
-const LANDMARK_CHANCE = 0.06;
-// Few and far between, so the map doesn't get crowded, and never right by
-// the shelter, so going to one means going out.
-const LANDMARK_SPACING = 500;
-const LANDMARK_SHELTER_DISTANCE = 500;
+// Landmarks wait at the corners of a hexagonal grid laid around the shelter,
+// with one corner on the shelter itself, which never has a landmark. A search
+// that covers a corner always finds its landmark, so walking into new ground
+// is reliably rewarded, while a route walked before has nothing left to find.
+// Simulated hour-long walks found 2-3 landmarks with 700 m sides.
+const LANDMARK_GRID_SIDE = 700;
+// The grid is turned by an angle derived from the shelter's position, so its
+// rows of corners don't line up with streets running north-south.
+const LANDMARK_GRID_SALT = 4099;
 // A landmark stands where the player searched, which proves they could get
 // there on foot. From a bus or a train it could end up on a road or railway.
 const MAX_LANDMARK_SPEED = 10 / 3.6;
@@ -270,7 +275,7 @@ export function collectLoot(state, position, time, multiplier = 1, random = Math
     found,
     carried,
     manual: rollManual(state, biome, random),
-    landmark: rollLandmark(state, position, biome, time, random),
+    landmark: findLandmark(state, position, biome, time, random),
   };
 }
 
@@ -289,21 +294,62 @@ function rollManual(state, biome, random) {
   return pickWeighted(missing.map((id) => ({ id })), weights, random).id;
 }
 
-// Sometimes discovers a landmark where the player searched. Returns it, or null.
-function rollLandmark(state, position, biome, time, random) {
-  if (!canHaveLandmark(state, position) || random() >= LANDMARK_CHANCE) return null;
+// Discovers the landmark at a grid corner within the search radius, if there
+// is one nobody has found yet. Returns it, or null. The landmark stands where
+// the player searched, not on the corner itself.
+function findLandmark(state, position, biome, time, random) {
+  // An unknown speed counts as walking: it is unknown mostly when standing still.
+  if (position.speed > MAX_LANDMARK_SPEED) return null;
+  const corner = landmarkCorner(state.shelter, position);
+  if (corner.distance > SEARCH_RADIUS || corner.key === SHELTER_CORNER) return null;
+  if (state.landmarks.some((landmark) => landmark.corner === corner.key)) return null;
   const types = Object.keys(LANDMARKS).filter((type) => LANDMARKS[type].biome === biome);
   const type = types[Math.floor(random() * types.length)];
-  const landmark = { type, lat: position.lat, lon: position.lon, discoveredAt: time };
+  const landmark = { type, lat: position.lat, lon: position.lon, discoveredAt: time, corner: corner.key };
   state.landmarks.push(landmark);
   return landmark;
 }
 
-function canHaveLandmark(state, position) {
-  // An unknown speed counts as walking: it is unknown mostly when standing still.
-  if (position.speed > MAX_LANDMARK_SPEED) return false;
-  if (distanceMeters(state.shelter, position) < LANDMARK_SHELTER_DISTANCE) return false;
-  return state.landmarks.every((landmark) => distanceMeters(landmark, position) >= LANDMARK_SPACING);
+// The landmark grid corner nearest to a { lat, lon } position:
+// { key, distance }, where key identifies the corner in the save and distance
+// is in meters. The corners form two triangular lattices: one through the
+// shelter, the other shifted by one side.
+export function landmarkCorner(shelter, position) {
+  const { x, y } = gridCoordinates(shelter, position);
+  const side = LANDMARK_GRID_SIDE;
+  const width = Math.sqrt(3) * side;
+  let best = { key: null, distance: Infinity };
+  for (const lattice of [0, 1]) {
+    const ly = y - lattice * side;
+    const row = ly / (1.5 * side);
+    const j0 = Math.floor(row);
+    const i0 = Math.floor((x - (row * width) / 2) / width);
+    // The nearest lattice point is a corner of the cell the position is in.
+    for (const j of [j0, j0 + 1]) {
+      for (const i of [i0, i0 + 1]) {
+        const distance = Math.hypot(x - (i * width + (j * width) / 2), ly - 1.5 * side * j);
+        if (distance < best.distance) best = { key: `${lattice},${i},${j}`, distance };
+      }
+    }
+  }
+  return best;
+}
+const SHELTER_CORNER = '0,0,0';
+
+// A position in meters east and north of the shelter, turned by the grid's
+// angle. A flat approximation is plenty at walking distances.
+function gridCoordinates(shelter, position) {
+  const origin = toMercator(shelter);
+  const point = toMercator(position);
+  const scale = 1 / mercatorUnitsPerMeter(shelter.lat);
+  const east = (point.x - origin.x) * scale;
+  const north = (point.y - origin.y) * scale;
+  const angle =
+    2 * Math.PI * hash(Math.round(shelter.lat * 1e5), Math.round(shelter.lon * 1e5), LANDMARK_GRID_SALT);
+  return {
+    x: east * Math.cos(angle) + north * Math.sin(angle),
+    y: north * Math.cos(angle) - east * Math.sin(angle),
+  };
 }
 
 // Whether the player has the manual, in the shelter or on the way there.

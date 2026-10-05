@@ -44,7 +44,7 @@ Zasada ogólna: kara nigdy nie blokuje chodzenia ani przeszukiwania. Użytkownik
 ### Wygrana
 
 - Przeszukanie daje dwa razy więcej zasobów niż zwykle. Jeśli łup się nie mieści, obowiązuje zwykła zasada: reszta przepada.
-- Szansa na podręcznik i landmark jest taka sama jak zwykle.
+- Podręcznik i landmark można znaleźć tak samo jak zwykle.
 
 ### Przegrana
 

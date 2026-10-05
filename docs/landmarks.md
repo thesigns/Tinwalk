@@ -6,15 +6,21 @@ Przy przeszukiwaniu można czasem odkryć landmark, np. opuszczoną kopalnię al
 
 ### Odkrywanie
 
-- Każde przeszukanie ma 6% szansy na odkrycie landmarku, osobno od zasobów i podręcznika.
+- Landmarki czekają w wierzchołkach siatki heksagonalnej o boku 700 m, w miejscach, gdzie stykają się trzy heksy. Siatka jest rozłożona wokół schronu tak, że jeden wierzchołek wypada w środku schronu. W tym wierzchołku landmarku nie ma, więc najbliższe trzy są ok. 700 m od schronu.
+- Siatka jest obrócona o kąt wyliczony z położenia schronu, żeby rzędy wierzchołków nie układały się wzdłuż ulic biegnących z północy na południe. Inaczej idąc prosto taką ulicą, można by przejść między rzędami i nic nie znaleźć.
+- Przeszukanie zawsze odkrywa landmark, gdy w promieniu 200 m od miejsca przeszukania jest wierzchołek, w którym nikt jeszcze nie znalazł landmarku. Wierzchołki są 700 m od siebie, więc jedno przeszukanie odkrywa najwyżej jeden landmark.
 - Landmark nie powstaje, gdy:
-  - w promieniu 500 m od miejsca przeszukania jest już inny landmark,
-  - miejsce przeszukania jest bliżej niż 500 m od środka schronu,
   - użytkownik porusza się szybciej niż 10 km/h,
   - przeszukanie zakończyło się ucieczką albo przegraną walką (zob. [combat.md](combat.md)).
-- Landmark stoi dokładnie w miejscu, w którym użytkownik przeszukał obszar (tam, gdzie przeszukanie zostawia swój punkt). Dzięki temu wiadomo, że da się tam bezpiecznie dojść pieszo, więc można wysyłać tam użytkownika na misje.
+- Wierzchołek czeka wtedy na kolejne przeszukanie.
+- Landmark stoi dokładnie w miejscu, w którym użytkownik przeszukał obszar (tam, gdzie przeszukanie zostawia swój punkt), a nie w samym wierzchołku. Dzięki temu wiadomo, że da się tam bezpiecznie dojść pieszo, więc można wysyłać tam użytkownika na misje.
 - Z tego samego powodu landmark nie powstaje przy szybszym ruchu. Inaczej przeszukanie z okna autobusu albo pociągu postawiłoby landmark na jezdni albo na torach. To zasada bezpieczeństwa, a nie ochrona przed oszukiwaniem.
 - Prędkość pochodzi z pomiaru GPS. Gdy przeglądarka jej nie podaje, aplikacja liczy ją z pomiarów z ostatnich ok. 30 s. Gdy nie da się jej ustalić (np. jest tylko jeden pomiar), aplikacja przyjmuje, że użytkownik idzie.
+- Skutki:
+  - Godzinny spacer (ok. 4,5 km) w nowy teren daje zwykle 2–3 landmarki, a bez żadnego kończy się ok. 3% takich spacerów (symulacja). Spacer tam i z powrotem daje mniej, bo droga powrotna leży w przeszukanym obszarze.
+  - Na trasie przebytej wcześniej nie ma już nic do znalezienia. Landmark jest nagrodą za odkrywanie nowych kierunków.
+  - W promieniu 2 km od schronu jest 18 wierzchołków, a w promieniu 3 km 39.
+- Landmarki odkryte przed wprowadzeniem siatki zajmują najbliższy wierzchołek, jeśli są od niego najwyżej 350 m. Pozostałe zostają na mapie jako dodatkowe.
 
 ### Rodzaje
 
