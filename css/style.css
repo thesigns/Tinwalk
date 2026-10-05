@@ -731,7 +731,7 @@ button {
   gap: 12px;
 }
 
-/* Full-screen overlays: welcome and missing location */
+/* Full-screen overlays: safety notice, welcome and missing location */
 
 .overlay {
   position: fixed;
@@ -773,6 +773,20 @@ button {
   font-size: 68px;
   font-weight: 900;
   letter-spacing: 0.02em;
+}
+
+/* "Save version 8 · Updated 5 Oct 2026", under the wordmark on the start screen. */
+.app-meta {
+  margin: 0 0 18px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.safety-text {
+  margin: 0 0 22px;
+  font-size: 17px;
+  font-weight: 700;
 }
 
 /* A stroke of red paint under the title. */

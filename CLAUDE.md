@@ -49,6 +49,7 @@ All code is in `js/`, loaded from `index.html` via `js/main.js`.
 | `sound.js` | Sound effects synthesized with the Web Audio API (no audio files) |
 | `haptics.js` | Vibration patterns (Android only; iPhone browsers don't support it) |
 | `settings.js` | On/off preferences in `localStorage` |
+| `version.js` | `APP_UPDATED`, the date of the last update shown on the start screen |
 | `debug.js` | Debug panel and the debug clock |
 | `names.js` | Survivor names and settlement name parts |
 
@@ -76,6 +77,8 @@ There is no test framework.
 - UI: check in the browser with `?debug`, setting the position by tapping the map. To force a survivor, an enemy or a manual, temporarily override `Math.random` while the search animation runs. Set the override after the animation starts: the search sound also calls `Math.random` and would use up a scripted sequence of values.
 
 ## Deployment
+
+Bump `APP_UPDATED` in `js/version.js` to the current date with every commit that changes the app; the start screen shows it next to the save version.
 
 The app is live on GitHub Pages at https://thesigns.github.io/Tinwalk/, published straight from the repository (no build, no workflow), so pushing `main` deploys it. The site is served under `/Tinwalk/`, so keep all paths relative.
 

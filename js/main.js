@@ -70,7 +70,8 @@ import { LocationTracker } from './gps.js';
 import { Haptics, canVibrate } from './haptics.js';
 import { MapView } from './map.js';
 import { SoundEffects } from './sound.js';
-import { exportState, loadState, parseSave, requestPersistentStorage, saveState } from './state.js';
+import { STATE_VERSION, exportState, loadState, parseSave, requestPersistentStorage, saveState } from './state.js';
+import { APP_UPDATED } from './version.js';
 
 const SHELTER_LOCATING_MS = 10_000;
 const SEARCH_ANIMATION_MS = 1_400;
@@ -199,6 +200,7 @@ const ui = {
   locationDaylight: $('location-daylight'),
   scaleLine: $('scale-line'),
   welcomeScreen: $('welcome-screen'),
+  safetyScreen: $('safety-screen'),
   menuDialog: $('menu-dialog'),
   importInput: $('import-input'),
   importDialog: $('import-dialog'),
@@ -1267,6 +1269,14 @@ mapView.onScaleChange = (meters, pixels) => {
 // Map labels are drawn with the web fonts, so redraw once they have loaded.
 document.fonts?.ready.then(update);
 
+// The safety notice comes first at every start; then the welcome screen on
+// the first one, or the game.
+$('safety-button').addEventListener('click', () => {
+  ui.safetyScreen.hidden = true;
+  if (hasBeenWelcomed()) startTracking();
+  else ui.welcomeScreen.hidden = false;
+});
+
 $('start-button').addEventListener('click', () => {
   try {
     localStorage.setItem(WELCOMED_KEY, '1');
@@ -1341,5 +1351,7 @@ setInterval(tick, TICK_MS);
 
 requestPersistentStorage();
 tick();
-if (hasBeenWelcomed()) startTracking();
-else ui.welcomeScreen.hidden = false;
+const updated = new Date(`${APP_UPDATED}T12:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+$('app-meta').textContent = `Save version ${STATE_VERSION} · Updated ${updated}`;
+ui.safetyScreen.hidden = false;
+$('safety-button').focus();

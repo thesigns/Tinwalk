@@ -150,6 +150,13 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
 - Obok kompasu i podziałki mapy jedno słowo mówi, gdzie stoi użytkownik: **Shelter**, **Plains**, **Forest** albo **Ruins**. W ruinach pod spodem jest mniejszym drukiem nazwa osady. Najniżej jest pora dnia i czas do jej zmiany, np. „Day · dark in 3 h” (zob. [night.md](night.md)). Dzięki temu na granicy biomów nie trzeba zgadywać z mapy, jaki łup da przeszukanie. Bez pozycji słowa nie ma, a przy słabym sygnale jest przygaszone, tak jak pinezka.
 - Panel schronu pokazuje nazwę schronu, stan magazynu, przedmioty i podręczniki, warsztat (zob. [crafting.md](crafting.md)), radio (zob. [landmarks.md](landmarks.md#radio)) oraz ocalałych z ich etapem głodu i ranami (zob. [survivors.md](survivors.md)).
 
+#### Ekran startowy
+
+- Przy każdym uruchomieniu aplikacji, zanim pojawi się cokolwiek innego, aplikacja pokazuje ekran z logo (napisem **Tinwalk**), wersją zapisu i datą ostatniej aktualizacji, np. „Save version 8 · Updated 5 Oct 2026”.
+- Pod spodem jest przypomnienie o bezpieczeństwie: „When you walk outdoors, stay aware of your surroundings. Don't enter restricted, private or dangerous areas, and keep an eye on traffic. Stay safe!” i przycisk **I understand**.
+- Dopiero po kliknięciu przycisku aplikacja zaczyna śledzić pozycję, a przy pierwszym uruchomieniu pokazuje ekran powitalny.
+- Datę aktualizacji trzeba zmieniać ręcznie (stała `APP_UPDATED` w `js/version.js`), bo aplikacja nie ma kroku budowania.
+
 #### Pierwsze uruchomienie
 
 - Przy pierwszym uruchomieniu aplikacja pokazuje krótki ekran powitalny: o co w niej chodzi i że potrzebuje lokalizacji.
