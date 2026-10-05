@@ -1,6 +1,7 @@
 import { now } from './clock.js';
 import { DEBUG_START, DebugPanel, isDebug } from './debug.js';
 import {
+  ENEMIES,
   HUNGER_STAGES,
   ITEMS,
   LANDMARKS,
@@ -9,6 +10,7 @@ import {
   RADIO,
   RESOURCES,
   SEARCH_RADIUS,
+  STRIKE_CARDS,
   SHELTER_RADIUS,
   VICTORY_LOOT_MULTIPLIER,
   WOUNDED_CAPACITY_BONUS,
@@ -16,7 +18,7 @@ import {
   backpackCapacity,
   biomeAtPosition,
   backpackLoad,
-  bestWeapon,
+  backpackWeapons,
   buildRadio,
   canBuildRadio,
   canCraft,
@@ -24,7 +26,6 @@ import {
   canTakeManual,
   canTreat,
   canUnload,
-  collectLoot,
   companionCapacityBonus,
   craft,
   createShelter,
@@ -32,6 +33,7 @@ import {
   emptyResources,
   expireMission,
   fight,
+  finishSearch,
   freeSpace,
   hasGeigerCounter,
   hungerOf,
@@ -61,7 +63,6 @@ import {
   totalResources,
   treat,
   unload,
-  winChance,
   woundHealsAt,
 } from './game.js';
 import { flyIcon, iconElement, replayAnimation, wait } from './fx.js';
@@ -103,8 +104,24 @@ const SEARCH_BLOCKER_HINTS = {
   searched: 'This area has already been searched',
 };
 const ENCOUNTER_TEXT = {
-  'giant-rat': 'A rat the size of a dog jumps out at you, teeth bared.',
+  rat: 'A rat jumps out of the rubble at you, teeth bared.',
+  'mutated-rat': 'Something rat-shaped and wrong crawls out at you, hissing.',
 };
+// What the enemy's threat card looks like, by the highest value each line covers.
+const THREAT_TEXT = {
+  rat: [
+    [2, 'Scrawny and limping'],
+    [4, 'Hungry and bold'],
+    [6, 'Big and cornered'],
+  ],
+  'mutated-rat': [
+    [5, 'Twitching, half blind'],
+    [8, 'Covered in glowing sores'],
+    [10, 'Huge, foaming at the mouth'],
+  ],
+};
+// How long the strike card takes to turn before the outcome shows.
+const CARD_FLIP_MS = 700;
 const COMPASS_POINTS = [
   { short: 'N', long: 'north' },
   { short: 'NE', long: 'north-east' },
@@ -156,7 +173,14 @@ const ui = {
   encounterTitle: $('encounter-title'),
   encounterIcon: $('encounter-icon'),
   encounterText: $('encounter-text'),
-  encounterOdds: $('encounter-odds'),
+  threatCard: $('threat-card'),
+  threatNote: $('threat-note'),
+  strikeCard: $('strike-card'),
+  strikeNote: $('strike-note'),
+  encounterChoices: $('encounter-choices'),
+  encounterResult: $('encounter-result'),
+  encounterDone: $('encounter-done'),
+  encounterOk: $('encounter-ok'),
   manualDialog: $('manual-dialog'),
   manualName: $('manual-name'),
   manualText: $('manual-text'),
@@ -450,6 +474,7 @@ function renderMap() {
     shelter: state.shelter && { ...state.shelter, radius: SHELTER_RADIUS },
     searchedAreas: activeSearchedAreas(state, now()),
     landmarks: state.landmarks,
+    enemies: state.enemies,
     target: state.mission?.landmark ?? null,
   });
 }
@@ -540,16 +565,15 @@ async function searchAction() {
   holdBackpack = true;
   const result = search(state, position, now());
   saveAndUpdate();
-  let { loot } = result;
-  const { rescued = null } = result;
+  let { loot = null, rescued = null } = result;
   let victory = null;
-  if (result.enemy) {
+  if (result.encounter) {
     holdBackpack = false;
     update();
-    victory = await encounter(result.enemy);
+    victory = await encounter(result.encounter);
     if (!victory) return;
     holdBackpack = true;
-    loot = collectLoot(state, position, now(), VICTORY_LOOT_MULTIPLIER);
+    ({ loot, rescued } = finishSearch(state, position, now(), VICTORY_LOOT_MULTIPLIER));
     saveAndUpdate();
   }
 
@@ -602,47 +626,100 @@ function withArticle(label) {
   return `${/^[aeiou]/i.test(label) ? 'an' : 'a'} ${label}`;
 }
 
-// Asks whether to fight the enemy or run, and settles it. Returns a note for
-// the loot card after a won fight, or null if the search ends here.
-async function encounter(enemy) {
-  const weapon = bestWeapon(state);
-  const chance = `${Math.round(100 * winChance(state, enemy))}% to win`;
-  ui.encounterTitle.textContent = `${enemy.label}!`;
-  ui.encounterIcon.setAttribute('href', `#i-${enemy.id}`);
-  ui.encounterText.textContent = ENCOUNTER_TEXT[enemy.id];
-  ui.encounterOdds.textContent =
-    (weapon
-      ? `With your ${ITEMS[weapon.id].label} (${plural(weapon.uses, 'use')} left): ${chance}.`
-      : `Bare-handed: ${chance}.`) + ' Running away costs some of your supplies.';
+// Shows the enemy's threat card and lets the player pick a weapon from the
+// backpack, fight bare-handed or run, then turns their strike card. Returns a
+// note for the loot card after a won fight, or null if the search ends here.
+async function encounter(encounter) {
+  const { enemy, threat, returning } = encounter;
+  const { label } = ENEMIES[enemy.type];
+  ui.encounterTitle.textContent = `${label}!`;
+  ui.encounterIcon.setAttribute('href', `#i-${enemy.type}`);
+  ui.encounterText.textContent = returning ? `The ${label} you met here is still around.` : ENCOUNTER_TEXT[enemy.type];
+  ui.threatCard.textContent = threat;
+  ui.threatNote.textContent = THREAT_TEXT[enemy.type].find(([max]) => threat <= max)[1];
+  ui.strikeCard.textContent = '';
+  ui.strikeCard.classList.add('face-down');
+  ui.strikeNote.textContent = `1–${STRIKE_CARDS} + your weapon`;
+  ui.encounterResult.hidden = true;
+  ui.encounterDone.hidden = true;
+  ui.encounterChoices.hidden = false;
+  const choice = new Promise((resolve) => ui.encounterChoices.replaceChildren(...fightChoices(resolve)));
+  ui.encounterDialog.showModal();
   feedback('enemy');
+  const weapon = await choice;
+  ui.encounterChoices.hidden = true;
 
-  if ((await ask(ui.encounterDialog)) !== 'fight') {
-    const lost = runAway(state, enemy);
+  if (weapon === 'run') {
+    ui.encounterDialog.close();
+    const lost = runAway(state, encounter);
     saveAndUpdate();
     feedback('flee');
     const total = totalResources(lost);
     if (total > 0) replayAnimation(ui.backpackHud, 'bump');
-    showToast(total > 0 ? `You ran, dropping ${describeResources(lost)}` : 'You ran and got away', enemy.id);
+    const dropped = total > 0 ? `You ran, dropping ${describeResources(lost)}` : 'You ran and got away';
+    showToast(`${dropped}. The ${label} stays on your map.`, enemy.type);
     return null;
   }
 
-  const { won, weapon: used, wornOut, lost, wounded } = fight(state, enemy, now());
+  const weaponLabel = weapon && ITEMS[weapon.id].label;
+  const { outcome, card, strike, wornOut, lost, wounded } = fight(state, encounter, weapon, now());
   saveAndUpdate();
-  const wornNote = wornOut ? ` Your ${ITEMS[used].label} is worn out.` : '';
-  if (won) {
-    feedback('hit');
-    return `You fought off the ${enemy.label}: double loot!${wornNote}`;
-  }
+  ui.strikeCard.classList.remove('face-down');
+  ui.strikeCard.textContent = strike;
+  ui.strikeNote.textContent = weapon ? `${card} + ${ITEMS[weapon.id].bonus} for the ${weaponLabel}` : `${card}, bare-handed`;
+  replayAnimation(ui.strikeCard, 'flip');
+  feedback('flip');
+  await wait(CARD_FLIP_MS);
 
-  feedback('defeat');
+  const wornNote = wornOut ? ` Your ${weaponLabel} is worn out.` : '';
   const total = totalResources(lost);
-  let note = `The ${enemy.label} got the better of you.`;
-  if (total > 0) note += ` You lost ${describeResources(lost)}.`;
-  if (wounded) note += ` ${state.companion.name} was wounded.`;
-  await showReward({ icon: enemy.id, amount: total > 0 ? `−${total}` : '', name: 'Defeat', note: note + wornNote, empty: true });
+  let note;
+  if (outcome === 'won') {
+    note = `You fought off the ${label}: double loot!`;
+    feedback('hit');
+  } else if (outcome === 'stalemate') {
+    note = `A stalemate: the ${label} holds its ground and stays on your map. You find nothing here.`;
+    feedback('stalemate');
+  } else {
+    note = `The ${label} got the better of you and stays on your map.`;
+    if (total > 0) note += ` You lost ${describeResources(lost)}.`;
+    if (wounded) note += ` ${state.companion.name} was wounded.`;
+    feedback('defeat');
+  }
+  ui.encounterResult.textContent = note + wornNote;
+  ui.encounterResult.hidden = false;
+  ui.encounterDone.hidden = false;
+  ui.encounterOk.focus();
+  await new Promise((resolve) => ui.encounterDialog.addEventListener('close', resolve, { once: true }));
   if (total > 0) replayAnimation(ui.backpackHud, 'bump');
   if (wounded) replayAnimation(ui.companion, 'bump');
-  return null;
+  return outcome === 'won' ? note + wornNote : null;
+}
+
+// A button for each weapon in the backpack, bare hands and running away; a
+// tap resolves with the weapon, null for bare hands, or 'run'.
+function fightChoices(resolve) {
+  const choices = [
+    ...backpackWeapons(state).map((item) => {
+      const { label, bonus, uses } = ITEMS[item.id];
+      return { value: item, label, detail: `+${bonus} · ${item.uses}/${uses} uses`, style: 'btn-paint' };
+    }),
+    { value: null, label: 'Bare hands', detail: '+0', style: 'btn-paint' },
+    { value: 'run', label: 'Run', detail: 'drop some supplies', style: 'btn-ink' },
+  ];
+  return choices.map(({ value, label, detail, style }) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `btn ${style}`;
+    const name = document.createElement('span');
+    name.textContent = label;
+    const small = document.createElement('span');
+    small.className = 'choice-detail';
+    small.textContent = detail;
+    button.append(name, small);
+    button.addEventListener('click', () => resolve(value), { once: true });
+    return button;
+  });
 }
 
 // "3 Junk and 1 Food", leaving out resources with no units.

@@ -66,11 +66,11 @@ const BIOME_MANUAL_WEIGHTS = {
 };
 
 // Crafted items, in workshop order. Ids double as icon names. The cost is in
-// resources from storage. Electric items come with their Cells built in and
+// resources from storage; a weapon's bonus adds to the player's strike card. Electric items come with their Cells built in and
 // are gone once those run flat: they are never recharged.
 export const ITEMS = {
-  knife: { label: 'Knife', manual: 'knifemaking', cost: { junk: 5 }, uses: 6, size: 2, attack: 3 },
-  'combat-knife': { label: 'Combat knife', manual: 'knifemaking', cost: { junk: 15 }, uses: 12, size: 3, attack: 9 },
+  knife: { label: 'Knife', manual: 'knifemaking', cost: { junk: 5 }, uses: 6, size: 2, bonus: 2 },
+  'combat-knife': { label: 'Combat knife', manual: 'knifemaking', cost: { junk: 15 }, uses: 12, size: 3, bonus: 4 },
   'first-aid-kit': { label: 'First aid kit', manual: 'pharmacology', cost: { junk: 7 }, uses: 3, size: 2 },
   flashlight: { label: 'Flashlight', manual: 'electric-tools', cost: { junk: 10, cells: 1 }, uses: 10, size: 2 },
   'geiger-counter': {
@@ -140,13 +140,18 @@ const LANDMARK_GRID_SALT = 4099;
 // there on foot. From a bus or a train it could end up on a road or railway.
 const MAX_LANDMARK_SPEED = 10 / 3.6;
 
-// lossOnRun and lossOnDefeat are the shares of backpack resources the player
-// loses. Ids double as icon names.
-export const ENEMIES = [
-  { id: 'giant-rat', label: 'Giant Rat', attack: 1, defense: 1, lossOnRun: 0.1, lossOnDefeat: 0.3 },
-];
+// A fight is two cards: the enemy draws a threat card from its own deck, the
+// player sees it and either runs or draws a strike card, 1 to 10 plus their
+// weapon's bonus. A higher strike wins, an equal one is a stalemate.
+// Rats live outside the fallout, mutated rats inside it. lossOnRun and
+// lossOnDefeat are the shares of backpack resources the player loses; attack
+// sets the chance of wounding the companion. Ids double as icon names.
+export const ENEMIES = {
+  rat: { label: 'Rat', threat: [1, 6], attack: 1, lossOnRun: 0.1, lossOnDefeat: 0.3 },
+  'mutated-rat': { label: 'Mutated Rat', threat: [4, 10], attack: 2, lossOnRun: 0.15, lossOnDefeat: 0.4 },
+};
+export const STRIKE_CARDS = 10;
 const ENCOUNTER_CHANCE = 0.05;
-const BARE_HANDS_ATTACK = 1;
 const PLAYER_DEFENSE = 1;
 // Winning a fight doubles the loot of the search.
 export const VICTORY_LOOT_MULTIPLIER = 2;
@@ -272,17 +277,50 @@ export function searchBlocker(state, position, time) {
 }
 
 // Searches the area, which counts as searched whatever happens next. Returns
-// { enemy } if an enemy shows up: the player then fights or runs, and only a
-// won fight brings loot. Otherwise returns { loot, rescued }, with loot from
-// collectLoot() and rescued the name of the survivor found if the search
-// reached the rescue mission's landmark, or null.
+// { encounter } if an enemy shows up (see fight()): an enemy left on the map
+// nearby always does, and otherwise one may turn up and stay on the map until
+// beaten. Only a won fight then brings loot, through finishSearch().
+// Otherwise returns finishSearch()'s { loot, rescued }.
 export function search(state, position, time, random = Math.random) {
   state.searchedAreas.push({ lat: position.lat, lon: position.lon, searchedAt: time });
+  const waiting = enemyNear(state, position);
+  if (waiting) return { encounter: { enemy: waiting, threat: drawThreat(waiting, random), returning: true } };
   const rescued = completeRescue(state, time);
   // A wounded survivor wouldn't have lasted with enemies around.
-  // There is only one kind of enemy so far.
-  if (!rescued && random() < ENCOUNTER_CHANCE) return { enemy: ENEMIES[0] };
+  if (!rescued && random() < ENCOUNTER_CHANCE) {
+    const type = radiationAtPosition(state, position) > 0 ? 'mutated-rat' : 'rat';
+    const enemy = { type, lat: position.lat, lon: position.lon, foundAt: time };
+    state.enemies.push(enemy);
+    return { encounter: { enemy, threat: drawThreat(enemy, random), returning: false } };
+  }
   return { loot: collectLoot(state, position, time, 1, random), rescued };
+}
+
+// The rest of a search after a won fight: { loot, rescued }, with loot from
+// collectLoot() and rescued the name of the survivor found if the search
+// reached the rescue mission's landmark, or null.
+export function finishSearch(state, position, time, multiplier, random = Math.random) {
+  const rescued = completeRescue(state, time);
+  return { loot: collectLoot(state, position, time, multiplier, random), rescued };
+}
+
+// The enemy on the map closest to a position within a search's reach, or null.
+function enemyNear(state, position) {
+  let nearest = null;
+  let nearestDistance = SEARCH_RADIUS;
+  for (const enemy of state.enemies) {
+    const distance = distanceMeters(enemy, position);
+    if (distance <= nearestDistance) {
+      nearest = enemy;
+      nearestDistance = distance;
+    }
+  }
+  return nearest;
+}
+
+function drawThreat(enemy, random) {
+  const [low, high] = ENEMIES[enemy.type].threat;
+  return low + Math.floor(random() * (high - low + 1));
 }
 
 // The biome at a { lat, lon } position, e.g. BIOMES.forest.
@@ -459,44 +497,42 @@ export function takeManual(state, id, time) {
   return true;
 }
 
-// The weapon the player would fight with: the strongest one in the backpack,
-// and of equally strong ones the most worn, so they get used up one by one.
-export function bestWeapon(state) {
-  let best = null;
-  for (const item of state.backpackItems) {
-    const { attack } = ITEMS[item.id];
-    if (!attack) continue;
-    const bestAttack = best ? ITEMS[best.id].attack : 0;
-    if (attack > bestAttack || (attack === bestAttack && item.uses < best.uses)) best = item;
-  }
-  return best;
+// The weapons in the backpack, the player's to choose from: the strongest
+// first, and of equally strong ones the most worn, which is worth using up first.
+export function backpackWeapons(state) {
+  return state.backpackItems
+    .filter((item) => ITEMS[item.id].bonus)
+    .sort((a, b) => ITEMS[b.id].bonus - ITEMS[a.id].bonus || a.uses - b.uses);
 }
 
-export function winChance(state, enemy) {
-  const weapon = bestWeapon(state);
-  const attack = weapon ? ITEMS[weapon.id].attack : BARE_HANDS_ATTACK;
-  return attack / (attack + enemy.defense);
-}
-
-// Fights the enemy. Returns { won, weapon, wornOut, lost, wounded }: the id of
-// the weapon used (or null), whether it was used up, the resources lost and
-// whether the companion was wounded. After a win, the caller collects the
-// loot with VICTORY_LOOT_MULTIPLIER.
-export function fight(state, enemy, time, random = Math.random) {
-  const won = random() < winChance(state, enemy);
-  const weapon = bestWeapon(state);
+// Fights the encounter's enemy with a weapon from the backpack, or bare-handed
+// if it is null. Every fight uses the weapon up a little, whatever the outcome.
+// Returns { outcome, card, strike, wornOut, lost, wounded }: 'won', 'stalemate'
+// or 'lost', the strike card drawn and the strike with the weapon's bonus,
+// whether the weapon was used up, the resources lost and whether the companion
+// was wounded. A beaten enemy leaves the map; after a win, the caller finishes
+// the search with VICTORY_LOOT_MULTIPLIER.
+export function fight(state, { enemy, threat }, weapon, time, random = Math.random) {
+  const card = 1 + Math.floor(random() * STRIKE_CARDS);
+  const strike = card + (weapon ? ITEMS[weapon.id].bonus : 0);
   const wornOut = weapon ? useItem(state.backpackItems, weapon) : false;
-  if (won) return { won, weapon: weapon?.id ?? null, wornOut, lost: emptyResources(), wounded: false };
+  const result = { card, strike, wornOut, lost: emptyResources(), wounded: false };
+  if (strike > threat) {
+    state.enemies.splice(state.enemies.indexOf(enemy), 1);
+    return { outcome: 'won', ...result };
+  }
+  if (strike === threat) return { outcome: 'stalemate', ...result };
 
-  const lost = loseResources(state, enemy.lossOnDefeat, random);
-  const wounded = state.companion !== null && random() < enemy.attack / (enemy.attack + PLAYER_DEFENSE);
+  const { lossOnDefeat, attack } = ENEMIES[enemy.type];
+  const lost = loseResources(state, lossOnDefeat, random);
+  const wounded = state.companion !== null && random() < attack / (attack + PLAYER_DEFENSE);
   if (wounded) state.companion.woundedAt = time;
-  return { won, weapon: weapon?.id ?? null, wornOut, lost, wounded };
+  return { outcome: 'lost', ...result, lost, wounded };
 }
 
 // Runs from the enemy, always successfully. Returns the resources dropped on the way.
-export function runAway(state, enemy, random = Math.random) {
-  return loseResources(state, enemy.lossOnRun, random);
+export function runAway(state, { enemy }, random = Math.random) {
+  return loseResources(state, ENEMIES[enemy.type].lossOnRun, random);
 }
 
 // Loses a share of the resources in the backpack, rounded down but at least 1
@@ -715,11 +751,13 @@ export function expireMission(state, time) {
 }
 
 // Ends the mission if its landmark has just been searched. Returns the
-// rescued survivor's name, or null. They join only after takeSurvivor().
+// rescued survivor's name, or null. They join only after takeSurvivor(). An
+// enemy near the landmark keeps the survivor pinned down until it is beaten.
 function completeRescue(state, time) {
   const { mission } = state;
   if (!mission || time >= missionEndsAt(mission)) return null;
   if (!isSearched(activeSearchedAreas(state, time), mission.landmark)) return null;
+  if (enemyNear(state, mission.landmark)) return null;
   state.mission = null;
   state.shelter.radio.quietSince = time;
   return mission.survivor;

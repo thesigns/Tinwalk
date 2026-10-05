@@ -16,6 +16,8 @@ const PATTERNS = {
   drop: [30, 40, 15],
   enemy: [80, 50, 80],
   hit: [40],
+  flip: [10],
+  stalemate: [30, 50, 30],
   defeat: [120, 60, 120],
   flee: [15, 40, 15, 40, 15],
   craft: [20, 60, 20, 60, 30],

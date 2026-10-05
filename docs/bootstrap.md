@@ -80,7 +80,7 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
 - Przeszukanie może dać podręcznik, który odblokowuje wytwarzanie przedmiotów (zob. [crafting.md](crafting.md)).
 - Po ciemku przeszukanie daje mniej, chyba że użytkownik ma latarkę (zob. [night.md](night.md)).
 - Część pustkowia jest skażona radiacją. Strefy są niewidoczne i wykrywa je licznik Geigera (zob. [radiation.md](radiation.md)).
-- Przeszukanie może zakończyć się spotkaniem z wrogiem (zob. [combat.md](combat.md)).
+- Przeszukanie może zakończyć się spotkaniem z wrogiem, a niepokonany wróg zostaje na mapie (zob. [combat.md](combat.md)).
 - Przeszukanie może czasem odkryć landmark, który zostaje na mapie na zawsze (zob. [landmarks.md](landmarks.md)).
 - W prototypie nie ma budowania.
 
@@ -135,6 +135,7 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
   - schron jako okrąg z nazwą,
   - aktywne przeszukane obszary jako zlane kształty, zakreskowane czerwonym ołówkiem, z krzyżykiem w miejscu każdego przeszukania,
   - odkryte landmarki jako małe ikony, a cel misji ratunkowej zakreślony czerwonym ołówkiem (zob. [landmarks.md](landmarks.md)),
+  - niepokonani wrogowie jako ikony na czerwonych kółkach (zob. [combat.md](combat.md#wrogowie-na-mapie)),
   - pozycja użytkownika jako pinezka (z okręgiem dokładności GPS),
 - Pinezka jest zielona, gdy użytkownik może przeszukać obszar, a czerwona, gdy nie może (np. jest w przeszukanym obszarze, za blisko schronu albo w schronie). Przy słabym sygnale pinezka jest szara.
 - Domyślny widok obejmuje około 1–2 km wokół użytkownika i jest wycentrowany na użytkowniku.

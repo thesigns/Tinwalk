@@ -12,6 +12,7 @@ Na pustkowiu są strefy skażone radiacją. Nie widać ich na mapie. Wykrywa je 
 - Strefa ma natężenie od 0 przy brzegu do 1 w najgorętszym rdzeniu. Natężenie wpływa tylko na trzaski licznika (zob. niżej), a nie na zasady gry.
 - W promieniu 200 m od środka schronu (tam, gdzie nie można przeszukiwać) radiacji nie ma.
 - O tym, czy przeszukanie jest w strefie, decyduje miejsce przeszukania.
+- W strefach zamiast zwykłych szczurów spotyka się zmutowane (Mutated Rat), silniejsze (zob. [combat.md](combat.md#wrogowie)). Niepokonany zmutowany szczur zostaje na mapie, więc zdradza strefę także graczowi bez licznika.
 
 ## Licznik Geigera
 

@@ -1,10 +1,10 @@
 // Loads, saves, exports and imports the game state.
 
 import { now } from './clock.js';
-import { ITEMS, LANDMARKS, MANUALS, RESOURCES, emptyResources, landmarkCorner } from './game.js';
+import { ENEMIES, ITEMS, LANDMARKS, MANUALS, RESOURCES, emptyResources, landmarkCorner } from './game.js';
 
 const STORAGE_KEY = 'tinwalk.state';
-export const STATE_VERSION = 8;
+export const STATE_VERSION = 9;
 
 const INVALID_SAVE = "This file isn't a valid Tinwalk save";
 const OTHER_VERSION = 'This save comes from a different version of Tinwalk';
@@ -88,6 +88,11 @@ const MIGRATIONS = {
     }
     save.version = 8;
   },
+  // Enemies that weren't beaten stay on the map. None were kept before.
+  8(save) {
+    save.enemies = [];
+    save.version = 9;
+  },
 };
 // Half the grid side: closer to this corner than to any other could be.
 const LEGACY_CORNER_DISTANCE = 350;
@@ -111,6 +116,7 @@ export function createInitialState() {
     landmarks: [], // [{ type, lat, lon, discoveredAt, corner }]
     // The rescue mission under way: { survivor, landmark: { type, lat, lon }, calledAt }
     mission: null,
+    enemies: [], // enemies not beaten yet, where they were met: [{ type, lat, lon, foundAt }]
     backpack: emptyResources(),
     // How many of the Food units in the backpack are contaminated. Hidden from the player.
     backpackContaminatedFood: 0,
@@ -196,6 +202,7 @@ const isManualList = (value) =>
 const isLandmarkPoint = (value) => isPoint(value) && Object.hasOwn(LANDMARKS, value.type);
 const isLandmark = (value) =>
   isLandmarkPoint(value) && isNumber(value.discoveredAt) && (value.corner === null || typeof value.corner === 'string');
+const isEnemy = (value) => isPoint(value) && Object.hasOwn(ENEMIES, value.type) && isNumber(value.foundAt);
 const isMission = (value) =>
   isObject(value) && typeof value.survivor === 'string' && isLandmarkPoint(value.landmark) && isNumber(value.calledAt);
 const isRadio = (value) =>
@@ -231,6 +238,8 @@ function isValidState(state) {
     state.searchedAreas.every((area) => isPoint(area) && isNumber(area.searchedAt)) &&
     Array.isArray(state.landmarks) &&
     state.landmarks.every(isLandmark) &&
+    Array.isArray(state.enemies) &&
+    state.enemies.every(isEnemy) &&
     // A mission needs a radio, which is in the shelter.
     (state.mission === null || (isMission(state.mission) && state.shelter?.radio != null)) &&
     isResources(state.backpack) &&

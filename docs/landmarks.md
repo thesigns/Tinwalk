@@ -101,7 +101,8 @@ Szansa zależy od czasu, który minął od końca poprzedniej misji ratunkowej (
 ### Ratunek
 
 - Misja się udaje, gdy po przeszukaniu cel leży w przeszukanym obszarze. Wystarczy więc przeszukać obszar w promieniu ok. 200 m od landmarku. Zlane obszary mogą sięgnąć nawet dalej.
-- Takie przeszukanie nigdy nie kończy się spotkaniem z wrogiem: ranny nie przetrwałby w otoczeniu wrogów.
+- Takie przeszukanie nigdy nie spotyka nowego wroga: ranny nie przetrwałby w otoczeniu wrogów.
+- Wróg pozostawiony na mapie w promieniu 200 m od celu przytrzymuje ocalałego: misja nie uda się, dopóki ten wróg nie zostanie pokonany (zob. [combat.md](combat.md#wrogowie-na-mapie)). Przeszukanie przy celu zaczyna się wtedy walką z nim. Wygrana kończy ratunek w tym samym przeszukaniu, a ucieczka, remis albo przegrana nie. Przeszukany obszar wygasa po 6 godzinach, więc na kolejną próbę zostaje zwykle dość czasu z 24 godzin misji.
 - Poza tym przeszukanie daje to co zwykle: zasoby i może dać podręcznik.
 - Po komunikacie o zasobach użytkownik wybiera: **Take with you** albo **Leave**. Pozostawiony ocalały przepada. Misja kończy się w obu przypadkach.
 - Uratowany ocalały jest ranny od chwili ratunku (zob. [combat.md](combat.md#rany)). Rana goi się po 72 godzinach albo od apteczki. Do tego czasu ocalały zwiększa pojemność plecaka tylko o 10 jednostek, a w schronie je 2 Food.

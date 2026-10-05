@@ -5,7 +5,7 @@ An app that gamifies walks, with a survival/scavenging theme. The user sets up a
 ## Source of truth
 
 - `docs/bootstrap.md` is the app spec (in Polish). Its "Zakres prototypu" section is what's implemented; "Na przyszłość" lists ideas that are deliberately **not** implemented yet. Check the spec before changing game rules.
-- Rules on a specific topic live in their own files in `docs/`, linked from `bootstrap.md` (e.g. `docs/loot.md`: resources, loot by distance and biome; `docs/landmarks.md`: landmarks, the radio and rescue missions (the only source of survivors); `docs/survivors.md`: survivors in the shelter, meals and hunger; `docs/crafting.md`: manuals, recipes, items; `docs/combat.md`: enemies, fight or run, wounds; `docs/night.md`: day and night, the flashlight; `docs/radiation.md`: invisible fallout zones, the Geiger counter, Isotopes, contaminated food and sickness). The project author prefers this to growing `bootstrap.md`.
+- Rules on a specific topic live in their own files in `docs/`, linked from `bootstrap.md` (e.g. `docs/loot.md`: resources, loot by distance and biome; `docs/landmarks.md`: landmarks, the radio and rescue missions (the only source of survivors); `docs/survivors.md`: survivors in the shelter, meals and hunger; `docs/crafting.md`: manuals, recipes, items; `docs/combat.md`: enemies, the card fight, enemies left on the map, wounds; `docs/night.md`: day and night, the flashlight; `docs/radiation.md`: invisible fallout zones, the Geiger counter, Isotopes, contaminated food and sickness). The project author prefers this to growing `bootstrap.md`.
 - The project author communicates in Polish; reply in Polish.
 
 ## Project rules
@@ -35,13 +35,13 @@ All code is in `js/`, loaded from `index.html` via `js/main.js`.
 | Module | Responsibility |
 |---|---|
 | `main.js` | Wires everything together: UI rendering, actions (create shelter, search, fight, unload, craft, listen to the radio), dialogs, menu, reward animations |
-| `game.js` | Game rules and constants (radii, loot tiers and weights, capacity, survivor meals, manuals, items, the radio, landmarks, rescue missions, enemies, wounds). Functions mutate the state; the caller saves |
+| `game.js` | Game rules and constants (radii, loot tiers and weights, capacity, survivor meals, manuals, items, the radio, landmarks, rescue missions, enemies and the card fight, wounds). Functions mutate the state; the caller saves |
 | `state.js` | State shape, `STATE_VERSION`, load/save to `localStorage`, export/import with validation |
 | `gps.js` | `LocationTracker`: Geolocation API, accuracy/staleness filtering, signal state, manual position for debug |
 | `geo.js` | Haversine distances, Web Mercator projection, weighted position averaging |
 | `sun.js` | Sun elevation from time and position (simplified NOAA formulas), for telling day from night |
 | `clock.js` | Game time (`now()`), which debug mode can speed up |
-| `map.js` | `MapView`: canvas rendering, zoom gestures, markers (shelter, landmarks, the rescue target and an arrow to it), short map animations (`playSweep`, `playRipple`) |
+| `map.js` | `MapView`: canvas rendering, zoom gestures, markers (shelter, landmarks, enemies, the rescue target and an arrow to it), short map animations (`playSweep`, `playRipple`) |
 | `terrain.js` | Procedural biomes (warped-noise forests, settlements with street grids), the invisible radiation layer, ground colors and icon drawing, as pure functions of Mercator coordinates |
 | `terrain-tiles.js` | Renders terrain into cached tiles per zoom level: sampled ground, settlements drawn as shapes, icons |
 | `noise.js` | Seeded simplex noise and integer hashing |
@@ -61,7 +61,7 @@ All code is in `js/`, loaded from `index.html` via `js/main.js`.
 - **Coordinates:** the map and terrain work in Web Mercator units; distances in game rules use `distanceMeters` (haversine).
 - **Tile cache:** its capacity scales with the number of visible tiles. A fixed, too-small cache made large screens re-render tiles every frame (flickering).
 - **Colors:** the palette is defined as CSS custom properties in `css/style.css`; `COLORS` in `map.js` mirrors it for canvas drawing. Keep them in sync.
-- **Icons:** icons are `<symbol id="i-…">` entries in the SVG sprite in `index.html`; create them in JS with `iconElement(name)`. Resource, item, enemy and landmark ids (`junk`, `knife`, `giant-rat`, `windmill`) double as icon names. The map draws landmark icons on the canvas from the same sprite via `Path2D`, so landmark symbols must use `<path>` elements only.
+- **Icons:** icons are `<symbol id="i-…">` entries in the SVG sprite in `index.html`; create them in JS with `iconElement(name)`. Resource, item, enemy and landmark ids (`junk`, `knife`, `rat`, `windmill`) double as icon names. The map draws landmark and enemy icons on the canvas from the same sprite via `Path2D`, so their symbols must use `<path>` elements only.
 - **Shelter panel re-renders every tick:** replacing a button between press and release swallows the tap, so lists with buttons go through `renderOnChange()` and survivor badges are updated in place.
 - **Fonts:** Big Shoulders Stencil (headings, buttons, numbers) and Courier Prime (text) are self-hosted in `fonts/` with their OFL licenses. Canvas labels use them too, so the map re-renders once `document.fonts.ready` resolves.
 - **Feedback:** `feedback(name)` in `main.js` plays both a sound and a vibration; event names are shared between `SOUNDS` in `sound.js` and `PATTERNS` in `haptics.js`. Browsers only allow audio after a user gesture, so `sound.unlock()` runs on every click.

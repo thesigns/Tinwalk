@@ -51,7 +51,11 @@ const COLORS = {
   searchedFill: 'rgba(180, 60, 35, 0.07)',
   pencil: 'rgba(170, 45, 25, 0.85)',
   pencilFaint: 'rgba(170, 45, 25, 0.3)',
+  paintText: '#f6ecd6',
 };
+// Landmarks are inked on paper; enemies stand out in red paint.
+const LANDMARK_STYLE = { disc: COLORS.paper, icon: COLORS.ink };
+const ENEMY_STYLE = { disc: COLORS.paint, icon: COLORS.paintText };
 
 export class MapView {
   constructor(canvas) {
@@ -156,6 +160,7 @@ export class MapView {
   //   shelter: { lat, lon, name, radius } | null,
   //   searchedAreas: [{ lat, lon, searchedAt }],
   //   landmarks: [{ type, lat, lon }],
+  //   enemies: [{ type, lat, lon }],
   //   target: { lat, lon } | null, the rescue mission's landmark
   // }
   render(scene) {
@@ -174,7 +179,8 @@ export class MapView {
     const complete = this.drawTerrain(scene.center);
     if (!complete) this.requestFrame();
     this.drawSearchedAreas(scene.center, scene.searchedAreas);
-    this.drawLandmarks(scene.center, scene.landmarks);
+    this.drawMarkers(scene.center, scene.landmarks, LANDMARK_STYLE);
+    this.drawMarkers(scene.center, scene.enemies, ENEMY_STYLE);
     if (scene.target) this.drawTarget(scene.center, scene.target);
     if (scene.shelter) this.drawShelter(scene.center, scene.shelter);
     this.drawEffects();
@@ -418,17 +424,17 @@ export class MapView {
     ctx.stroke();
   }
 
-  // Landmarks: small inked symbols on paper discs, the same size at every zoom.
-  drawLandmarks(center, landmarks) {
+  // Landmarks and enemies: small symbols on discs, the same size at every zoom.
+  drawMarkers(center, markers, style) {
     const { ctx, width, height } = this;
     const margin = LANDMARK_RADIUS_PX + 4;
     const scale = LANDMARK_ICON_PX / 24;
-    for (const landmark of landmarks) {
-      const { x, y } = this.toScreen(center, landmark);
+    for (const marker of markers) {
+      const { x, y } = this.toScreen(center, marker);
       if (x < -margin || y < -margin || x > width + margin || y > height + margin) continue;
       ctx.beginPath();
       ctx.arc(x, y, LANDMARK_RADIUS_PX, 0, Math.PI * 2);
-      ctx.fillStyle = COLORS.paper;
+      ctx.fillStyle = style.disc;
       ctx.shadowColor = COLORS.shadow;
       ctx.shadowBlur = 3;
       ctx.shadowOffsetY = 1;
@@ -444,7 +450,8 @@ export class MapView {
       ctx.lineWidth = 2.2;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
-      ctx.stroke(landmarkIcon(landmark.type));
+      ctx.strokeStyle = style.icon;
+      ctx.stroke(markerIcon(marker.type));
       ctx.restore();
     }
   }
@@ -638,14 +645,14 @@ export class MapView {
 
 // Landmark icons are read from the SVG sprite, so the map and the interface
 // share them. They are made of paths only, which Path2D understands.
-const landmarkIcons = new Map();
+const markerIcons = new Map();
 
-function landmarkIcon(type) {
-  let icon = landmarkIcons.get(type);
+function markerIcon(type) {
+  let icon = markerIcons.get(type);
   if (!icon) {
     icon = new Path2D();
     for (const path of document.querySelectorAll(`#i-${type} path`)) icon.addPath(new Path2D(path.getAttribute('d')));
-    landmarkIcons.set(type, icon);
+    markerIcons.set(type, icon);
   }
   return icon;
 }

@@ -189,6 +189,16 @@ const SOUNDS = {
     thud(sound, time + 0.1, 0.6);
     clink(sound, time + 0.12, 0.8);
   },
+  // A playing card snapped onto the table.
+  flip(sound, time) {
+    sound.noise(time, { duration: 0.06, volume: 0.5, frequency: 2400, q: 0.8 });
+    sound.noise(time + 0.05, { duration: 0.03, volume: 0.6, frequency: 900, filter: 'lowpass' });
+  },
+  // Blades clashing, and neither gives way.
+  stalemate(sound, time) {
+    clink(sound, time, 1.5);
+    clink(sound, time + 0.1, 1.4);
+  },
   // Knocked down: two thuds and a falling note.
   defeat(sound, time) {
     thud(sound, time, 0.6);
