@@ -40,6 +40,7 @@ Każdy rodzaj ma własną ikonę w interfejsie, własną odznakę na mapie i wł
 - Landmark jest na mapie okrągłą odznaką swojego rodzaju (uproszczony, czytelny rysunek na papierowym krążku, z paskiem gruntu w kolorze biomu), bez nazwy, żeby nie zaśmiecać mapy. Odznaka ma stały rozmiar przy każdym zbliżeniu.
 - Po odkryciu, za komunikatem o zasobach, aplikacja pokazuje komunikat, np. „You've discovered an Abandoned Mine”, a ikona zostaje wbita w mapę krótką animacją.
 - Landmark pamięta, kiedy był ostatnio odwiedzony: przy odkryciu i przy każdym przeszukaniu, którego obszar go obejmuje (ten sam zasięg, który kończy misję ratunkową).
+- Gdy przeszukanie z miejsca, w którym stoi użytkownik, objęłoby landmark, nad przyciskiem przeszukania widać podpowiedź, np. „Near the Police Station”. Ważniejsze podpowiedzi (słaby sygnał GPS, obszar już przeszukany) mają pierwszeństwo.
 - Sam landmark nic nie daje. Odkrycie jest nagrodą samą w sobie, a landmark jest celem misji ratunkowych.
 
 ### Ekran landmarku

@@ -43,6 +43,7 @@ import {
   isSick,
   isWounded,
   knownRecipes,
+  landmarkInReach,
   knowsRadio,
   listen,
   listenBlocker,
@@ -467,11 +468,13 @@ function currentAction() {
     };
   }
   const blocker = good ? searchBlocker(state, tracker.position, now()) : null;
+  // Tells the player a search here would reach a landmark, e.g. a rescue mission's.
+  const landmark = good && !blocker ? landmarkInReach(state, tracker.position, now()) : null;
   return {
     id: 'search',
     label: 'Search area',
     enabled: good && !blocker,
-    hint: signalHint ?? SEARCH_BLOCKER_HINTS[blocker] ?? null,
+    hint: signalHint ?? SEARCH_BLOCKER_HINTS[blocker] ?? (landmark && `Near the ${LANDMARKS[landmark.type].label}`),
   };
 }
 

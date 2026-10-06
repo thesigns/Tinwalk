@@ -298,10 +298,24 @@ export function search(state, position, time, random = Math.random) {
 function visitLandmarks(state, position, time) {
   const areas = activeSearchedAreas(state, time);
   for (const landmark of state.landmarks) {
-    if (distanceMeters(landmark, position) < SEARCH_INFLUENCE && isSearched(areas, landmark)) {
-      landmark.visitedAt = time;
-    }
+    if (reaches(areas, position, landmark)) landmark.visitedAt = time;
   }
+}
+
+// The landmark a search here would reach, the nearest if there are more, or null.
+export function landmarkInReach(state, position, time) {
+  const areas = [...activeSearchedAreas(state, time), { lat: position.lat, lon: position.lon, searchedAt: time }];
+  let nearest = null;
+  for (const landmark of state.landmarks) {
+    if (!reaches(areas, position, landmark)) continue;
+    if (!nearest || distanceMeters(landmark, position) < distanceMeters(nearest, position)) nearest = landmark;
+  }
+  return nearest;
+}
+
+// Whether the areas, including one just searched at the position, cover the landmark.
+function reaches(areas, position, landmark) {
+  return distanceMeters(landmark, position) < SEARCH_INFLUENCE && isSearched(areas, landmark);
 }
 
 // Whether a rescue mission's survivor is waiting at the landmark.
