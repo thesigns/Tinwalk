@@ -38,14 +38,14 @@ Każdy rodzaj ma własną ikonę w interfejsie, własną odznakę na mapie i wł
 ### Na mapie
 
 - Landmark jest na mapie okrągłą odznaką swojego rodzaju (uproszczony, czytelny rysunek na papierowym krążku, z paskiem gruntu w kolorze biomu), bez nazwy, żeby nie zaśmiecać mapy. Odznaka ma stały rozmiar przy każdym zbliżeniu.
-- Po odkryciu, za komunikatem o zasobach, aplikacja pokazuje komunikat, np. „You've discovered an Abandoned Mine”, a ikona zostaje wbita w mapę krótką animacją.
+- Po odkryciu, za komunikatem o zasobach, odznaka zostaje wbita w mapę krótką animacją i otwiera się ekran landmarku (zob. niżej) z napisem „You've found a landmark!” zamiast daty ostatniej wizyty. Ten ekran zamyka się sam, gdy użytkownik odejdzie ponad 50 m od landmarku.
 - Landmark pamięta, kiedy był ostatnio odwiedzony: przy odkryciu i przy każdym przeszukaniu, którego obszar go obejmuje (ten sam zasięg, który kończy misję ratunkową).
 - Gdy przeszukanie z miejsca, w którym stoi użytkownik, objęłoby landmark, nad przyciskiem przeszukania widać podpowiedź, np. „Near the Police Station”. Ważniejsze podpowiedzi (słaby sygnał GPS, obszar już przeszukany) mają pierwszeństwo.
 - Sam landmark nic nie daje. Odkrycie jest nagrodą samą w sobie, a landmark jest celem misji ratunkowych.
 
 ### Ekran landmarku
 
-- Tapnięcie w landmark na mapie otwiera jego ekran: dużą ilustrację, nazwę (np. „Gas Station”) i drobnym drukiem, kiedy był ostatnio odwiedzony (np. „Last visited: 1d 23h ago”).
+- Tapnięcie w landmark na mapie otwiera jego ekran: dużą ilustrację, nazwę (np. „Gas Station”), drobnym drukiem, kiedy był ostatnio odwiedzony (np. „Last visited: 1d 23h ago”), i jedno zdanie o landmarku (flavor text, np. „Someone made a last stand here. The sandbags are still in place.”). Każdy rodzaj ma własne zdanie.
 - Przycisk „Remove landmark” trwale usuwa landmark z mapy, po potwierdzeniu w osobnym okienku. Miejsce zwalnia się dla nowych landmarków (zob. odstęp 600 m wyżej).
 - Landmarku, przy którym czeka ocalały z trwającej misji, nie da się usunąć; ekran mówi wtedy, że ktoś tam czeka.
 - „Close” zamyka ekran.

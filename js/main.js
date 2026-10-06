@@ -81,6 +81,8 @@ const SHELTER_LOCATING_MS = 10_000;
 const SEARCH_ANIMATION_MS = 1_400;
 const REWARD_CARD_MS = 1_300;
 const RIPPLE_MS = 900;
+// How far the player can walk from a landmark they just found before its card closes.
+const DISCOVERY_CARD_RANGE = 50;
 // How long the radio crackles before the player hears whether anyone called.
 const LISTEN_MS = 3_400;
 const TOAST_DURATION_MS = 4_000;
@@ -239,6 +241,7 @@ const ui = {
   landmarkArt: $('landmark-art'),
   landmarkName: $('landmark-name'),
   landmarkVisited: $('landmark-visited'),
+  landmarkFlavor: $('landmark-flavor'),
   landmarkMission: $('landmark-mission'),
   landmarkRemove: $('landmark-remove'),
   removeLandmarkDialog: $('remove-landmark-dialog'),
@@ -280,6 +283,8 @@ let ringTimer = null;
 // What is marked to be dropped in the open backpack panel: resource units by
 // id, backpack items and manual ids.
 let dropping = { resources: emptyResources(), items: [], manuals: [] };
+// The landmark whose discovery card is open, or null.
+let discoveredLandmark = null;
 // Survivor name tags in the shelter panel, kept between renders (see renderSurvivorBadges).
 const survivorBadges = new WeakMap();
 
@@ -319,6 +324,10 @@ function crackle() {
 
 function update() {
   inShelter = isInShelter(state.shelter, tracker.position, inShelter);
+  const { position } = tracker;
+  if (discoveredLandmark && position && distanceMeters(position, discoveredLandmark) > DISCOVERY_CARD_RANGE) {
+    ui.landmarkDialog.close('close');
+  }
   renderStatus();
   renderActions();
   renderMap();
@@ -648,22 +657,11 @@ async function searchAction() {
   if (manual) await offerManual(manual);
 }
 
-// A newly discovered landmark is stamped onto the map.
+// A newly discovered landmark is stamped onto the map and its card opens.
 async function showLandmark(landmark) {
-  const { label } = LANDMARKS[landmark.type];
   feedback('landmark');
   mapView.playRipple(landmark, 0, RIPPLE_MS);
-  await showReward({
-    icon: landmark.type,
-    amount: '',
-    name: label,
-    note: `You've discovered ${withArticle(label)}. It stays on your map.`,
-  });
-}
-
-// "an Abandoned Mine", "a Farmstead".
-function withArticle(label) {
-  return `${/^[aeiou]/i.test(label) ? 'an' : 'a'} ${label}`;
+  await openLandmark(landmark, true);
 }
 
 // Shows the enemy's threat card and lets the player pick a weapon from the
@@ -1354,17 +1352,25 @@ async function importSave(file) {
   showToast('Save imported', 'import');
 }
 
-// A tapped landmark's card: its illustration, when it was last visited, and
-// a way to take it off the map.
-async function openLandmark(landmark) {
-  const { label } = LANDMARKS[landmark.type];
+// A landmark's card: its illustration, a line about it, when it was last
+// visited, and a way to take it off the map. Right after a discovery it
+// announces the find instead, and closes by itself once the player walks on.
+async function openLandmark(landmark, discovered = false) {
+  const { label, flavor } = LANDMARKS[landmark.type];
   const pinned = isMissionLandmark(state, landmark);
   ui.landmarkArt.src = `img/landmarks/${landmark.type}.svg`;
   ui.landmarkName.textContent = label;
-  ui.landmarkVisited.textContent = `Last visited: ${formatAgo(now() - landmark.visitedAt)}`;
+  ui.landmarkVisited.textContent = discovered
+    ? "You've found a landmark!"
+    : `Last visited: ${formatAgo(now() - landmark.visitedAt)}`;
+  ui.landmarkVisited.classList.toggle('found', discovered);
+  ui.landmarkFlavor.textContent = flavor;
   ui.landmarkMission.hidden = !pinned;
   ui.landmarkRemove.hidden = pinned;
-  if ((await ask(ui.landmarkDialog)) !== 'remove') return;
+  discoveredLandmark = discovered ? landmark : null;
+  const choice = await ask(ui.landmarkDialog);
+  discoveredLandmark = null;
+  if (choice !== 'remove') return;
   ui.removeLandmarkName.textContent = label;
   if ((await ask(ui.removeLandmarkDialog)) !== 'remove') return;
   if (!removeLandmark(state, landmark)) return;

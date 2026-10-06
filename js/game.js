@@ -107,24 +107,96 @@ const MISSION_DURATION_MS = 24 * 60 * 60 * 1000;
 
 // Landmarks, by the biome they are found in. Ids double as icon names.
 export const LANDMARKS = {
-  'abandoned-mine': { label: 'Abandoned Mine', biome: 'plains' },
-  farmstead: { label: 'Farmstead', biome: 'plains' },
-  windmill: { label: 'Windmill', biome: 'plains' },
-  'grain-silo': { label: 'Grain Silo', biome: 'plains' },
-  'bus-wreck': { label: 'Bus Wreck', biome: 'plains' },
-  'roadside-shrine': { label: 'Roadside Shrine', biome: 'plains' },
-  watchtower: { label: 'Watchtower', biome: 'forest' },
-  'lean-to': { label: 'Lean-to', biome: 'forest' },
-  'hunting-stand': { label: 'Hunting Stand', biome: 'forest' },
-  'ranger-station': { label: 'Ranger Station', biome: 'forest' },
-  bunker: { label: 'Bunker', biome: 'forest' },
-  'plane-wreck': { label: 'Plane Wreck', biome: 'forest' },
-  pharmacy: { label: 'Pharmacy', biome: 'ruins' },
-  'gas-station': { label: 'Gas Station', biome: 'ruins' },
-  'police-station': { label: 'Police Station', biome: 'ruins' },
-  school: { label: 'School', biome: 'ruins' },
-  'water-tower': { label: 'Water Tower', biome: 'ruins' },
-  church: { label: 'Church', biome: 'ruins' },
+  'abandoned-mine': {
+    label: 'Abandoned Mine',
+    biome: 'plains',
+    flavor: 'The headframe still creaks in the wind. Nobody has gone down in years.',
+  },
+  farmstead: {
+    label: 'Farmstead',
+    biome: 'plains',
+    flavor: 'A cold stove, a dry well and an empty dog chain. They left in a hurry.',
+  },
+  windmill: {
+    label: 'Windmill',
+    biome: 'plains',
+    flavor: 'Its sails stopped turning when the grain ran out. Crows keep watch now.',
+  },
+  'grain-silo': {
+    label: 'Grain Silo',
+    biome: 'plains',
+    flavor: 'Rust ate through the bins and the grain spilled out. The rats got there first.',
+  },
+  'bus-wreck': {
+    label: 'Bus Wreck',
+    biome: 'plains',
+    flavor: 'The last bus to town never made it. A birch grows through its roof.',
+  },
+  'roadside-shrine': {
+    label: 'Roadside Shrine',
+    biome: 'plains',
+    flavor: 'Someone still lights a candle here. You never see who.',
+  },
+  watchtower: {
+    label: 'Watchtower',
+    biome: 'forest',
+    flavor: 'From the cabin you could once see three villages. Now you see smoke.',
+  },
+  'lean-to': {
+    label: 'Lean-to',
+    biome: 'forest',
+    flavor: 'Poles, branches and a cold fire pit. Someone slept here not long ago.',
+  },
+  'hunting-stand': {
+    label: 'Hunting Stand',
+    biome: 'forest',
+    flavor: 'Spent shells lie in the grass. The hunter left, or became the hunted.',
+  },
+  'ranger-station': {
+    label: 'Ranger Station',
+    biome: 'forest',
+    flavor: "The forester's logbook ends mid-sentence, on the day it all began.",
+  },
+  bunker: {
+    label: 'Bunker',
+    biome: 'forest',
+    flavor: 'Built for a war that never came. Then a different one did.',
+  },
+  'plane-wreck': {
+    label: 'Plane Wreck',
+    biome: 'forest',
+    flavor: "A small plane nosed into the pines. The pilot's seat is empty.",
+  },
+  pharmacy: {
+    label: 'Pharmacy',
+    biome: 'ruins',
+    flavor: 'The shelves were stripped bare in the first week. Maybe not the back room.',
+  },
+  'gas-station': {
+    label: 'Gas Station',
+    biome: 'ruins',
+    flavor: 'The pumps ran dry long ago, but the smell of fuel lingers.',
+  },
+  'police-station': {
+    label: 'Police Station',
+    biome: 'ruins',
+    flavor: 'Someone made a last stand here. The sandbags are still in place.',
+  },
+  school: {
+    label: 'School',
+    biome: 'ruins',
+    flavor: 'The clock stopped at a quarter past ten. Chalk words still cover the board.',
+  },
+  'water-tower': {
+    label: 'Water Tower',
+    biome: 'ruins',
+    flavor: 'The tank is dry and the ladder broken, but the view still reaches far.',
+  },
+  church: {
+    label: 'Church',
+    biome: 'ruins',
+    flavor: 'The spire fell into the churchyard. The doors were left open.',
+  },
 };
 // Every fourth searched area may turn up a landmark, counting the areas still
 // active, so each fresh walk starts counting anew. Landmarks keep apart from

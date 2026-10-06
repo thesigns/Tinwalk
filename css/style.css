@@ -943,6 +943,19 @@ dialog input:focus {
   text-align: center;
 }
 
+/* Right after a discovery, the line under the name announces it. */
+#landmark-visited.found {
+  color: var(--paint);
+  font-family: var(--font-stencil);
+  font-size: 19px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.landmark-flavor {
+  font-style: italic;
+}
+
 .dialog-buttons {
   display: flex;
   justify-content: flex-end;
