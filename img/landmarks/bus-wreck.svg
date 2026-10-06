@@ -1,0 +1,158 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- An old country bus left in the roadside ditch: windows smashed, tyres flat, rust eating
+       the skirt, a birch sapling on the roof, a red curtain blowing out of a window. -->
+  <defs>
+    <clipPath id="disc"><circle cx="256" cy="256" r="232"/></clipPath>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cdb98c"/>
+      <stop offset="0.45" stop-color="#e6d7b0"/>
+      <stop offset="0.7" stop-color="#f3e9cc"/>
+    </linearGradient>
+    <linearGradient id="field" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d4bf86"/>
+      <stop offset="1" stop-color="#b89c5e"/>
+    </linearGradient>
+    <linearGradient id="asphalt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9d968a"/>
+      <stop offset="1" stop-color="#857e72"/>
+    </linearGradient>
+    <linearGradient id="body" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ddd2b2"/>
+      <stop offset="1" stop-color="#b8ac8a"/>
+    </linearGradient>
+    <linearGradient id="skirt" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8f8a6c"/>
+      <stop offset="1" stop-color="#6f6b52"/>
+    </linearGradient>
+    <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <path d="M0 0v7" stroke="#33281c" stroke-width="1.6" opacity="0.55"/>
+    </pattern>
+    <pattern id="hatch-sky" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-20)">
+      <path d="M0 0v8" stroke="#6a5842" stroke-width="1.4" opacity="0.45"/>
+    </pattern>
+  </defs>
+
+  <g clip-path="url(#disc)">
+    <!-- Heavy sky. -->
+    <rect width="512" height="512" fill="url(#sky)"/>
+    <g stroke="#6a5842" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M24 108c10-22 36-28 52-14 10-24 46-28 60-6 18-12 44-4 48 16 14 0 24 10 22 22H24z" fill="#eadcb6"/>
+      <path d="M24 116h182v12H24z" fill="url(#hatch-sky)" stroke="none"/>
+      <path d="M300 82c8-18 30-24 44-12 10-20 40-22 52-4 16-8 36 2 38 18 12 0 20 8 18 18H300z" fill="#eadcb6"/>
+      <path d="M300 92h152v10H300z" fill="url(#hatch-sky)" stroke="none"/>
+    </g>
+    <!-- Crows. -->
+    <path d="M230 150q7-7 14 0q7-7 14 0M270 130q5-5 10 0q5-5 10 0" fill="none" stroke="#33281c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Distant hills, a tree line and a row of roadside poplars. -->
+    <path d="M0 324c50-20 100-24 150-14s80 2 120-6 90-10 130 2 80 12 112 6V512H0z" fill="#a9ab7c"/>
+    <path d="M0 324c50-20 100-24 150-14s80 2 120-6 90-10 130 2 80 12 112 6" fill="none" stroke="#6a5842" stroke-width="2.5"/>
+    <g fill="#6f7f45" stroke="#33281c" stroke-width="2.2" stroke-linejoin="round">
+      <path d="M440 316c2-30 6-54 12-54s10 24 12 54z"/>
+      <path d="M466 318c2-24 5-44 10-44s8 20 10 44z"/>
+      <path d="M150 312c3-12 7-18 12-18s9 8 10 18z"/>
+      <path d="M170 310c4-15 9-22 14-22s10 9 11 22z"/>
+    </g>
+
+    <!-- The verge, and the road running past. -->
+    <path d="M0 356c80-14 170-16 256-12s180 2 256-6V512H0z" fill="url(#field)"/>
+    <path d="M0 356c80-14 170-16 256-12s180 2 256-6" fill="none" stroke="#6a5842" stroke-width="2.5"/>
+    <path d="M0 418c120-14 300-24 512-26V512H0z" fill="url(#asphalt)"/>
+    <path d="M0 418c120-14 300-24 512-26" fill="none" stroke="#33281c" stroke-width="2.5"/>
+    <path d="M30 470l50-6M130 458l56-6M240 448l56-5M350 440l56-4M460 434l40-2" stroke="#ece0c0" stroke-width="5" stroke-linecap="round" opacity="0.55"/>
+    <g fill="none" stroke="#5f594f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M100 430l20 12 30-2 12 16M300 470l24-8 18 10 28-4M160 488l18 14"/>
+    </g>
+
+    <!-- The bus and its shadow, scaled up from the ground to fill the frame. -->
+    <g transform="translate(262 376) scale(1.16) translate(-262 -376)">
+    <!-- Shadow under the bus. -->
+    <path d="M82 372 150 384 450 360 480 368 160 398 92 384z" fill="#33281c" opacity="0.25"/>
+
+    <!-- The bus, sunk into the ditch at the back. -->
+    <g transform="rotate(3 150 374)" stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <!-- Long side wall. -->
+      <path d="M150 208 430 234q12 2 12 14V350L150 374z" fill="url(#body)" stroke-width="3.5"/>
+      <!-- Lower skirt, its paint gone to rust. -->
+      <path d="M150 304 442 304V350L150 374z" fill="url(#skirt)" stroke-width="2.5"/>
+      <path d="M150 304 442 304V350L150 374z" fill="url(#hatch)" stroke="none" opacity="0.5"/>
+      <path d="M220 320c10 4 16 14 14 28l-20 4c-4-10-2-24 6-32zM300 312c14 2 22 10 22 22l-16 2c-6-6-8-16-6-24zM400 316c8 4 12 12 10 22l-14 2c-2-8 0-18 4-24z" fill="#5e3a1e" stroke="none" opacity="0.45"/>
+      <path d="M150 300 442 296" stroke-width="2.5"/>
+      <path d="M150 292 442 288" stroke-width="1.4" opacity="0.6"/>
+      <!-- Side windows, smashed or gone. -->
+      <path d="M199 232.4 237 235.8V285.1L199 283.9z" fill="#2a2016" stroke-width="3"/>
+      <path d="M243 236.3 277 239.4V286.3L243 285.3z" fill="#2a2016" stroke-width="3"/>
+      <path d="M283 239.9 313 242.6V287.5L283 286.5z" fill="#8fa0a0" stroke-width="3"/>
+      <path d="M283 260l10-8 6 14 8-10 6 6v25.5L283 286.5z" fill="#2a2016" stroke-width="2"/>
+      <path d="M319 243.2 345 245.5V288.5L319 287.6z" fill="#2a2016" stroke-width="3"/>
+      <path d="M351 246 373 248V289.3L351 288.6z" fill="#8fa0a0" stroke-width="3"/>
+      <path d="M355 250l14 14M362 270l8 6" stroke-width="1.6"/>
+      <path d="M379 248.5 399 250.3V290.1L379 289.5z" fill="#2a2016" stroke-width="3"/>
+      <path d="M405 250.9 423 252.5V290.9L405 290.3z" fill="#2a2016" stroke-width="3"/>
+      <!-- The door, folded open and dark inside. -->
+      <path d="M158 226 190 229V370L158 373z" fill="#2a2016" stroke-width="3"/>
+      <path d="M158 226l-8 6v136l8 5z" fill="#8a8377" stroke-width="2.5"/>
+      <!-- Wheel arches with flat tyres. -->
+      <path d="M170 368a28 30 0 0 1 54-2z" fill="#2a2016" stroke-width="3"/>
+      <path d="M176 368c2-16 10-24 22-24s20 8 22 22z" fill="#3a3530" stroke-width="3"/>
+      <path d="M190 366a8 8 0 0 1 16 0" fill="#6b665c" stroke-width="2"/>
+      <path d="M366 354a24 26 0 0 1 48-2z" fill="#2a2016" stroke-width="3"/>
+      <path d="M372 354c2-14 8-20 18-20s16 6 18 18z" fill="#3a3530" stroke-width="3"/>
+      <path d="M384 352a6 6 0 0 1 12 0" fill="#6b665c" stroke-width="2"/>
+      <!-- Front face, rounded at the roof. -->
+      <path d="M86 232q2-16 18-18L150 208V374L92 366z" fill="#cfc4a3" stroke-width="3.5"/>
+      <path d="M90 304 150 300V374L92 366z" fill="#7f7a5f" stroke-width="2.5"/>
+      <!-- Windscreen, one pane shattered, a route board above it. -->
+      <path d="M96 222 144 216V230L96 236z" fill="#33281c" stroke-width="2.5"/>
+      <path d="M94 240 146 234V290L96 294z" fill="#8fa0a0" stroke-width="3"/>
+      <path d="M120 237V292" stroke-width="2.5"/>
+      <path d="M94 240l26-3v20l-8-6-6 12-4-8-8 6z" fill="#2a2016" stroke-width="2"/>
+      <path d="M128 250l12 14M134 276l8-4" stroke-width="1.6"/>
+      <!-- Headlamps, one smashed, and the bumper. -->
+      <circle cx="104" cy="330" r="8" fill="#ece0c0" stroke-width="2.5"/>
+      <circle cx="138" cy="327" r="8" fill="#2a2016" stroke-width="2.5"/>
+      <path d="M86 350 152 344V354L88 360z" fill="#a39d90" stroke-width="3"/>
+      <!-- The red curtain blowing out of a window. -->
+      <path d="M248 240c-10 6-18 4-26 0 4 10 2 20-6 28 10 0 16 6 18 14 6-10 10-24 14-42z" fill="#b4432b" stroke="#5a1e10" stroke-width="2.5"/>
+      <path d="M236 248c-2 8-6 14-10 18" fill="none" stroke="#82301c" stroke-width="2"/>
+      <!-- A birch sapling grown out of the roof hatch. -->
+      <path d="M300 230l20 2-2 6-18-2z" fill="#8a8377" stroke-width="2.5"/>
+      <path d="M310 232c0-16 4-32-2-48M310 210c8-6 14-8 22-8M308 196c-8-6-14-6-20-4" fill="none" stroke-width="2.4"/>
+      <g fill="#6f7f45" stroke-width="2">
+        <path d="M308 180c-6-6-2-14 4-14s10 8 4 14z"/>
+        <path d="M330 200c0-8 8-10 12-6s0 12-8 10z"/>
+        <path d="M288 190c-6-2-8-10-2-12s10 4 8 10z"/>
+        <path d="M318 196c-2-6 2-10 8-10s6 6 2 10z"/>
+      </g>
+    </g>
+
+    </g>
+
+    <!-- The bus-stop sign, knocked down onto the road. -->
+    <g stroke="#33281c" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M140 462 222 448" stroke="#6b665c" stroke-width="6"/>
+      <path d="M140 462 222 448" fill="none" stroke-width="2"/>
+      <g transform="rotate(-10 240 444)">
+        <path d="M220 426h40v34h-40z" fill="#ece0c0" stroke-width="3"/>
+        <path d="M226 432h28v16h-28zM228 450a3 3 0 1 0 6 0M246 450a3 3 0 1 0 6 0M232 432v8M240 432v8M248 432v8" fill="none" stroke-width="2"/>
+      </g>
+    </g>
+
+    <!-- Tall dry grass over the ditch. -->
+    <g fill="none" stroke="#5c6a2c" stroke-width="2.6" stroke-linecap="round">
+      <path d="M150 402c2-16 6-26 12-34M160 404c0-14-2-24-8-32M170 402c4-12 8-20 16-24"/>
+      <path d="M250 396c3-14 8-22 14-28M260 398c0-12-2-20-6-26M270 396c4-10 8-16 14-18"/>
+      <path d="M340 390c2-16 6-26 12-34M350 392c0-14-2-24-8-32M360 390c4-12 8-20 16-24"/>
+      <path d="M420 384c4-14 8-22 14-28M432 386c0-12-2-20-6-26"/>
+      <path d="M80 404c2-12 6-20 10-26M90 406c0-10-2-18-6-24"/>
+    </g>
+    <!-- A lost hubcap on the road. -->
+    <ellipse cx="326" cy="472" rx="16" ry="6" fill="#a39d90" stroke="#33281c" stroke-width="2.5"/>
+    <ellipse cx="326" cy="472" rx="5" ry="2" fill="#6b665c" stroke="#33281c" stroke-width="1.6"/>
+  </g>
+
+  <!-- The medallion's frame. -->
+  <circle cx="256" cy="256" r="232" fill="none" stroke="#33281c" stroke-width="5"/>
+  <circle cx="256" cy="256" r="244" fill="none" stroke="#33281c" stroke-width="9"/>
+  <circle cx="256" cy="256" r="238" fill="none" stroke="#ece0c0" stroke-width="3"/>
+</svg>

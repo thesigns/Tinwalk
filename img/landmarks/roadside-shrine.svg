@@ -1,0 +1,190 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- A Polish pillar shrine by a dirt road: flaking whitewash over brick, a rusted tin roof,
+       a tilted iron cross, a crow, a pollard willow and one red grave candle still at its foot. -->
+  <defs>
+    <clipPath id="disc"><circle cx="256" cy="256" r="232"/></clipPath>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cdb98c"/>
+      <stop offset="0.45" stop-color="#e6d7b0"/>
+      <stop offset="0.7" stop-color="#f3e9cc"/>
+    </linearGradient>
+    <linearGradient id="field" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#bfb57e"/>
+      <stop offset="1" stop-color="#9f9a5c"/>
+    </linearGradient>
+    <linearGradient id="road" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cdb88a"/>
+      <stop offset="1" stop-color="#b39a68"/>
+    </linearGradient>
+    <linearGradient id="plaster" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ebe2cb"/>
+      <stop offset="1" stop-color="#d6caad"/>
+    </linearGradient>
+    <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <path d="M0 0v7" stroke="#33281c" stroke-width="1.6" opacity="0.55"/>
+    </pattern>
+    <pattern id="hatch-sky" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-20)">
+      <path d="M0 0v8" stroke="#6a5842" stroke-width="1.4" opacity="0.45"/>
+    </pattern>
+    <!-- Bare brick where the whitewash has flaked off. -->
+    <pattern id="bricks" width="16" height="10" patternUnits="userSpaceOnUse">
+      <rect width="16" height="10" fill="#9a6e4c"/>
+      <path d="M0 0.5h16M0 5.5h16M4 0.5v5M12 5.5v5" stroke="#5e4428" stroke-width="1.4"/>
+    </pattern>
+  </defs>
+
+  <g clip-path="url(#disc)">
+    <!-- Heavy sky. -->
+    <rect width="512" height="512" fill="url(#sky)"/>
+    <g stroke="#6a5842" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M300 104c10-22 36-28 52-14 10-24 46-28 60-6 18-12 44-4 48 16 14 0 24 10 22 22H300z" fill="#eadcb6"/>
+      <path d="M300 112h182v12H300z" fill="url(#hatch-sky)" stroke="none"/>
+      <path d="M30 196c6-12 22-16 32-8 8-12 28-12 36 0 12-4 24 4 24 14H30z" fill="#efe3c2"/>
+    </g>
+    <path d="M86 128q6-6 12 0q6-6 12 0M396 178q5-5 10 0q5-5 10 0" fill="none" stroke="#33281c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Fields in strips running to the horizon, a far tree line. -->
+    <path d="M0 330c60-10 140-14 230-12s190 6 282-2V512H0z" fill="url(#field)"/>
+    <path d="M0 330c60-10 140-14 230-12s190 6 282-2" fill="none" stroke="#6a5842" stroke-width="2.5"/>
+    <g fill="#6f7f45" stroke="#33281c" stroke-width="2.2" stroke-linejoin="round">
+      <path d="M150 320c3-12 7-18 12-18s9 8 10 18z"/>
+      <path d="M170 319c3-9 6-13 9-13s7 6 8 13z"/>
+      <path d="M440 318c4-14 9-20 14-20s9 9 10 20z"/>
+      <path d="M462 318c3-10 7-15 11-15s8 7 9 15z"/>
+    </g>
+    <path d="M0 352c80-6 150-8 210-6M0 380c60-6 120-8 180-6M300 340c60-2 140-2 212-6M320 366c70-2 130-4 192-8" fill="none" stroke="#7e7a46" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- The pollard willow behind: a squat knobbly trunk and a spray of thin shoots. -->
+    <g stroke-linecap="round" stroke-linejoin="round">
+      <path d="M44 236c4-40 30-72 62-78 30 4 58 34 64 76-10 14-34 20-62 18-28 2-54-2-64-16z" fill="#a9ab7c" opacity="0.8"/>
+      <g fill="none" stroke="#5c6a2c" stroke-width="2.2">
+        <path d="M100 262c-10-30-30-56-52-70M102 260c-6-34-18-66-34-86M104 258c-2-36-6-70-14-96M108 258c2-38 4-72 2-102M112 258c6-36 14-68 28-94M114 260c10-32 24-60 42-78M116 262c14-26 32-46 52-58"/>
+        <path d="M100 262c-16-12-36-18-58-18M118 264c16-10 34-14 56-12"/>
+      </g>
+      <g fill="none" stroke="#6f7f45" stroke-width="5" stroke-dasharray="3 6">
+        <path d="M64 206c-6-8-10-14-14-16M80 186c-4-10-8-16-12-20M96 170c-2-10-4-18-6-24M118 168c4-10 8-18 12-22M138 182c6-8 10-14 16-16M152 206c6-6 12-10 18-12"/>
+      </g>
+      <path d="M86 340c4-30 4-52-2-70l-8-4c-2-6 2-12 8-12 6-6 22-6 30 0 6 0 10 6 8 12l-8 4c-6 18-6 40-2 70z" fill="#6f5233" stroke="#33281c" stroke-width="3.5"/>
+      <path d="M98 336c0-24 0-44-4-62M108 336c0-22 2-40 6-58" fill="none" stroke="#33281c" stroke-width="1.6" opacity="0.6"/>
+      <path d="M86 340c4-30 4-52-2-70" fill="none" stroke="url(#hatch)" stroke-width="10" opacity="0.6"/>
+      <path d="M84 266c4 4 10 4 14 0M106 262c4 4 10 4 14 0" fill="none" stroke="#33281c" stroke-width="2"/>
+    </g>
+
+    <!-- The dirt road sweeping past to the right and off to the horizon, ruts and a grass ridge. -->
+    <path d="M300 512c36-56 74-100 108-136 20-22 32-40 38-60h16c0 22-2 44 8 68 14 34 40 80 60 128z" fill="url(#road)" stroke="#6a5842" stroke-width="2.5" stroke-linejoin="round"/>
+    <g fill="none" stroke="#8a7348" stroke-width="2.2" stroke-linecap="round">
+      <path d="M346 512c30-46 62-84 90-116 14-18 20-36 22-52"/>
+      <path d="M478 512c-12-44-20-82-18-120 0-18 0-34 0-48"/>
+    </g>
+    <path d="M410 512c6-50 18-90 32-122 8-20 12-40 14-60" fill="none" stroke="#7e7a46" stroke-width="5" stroke-linecap="round" stroke-dasharray="6 6"/>
+    <path d="M380 474c14-4 30-2 40 6M450 430c10-2 20 0 26 6" fill="none" stroke="#6a5842" stroke-width="2" stroke-linecap="round"/>
+    <ellipse cx="430" cy="486" rx="24" ry="5" fill="#8f9a9a" stroke="#6a5842" stroke-width="1.6"/>
+
+    <!-- A birch at the roadside, its crown thin and drooping. -->
+    <g stroke="#33281c" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M392 352c2-64 0-150-6-230h10c4 72 6 164 6 230z" fill="#ece0c0" stroke-width="3"/>
+      <path d="M388 150h8M392 186h-6M394 224h7M393 262h-6M396 300h6M390 330h6" stroke-width="3"/>
+      <path d="M390 210l-28-26M394 170l30-24M398 250l36-18M392 140l-14-22" fill="none" stroke-width="2.2"/>
+      <g fill="none" stroke="#7e8a4a" stroke-width="4" stroke-dasharray="2 5">
+        <path d="M362 184c-8 10-12 24-12 40M346 196c-6 12-8 24-6 36M424 146c10 10 14 24 14 40M440 160c8 12 10 26 8 40M434 232c8 10 10 22 8 36M450 226c6 12 6 24 2 36M378 118c-8 8-12 20-12 34M366 132c-6 10-6 20-4 30"/>
+      </g>
+      <path d="M342 196c4-28 24-44 44-40 6-30 40-36 56-14 22 0 34 24 24 44 10 18 0 38-20 38-10 14-34 14-44 0-22 8-56-4-60-28z" fill="#9aa565" fill-opacity="0.75" stroke-width="2.6"/>
+      <path d="M362 212c18 8 44 8 66-2M380 170c14 6 30 6 46-2" fill="none" stroke="#5c6a2c" stroke-width="2"/>
+    </g>
+
+    <!-- Shadow of the shrine. -->
+    <path d="M196 418H332l40 14H216z" fill="#33281c" opacity="0.22"/>
+
+    <!-- The shrine. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <!-- Stepped plinth. -->
+      <path d="M302 384 334 392V420L302 424z" fill="#8a8377" stroke-width="3.5"/>
+      <path d="M302 384 334 392V420L302 424z" fill="url(#hatch)" stroke="none"/>
+      <path d="M196 384H302V424H196z" fill="#b5ad9b" stroke-width="3.5"/>
+      <path d="M196 398H302M226 384v14M262 384v14M212 398v26M248 398v26M284 398v26" stroke-width="1.6" opacity="0.55"/>
+      <!-- Pillar shaft: the side in shade, the front flaking. -->
+      <path d="M292 214 318 220V380L292 384z" fill="#b8ab8c" stroke-width="3.5"/>
+      <path d="M292 214 318 220V380L292 384z" fill="url(#hatch)" stroke="none"/>
+      <path d="M206 214H292V384H206z" fill="url(#plaster)" stroke-width="3.5"/>
+      <path d="M216 300c6-6 14-4 18 2s14 8 16 18-8 20-20 16-18-4-18-14 0-16 4-22z" fill="url(#bricks)" stroke-width="2"/>
+      <path d="M262 236c8-2 16 2 18 10s-2 14-10 14-12-4-12-10z" fill="url(#bricks)" stroke-width="2"/>
+      <path d="M270 352c6-4 16-2 18 6v20h-22c-2-10-2-20 4-26z" fill="url(#bricks)" stroke-width="2"/>
+      <path d="M210 240l6 14M286 300l-4 20 6 10M240 270l4 10" fill="none" stroke-width="1.6" opacity="0.7"/>
+      <!-- Cornice under the niche. -->
+      <path d="M198 202H300V214H198z" fill="#cfc3a6" stroke-width="3"/>
+      <path d="M300 202 326 208V220L300 214z" fill="#a39d90" stroke-width="3"/>
+      <!-- The niche block. -->
+      <path d="M292 122 320 130V204L292 202z" fill="#b8ab8c" stroke-width="3.5"/>
+      <path d="M292 122 320 130V204L292 202z" fill="url(#hatch)" stroke="none"/>
+      <path d="M204 122H292V202H204z" fill="url(#plaster)" stroke-width="3.5"/>
+      <!-- Arched niche with the figure behind cracked glass. -->
+      <path d="M226 198V150a22 22 0 0 1 44 0V198z" fill="#2a2016" stroke-width="3"/>
+      <path d="M248 148c-6 0-9 5-9 10 0 4 2 7 4 9l-8 31h26l-8-31c2-2 4-5 4-9 0-5-3-10-9-10z" fill="#d8cfb8" stroke-width="2"/>
+      <path d="M248 140c-8 0-12 4-14 8h28c-2-4-6-8-14-8z" fill="none" stroke="#a39d90" stroke-width="2"/>
+      <path d="M226 166l18-12 6 14 20-18M244 154l-4-6M250 168l10 12" fill="none" stroke="#8fa0a0" stroke-width="1.6"/>
+      <path d="M222 198H274" stroke-width="3"/>
+      <!-- Faded ribbons and a dry wreath hanging from the niche. -->
+      <path d="M216 198c4 12 12 20 22 22M280 198c-2 14-8 26-18 30" fill="none" stroke="#a39d90" stroke-width="3"/>
+      <path d="M228 204a20 9 0 0 0 40 0" fill="none" stroke="#6f7f45" stroke-width="5" stroke-dasharray="4 3"/>
+      <!-- Cornice under the roof. -->
+      <path d="M196 112H300V124H196z" fill="#cfc3a6" stroke-width="3"/>
+      <path d="M300 112 328 118V130L300 124z" fill="#a39d90" stroke-width="3"/>
+      <!-- Tin roof, rusted through in places. -->
+      <path d="M192 114 256 58 304 114z" fill="#8a8377" stroke-width="3.5"/>
+      <path d="M256 58 334 120 304 114z" fill="#6b665c" stroke-width="3.5"/>
+      <path d="M256 58 334 120 304 114z" fill="url(#hatch)" stroke="none"/>
+      <path d="M224 114 256 58M240 114l16-56M272 114l-16-56M288 114l-32-56" fill="none" stroke-width="1.4" opacity="0.6"/>
+      <path d="M210 104c8-4 14-2 18 4l-4 6h-16zM266 92c6-2 10 2 10 8l-8 4-6-6z" fill="#8b5a3a" stroke-width="1.6"/>
+      <!-- Iron cross, knocked askew. -->
+      <g transform="rotate(10 256 58)">
+        <path d="M253 60V22h6v38z" fill="#4a3f33" stroke-width="2.5"/>
+        <path d="M242 34h28v6h-28z" fill="#4a3f33" stroke-width="2.5"/>
+        <circle cx="256" cy="37" r="5" fill="none" stroke-width="2"/>
+      </g>
+      <!-- A crow on the roof's edge. -->
+      <path d="M314 112c-4-8-2-14 4-16l4-4 4 4-2 2c6 2 12 8 16 14l-6-2 2 6c-8 0-16-2-22-4z" fill="#33281c" stroke-width="1.6"/>
+    </g>
+
+    <!-- The one grave candle still burning red, and a toppled one. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M232 380h16v-18h-16z" fill="#b4432b" stroke="#5a1e10" stroke-width="2.5"/>
+      <path d="M230 362h20l-3-6h-14z" fill="#a39d90" stroke-width="2"/>
+      <path d="M236 366v10" stroke="#82301c" stroke-width="2"/>
+      <path d="M262 380l14-8 6 10-14 8z" fill="#ece0c0" stroke-width="2"/>
+    </g>
+
+    <!-- A broken picket fence around the shrine. -->
+    <g stroke="#33281c" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M150 412 194 416M150 428l44 2" stroke-width="5"/>
+      <path d="M150 412 194 416M150 428l44 2" stroke="#a07a4c" stroke-width="2"/>
+      <path d="M152 440V402l4-6 4 6v38zM170 442V404l4-6 4 6v38zM188 444v-36l4-6 4 6v36z" fill="#a07a4c" stroke-width="2.5"/>
+      <path d="M330 432l30-6M336 446l32-4" stroke-width="5"/>
+      <path d="M330 432l30-6M336 446l32-4" stroke="#a07a4c" stroke-width="2"/>
+      <path d="M340 450V414l4-6 4 6v36z" fill="#a07a4c" stroke-width="2.5"/>
+      <path d="M356 452l10-34 6-4 2 7-10 32z" fill="#a07a4c" stroke-width="2.5"/>
+      <path d="M298 462l26-8 2 6-26 8z" fill="#a07a4c" stroke-width="2.5"/>
+    </g>
+
+    <!-- Tall grass and chamomile in the foreground. -->
+    <g fill="none" stroke="#5c6a2c" stroke-width="2.6" stroke-linecap="round">
+      <path d="M20 470c4-20 8-32 16-44M30 474c2-18 2-30-2-44M42 472c4-14 10-24 18-30"/>
+      <path d="M110 480c2-16 6-26 12-34M120 482c0-14-2-24-8-32M130 480c4-12 8-20 16-24"/>
+      <path d="M196 470c2-14 6-24 12-30M206 472c0-14-2-22-6-30"/>
+      <path d="M264 490c2-16 6-26 12-34M276 492c0-14-2-24-8-32"/>
+      <path d="M150 400c2-10 4-16 8-20M318 404c2-10 6-16 10-18M206 386c-2-8-4-12-8-14"/>
+    </g>
+    <g fill="#ece0c0" stroke="#33281c" stroke-width="1.6">
+      <circle cx="60" cy="440" r="4"/><circle cx="74" cy="452" r="3.5"/><circle cx="142" cy="452" r="4"/>
+      <circle cx="224" cy="446" r="3.5"/><circle cx="292" cy="478" r="4"/><circle cx="180" cy="470" r="3.5"/>
+    </g>
+    <g fill="#e0bd68">
+      <circle cx="60" cy="440" r="1.4"/><circle cx="74" cy="452" r="1.2"/><circle cx="142" cy="452" r="1.4"/>
+      <circle cx="224" cy="446" r="1.2"/><circle cx="292" cy="478" r="1.4"/><circle cx="180" cy="470" r="1.2"/>
+    </g>
+  </g>
+
+  <!-- The medallion's frame. -->
+  <circle cx="256" cy="256" r="232" fill="none" stroke="#33281c" stroke-width="5"/>
+  <circle cx="256" cy="256" r="244" fill="none" stroke="#33281c" stroke-width="9"/>
+  <circle cx="256" cy="256" r="238" fill="none" stroke="#ece0c0" stroke-width="3"/>
+</svg>

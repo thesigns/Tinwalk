@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <!-- Map badge: a raised hunting stand, a plank hut on four splayed legs with a ladder. -->
+  <defs>
+    <clipPath id="inside"><circle cx="48" cy="48" r="42"/></clipPath>
+  </defs>
+
+  <circle cx="48" cy="48" r="45" fill="#ece0c0"/>
+  <g clip-path="url(#inside)">
+    <!-- Spruces behind the stand. -->
+    <g fill="#6f7f45" stroke="#33281c" stroke-width="2.4" stroke-linejoin="round">
+      <path d="M6 75 18 42 30 75z"/>
+      <path d="M66 75 78 42 90 75z"/>
+    </g>
+    <path d="M0 75H96V96H0z" fill="#5c6a2c"/>
+    <path d="M0 75H96" stroke="#33281c" stroke-width="2.4"/>
+  </g>
+
+  <!-- Legs and their cross braces. -->
+  <g stroke="#33281c" stroke-linecap="round" fill="none">
+    <path d="M36 46 29 75M60 46l7 29" stroke-width="3.4"/>
+    <path d="M34 54l30 16M62 54 32 70" stroke-width="2"/>
+  </g>
+
+  <!-- The hut: shaded side, plank front, shooting window, sloping roof. -->
+  <g stroke="#33281c" stroke-width="2.8" stroke-linejoin="round">
+    <path d="M62 23l7 2v19l-7 2z" fill="#6b4f30"/>
+    <path d="M33 22h29v24H33z" fill="#a8814f"/>
+    <path d="M30 23 67 16v6L30 28z" fill="#4a4036"/>
+    <path d="M30 46h37v4H30z" fill="#6b4f30"/>
+  </g>
+  <path d="M37 30h21v6H37z" fill="#33281c"/>
+  <path d="M33 40.5h29" stroke="#33281c" stroke-width="1.4" opacity="0.6"/>
+
+  <!-- Ladder up to the hut. -->
+  <g stroke="#33281c" stroke-linecap="round" fill="none">
+    <path d="M40 75l3-25M49 75l1-25" stroke-width="2.8"/>
+    <path d="M41 69h8M41.8 62h7.6M42.6 55h7.2" stroke-width="2"/>
+  </g>
+
+  <circle cx="48" cy="48" r="45" fill="none" stroke="#33281c" stroke-width="4"/>
+</svg>

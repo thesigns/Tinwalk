@@ -1,0 +1,174 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- An abandoned Polish farmstead: a whitewashed log cottage under a torn thatched roof,
+       a sagging barn behind it, a well sweep with a red bucket and a broken picket fence. -->
+  <defs>
+    <clipPath id="disc"><circle cx="256" cy="256" r="232"/></clipPath>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cdb98c"/>
+      <stop offset="0.45" stop-color="#e6d7b0"/>
+      <stop offset="0.7" stop-color="#f3e9cc"/>
+    </linearGradient>
+    <linearGradient id="field" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d4bf86"/>
+      <stop offset="1" stop-color="#b89c5e"/>
+    </linearGradient>
+    <linearGradient id="thatch" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9c8250"/>
+      <stop offset="1" stop-color="#7d6438"/>
+    </linearGradient>
+    <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <path d="M0 0v7" stroke="#33281c" stroke-width="1.6" opacity="0.55"/>
+    </pattern>
+    <pattern id="hatch-sky" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-20)">
+      <path d="M0 0v8" stroke="#6a5842" stroke-width="1.4" opacity="0.45"/>
+    </pattern>
+    <!-- Straw: short strokes falling down the roof. -->
+    <pattern id="straw" width="10" height="12" patternUnits="userSpaceOnUse">
+      <path d="M2 0l1 9M7 4l1 8" stroke="#33281c" stroke-width="1.3" opacity="0.4" stroke-linecap="round"/>
+    </pattern>
+  </defs>
+
+  <g clip-path="url(#disc)">
+    <!-- Heavy sky. -->
+    <rect width="512" height="512" fill="url(#sky)"/>
+    <g stroke="#6a5842" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M300 92c8-18 30-24 44-12 10-20 40-22 52-4 16-8 36 2 38 18 12 0 20 8 18 18H300z" fill="#eadcb6"/>
+      <path d="M300 102h152v10H300z" fill="url(#hatch-sky)" stroke="none"/>
+      <path d="M190 132c6-12 22-16 32-8 8-12 28-12 36 0 12-4 24 4 24 14H190z" fill="#efe3c2"/>
+    </g>
+    <!-- Crows. -->
+    <path d="M300 160q7-7 14 0q7-7 14 0M262 176q5-5 10 0q5-5 10 0" fill="none" stroke="#33281c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Distant hills and a tree line. -->
+    <path d="M0 326c50-20 100-24 150-14s80 2 120-6 90-10 130 2 80 12 112 6V512H0z" fill="#a9ab7c"/>
+    <path d="M0 326c50-20 100-24 150-14s80 2 120-6 90-10 130 2 80 12 112 6" fill="none" stroke="#6a5842" stroke-width="2.5"/>
+    <g fill="#6f7f45" stroke="#33281c" stroke-width="2.2" stroke-linejoin="round">
+      <path d="M24 318c3-12 7-18 12-18s9 8 10 18z"/>
+      <path d="M44 316c4-15 9-22 14-22s10 9 11 22z"/>
+    </g>
+
+    <!-- An old pear tree, bare, behind the barn. -->
+    <g stroke="#33281c" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M470 330c-4-40 0-70-10-100" stroke="#5e4428" stroke-width="8"/>
+      <path d="M470 330c-4-40 0-70-10-100" stroke-width="2.5"/>
+      <path d="M462 250c-18-10-26-30-30-50M464 236c10-16 26-24 34-40M460 230c-4-20-2-34 4-50M438 210c-10-4-18-10-22-20M444 214c-4-12 0-22 6-30M490 204c6-6 10-14 10-22" stroke-width="2.6"/>
+    </g>
+
+    <!-- Dry, overgrown yard. -->
+    <path d="M0 362c80-14 170-16 256-12s180 2 256-6V512H0z" fill="url(#field)"/>
+    <path d="M0 362c80-14 170-16 256-12s180 2 256-6" fill="none" stroke="#6a5842" stroke-width="2.5"/>
+    <path d="M0 430c90-10 200-12 300-6s150 2 212-6V512H0z" fill="#33281c" opacity="0.06"/>
+
+    <!-- The barn behind: dark boards, its roof sagging, a door hanging open. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M326 352V262l70-6 80 8V348z" fill="#6f5233" stroke-width="3.5"/>
+      <path d="M326 352V262l70-6 80 8V348z" fill="url(#hatch)" stroke="none"/>
+      <path d="M346 262v88M366 260v90M386 258v92M406 258v92M426 260v90M446 261v88M466 262v86" stroke-width="1.6" opacity="0.6"/>
+      <path d="M316 266c30-34 50-52 80-60 30 6 56 26 90 58-30-8-60-4-90-6-30 0-54 2-80 8z" fill="#5e4428" stroke-width="3.5"/>
+      <path d="M316 266c30-34 50-52 80-60 30 6 56 26 90 58-30-8-60-4-90-6-30 0-54 2-80 8z" fill="url(#hatch)" stroke="none"/>
+      <path d="M380 208l-6 30 14 4 6-32z" fill="#2a2016" stroke-width="2"/>
+      <path d="M418 296h40v52h-40z" fill="#2a2016" stroke-width="3"/>
+      <path d="M458 296l18 10v48l-18-6z" fill="#8b6a42" stroke-width="3"/>
+    </g>
+
+    <!-- Shadow of the cottage. -->
+    <path d="M206 378H446l30 14H236z" fill="#33281c" opacity="0.22"/>
+
+    <!-- The cottage, seen three-quarter: gable end in front, the long wall to the right. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <!-- Long wall, whitewash peeling off the logs. -->
+      <path d="M300 280 432 290V368L300 380z" fill="#d9ccaa" stroke-width="3.5"/>
+      <path d="M300 280 432 290V368L300 380z" fill="url(#hatch)" stroke="none" opacity="0.5"/>
+      <path d="M322 330l12-7 18 4 14-5 12 9-4 16-16 5-14-5-16 6-9-11z" fill="#8b6a42" stroke-width="2"/>
+      <path d="M324 334h52M322 342h54M326 350h40" stroke-width="1.6" opacity="0.7"/>
+      <!-- Door and windows on the long wall, one shutter hanging. -->
+      <path d="M392 368V316l24 2v50z" fill="#2a2016" stroke-width="3"/>
+      <path d="M392 316l-10 6v48l10-2z" fill="#6b5240" stroke-width="2.5"/>
+      <path d="M316 296l28 2v24l-28-2z" fill="#2a2016" stroke-width="3"/>
+      <path d="M330 297v24M316 309l28 1" stroke="#a39d90" stroke-width="2"/>
+      <path d="M344 298l10 1v24l-10-1z" fill="#6b5240" stroke-width="2.5"/>
+      <path d="M312 324l12 30 8-2-14-28z" fill="#6b5240" stroke-width="2.5"/>
+      <!-- Gable end. -->
+      <path d="M216 380V284L258 244 300 280V380z" fill="#e6dabb" stroke-width="3.5"/>
+      <path d="M216 300h84M216 318h84M216 336h84M216 354h84M216 372h84" stroke-width="1.3" opacity="0.35"/>
+      <path d="M216 340l12-5 12 6-2 13-12 5-10-5z" fill="#8b6a42" stroke-width="2"/>
+      <path d="M216 345h22M216 352h20" stroke-width="1.6" opacity="0.7"/>
+      <!-- The gable's small window, its glass gone. -->
+      <path d="M244 298h28v30h-28z" fill="#2a2016" stroke-width="3"/>
+      <path d="M258 298v30M244 313h28" stroke="#a39d90" stroke-width="2"/>
+      <path d="M240 328h36v5h-36z" fill="#a39d90" stroke-width="2.5"/>
+      <!-- Thatched roof: the gable's eave and the long slope, torn open. -->
+      <path d="M204 290 258 226 312 286z" fill="none" stroke-width="3.5"/>
+      <path d="M258 226 420 236 446 296 312 286z" fill="url(#thatch)" stroke-width="3.5"/>
+      <path d="M258 226 420 236 446 296 312 286z" fill="url(#straw)" stroke="none"/>
+      <path d="M312 286 446 296" stroke-width="5"/>
+      <path d="M204 290 258 226 312 286" fill="none" stroke="#7d6438" stroke-width="10"/>
+      <path d="M204 290 258 226 312 286" fill="none" stroke-width="2.5"/>
+      <path d="M200 294l4-4 4 6M308 290l4-4 4 6" stroke-width="2"/>
+      <!-- The hole in the thatch, rafters showing. -->
+      <path d="M340 244l40 4 10 22-40 4-14-18z" fill="#2a2016" stroke-width="2.5"/>
+      <path d="M352 246l8 26M370 248l6 24" stroke="#8b6a42" stroke-width="3"/>
+      <!-- A brick chimney. -->
+      <path d="M372 218h18v22h-18z" fill="#9c7050" stroke-width="3"/>
+      <path d="M368 214h26v6h-26z" fill="#9c7050" stroke-width="2.5"/>
+    </g>
+
+    <!-- The well sweep: a forked post, the long pole with a stone weight, the rope down to the well. -->
+    <g stroke="#33281c" stroke-linecap="round" stroke-linejoin="round">
+      <!-- Well box of logs. -->
+      <path d="M164 380h56v34h-56z" fill="#8b6a42" stroke-width="3.5"/>
+      <path d="M164 380h56v34h-56z" fill="url(#hatch)" stroke="none" opacity="0.6"/>
+      <path d="M164 392h56M164 404h56" stroke-width="1.8"/>
+      <path d="M160 376h64v8h-64z" fill="#6b5240" stroke-width="3"/>
+      <!-- The post and pole. -->
+      <path d="M114 418 118 232" stroke="#5e4428" stroke-width="9"/>
+      <path d="M114 418 118 232" fill="none" stroke-width="3"/>
+      <path d="M112 236l-6-14M124 236l6-14" fill="none" stroke-width="3.5"/>
+      <path d="M44 300 230 110" stroke="#8b6a42" stroke-width="7"/>
+      <path d="M44 300 230 110" fill="none" stroke-width="2.4"/>
+      <circle cx="118" cy="226" r="4" fill="#33281c"/>
+      <!-- Stone weight on the short end. -->
+      <path d="M34 300l12-10 14 6 0 14-14 6-12-6z" fill="#a39d90" stroke-width="2.5"/>
+      <!-- Rope and the red bucket over the well. -->
+      <path d="M230 110 196 362" fill="none" stroke-width="1.8"/>
+      <path d="M184 360h24l-3 20h-18z" fill="#b4432b" stroke="#5a1e10" stroke-width="2.5"/>
+      <path d="M186 360c2-8 18-8 20 0" fill="none" stroke="#5a1e10" stroke-width="2"/>
+    </g>
+
+    <!-- A broken picket fence in front. -->
+    <g stroke="#33281c" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M262 420 420 404M262 440 420 424" stroke="#8b6a42" stroke-width="6"/>
+      <path d="M262 420 420 404M262 440 420 424" fill="none" stroke-width="1.5"/>
+      <g fill="#a07a4c" stroke-width="2.5">
+        <path d="M268 448v-44l5-6 5 6v44z"/>
+        <path d="M290 446v-46l5-6 5 6v46z"/>
+        <path d="M334 442v-48l5-6 5 6v48z"/>
+        <path d="M356 440v-46l5-6 5 6v46z"/>
+        <path d="M398 434l10-38 6-4 3 7-10 38z"/>
+      </g>
+      <path d="M306 460l22-14 3 6-22 14z" fill="#a07a4c" stroke-width="2.5"/>
+    </g>
+
+    <!-- A cartwheel left in the grass, spokes broken. -->
+    <g transform="translate(150 446) rotate(-10)" stroke="#33281c" stroke-linecap="round" fill="none">
+      <ellipse rx="34" ry="13" stroke="#6b5240" stroke-width="6"/>
+      <ellipse rx="34" ry="13" stroke-width="2"/>
+      <path d="M0 0H30M0 0-28 4M0 0 18-10M0 0-12 12" stroke-width="2.2"/>
+      <ellipse rx="6" ry="3" fill="#5e4428" stroke-width="2"/>
+    </g>
+
+    <!-- Tall dry grass and nettles. -->
+    <g fill="none" stroke="#5c6a2c" stroke-width="2.6" stroke-linecap="round">
+      <path d="M140 422c3-16 8-26 16-34M150 424c1-14-1-24-6-32M162 420c4-12 9-18 16-22"/>
+      <path d="M224 418c2-16 6-26 12-34M234 420c0-14-2-24-8-32M244 418c4-12 8-20 16-24"/>
+      <path d="M210 496c2-14 6-24 12-30M222 498c0-14-2-22-6-30M232 496c4-10 8-16 14-18"/>
+      <path d="M340 486c3-14 8-22 14-28M350 488c0-12-2-20-6-26M360 486c4-10 8-16 14-18"/>
+      <path d="M298 386c2-10 4-16 8-20M430 376c2-8 6-14 10-16M90 400c2-10 4-16 8-18"/>
+    </g>
+  </g>
+
+  <!-- The medallion's frame. -->
+  <circle cx="256" cy="256" r="232" fill="none" stroke="#33281c" stroke-width="5"/>
+  <circle cx="256" cy="256" r="244" fill="none" stroke="#33281c" stroke-width="9"/>
+  <circle cx="256" cy="256" r="238" fill="none" stroke="#ece0c0" stroke-width="3"/>
+</svg>

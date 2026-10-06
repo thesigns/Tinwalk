@@ -1,0 +1,165 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- An abandoned mine on the plains: a rusted headframe with its winding wheel, a roofless
+       hoist house, a spoil heap behind, rails running out with an overturned mine cart. -->
+  <defs>
+    <clipPath id="disc"><circle cx="256" cy="256" r="232"/></clipPath>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cdb98c"/>
+      <stop offset="0.45" stop-color="#e6d7b0"/>
+      <stop offset="0.7" stop-color="#f3e9cc"/>
+    </linearGradient>
+    <linearGradient id="field" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d4bf86"/>
+      <stop offset="1" stop-color="#b89c5e"/>
+    </linearGradient>
+    <linearGradient id="heap" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8a8377"/>
+      <stop offset="1" stop-color="#5f594f"/>
+    </linearGradient>
+    <linearGradient id="bricks" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#b98a62"/>
+      <stop offset="1" stop-color="#9c7050"/>
+    </linearGradient>
+    <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <path d="M0 0v7" stroke="#33281c" stroke-width="1.6" opacity="0.55"/>
+    </pattern>
+    <pattern id="hatch-sky" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-20)">
+      <path d="M0 0v8" stroke="#6a5842" stroke-width="1.4" opacity="0.45"/>
+    </pattern>
+  </defs>
+
+  <g clip-path="url(#disc)">
+    <!-- Heavy sky. -->
+    <rect width="512" height="512" fill="url(#sky)"/>
+    <g stroke="#6a5842" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M300 96c8-18 30-24 44-12 10-20 40-22 52-4 16-8 36 2 38 18 12 0 20 8 18 18H300z" fill="#eadcb6"/>
+      <path d="M300 106h152v10H300z" fill="url(#hatch-sky)" stroke="none"/>
+      <path d="M34 150c6-14 24-18 36-10 8-14 32-14 40 0 12-4 26 4 26 16H34z" fill="#efe3c2"/>
+    </g>
+    <!-- Crows. -->
+    <path d="M330 168q7-7 14 0q7-7 14 0M368 150q5-5 10 0q5-5 10 0M110 110q5-5 10 0q5-5 10 0" fill="none" stroke="#33281c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Distant hills and a tree line. -->
+    <path d="M0 330c50-20 100-24 150-14s80 2 120-6 90-10 130 2 80 12 112 6V512H0z" fill="#a9ab7c"/>
+    <path d="M0 330c50-20 100-24 150-14s80 2 120-6 90-10 130 2 80 12 112 6" fill="none" stroke="#6a5842" stroke-width="2.5"/>
+    <g fill="#6f7f45" stroke="#33281c" stroke-width="2.2" stroke-linejoin="round">
+      <path d="M20 322c3-12 7-18 12-18s9 8 10 18z"/>
+      <path d="M40 320c4-15 9-22 14-22s10 9 11 22z"/>
+      <path d="M64 318c3-10 6-14 10-14s8 6 9 14z"/>
+    </g>
+
+    <!-- The spoil heap, a dark cone of waste rock behind the mine. -->
+    <path d="M300 340c30-50 60-110 100-126 16-6 24-2 34 10 22 26 46 70 78 116z" fill="url(#heap)" stroke="#33281c" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M400 214c18 20 40 70 52 126h60c-32-46-56-90-78-116-10-12-18-16-34-10z" fill="url(#hatch)"/>
+    <path d="M360 270l14-6M340 304l16-4M420 250l10 4M396 300l14 2M440 290l12 6" stroke="#33281c" stroke-width="1.8" stroke-linecap="round" opacity="0.7"/>
+    <path d="M330 330c4-10 8-16 14-18M470 328c2-8 6-14 10-16" fill="none" stroke="#5c6a2c" stroke-width="2.4" stroke-linecap="round"/>
+
+    <!-- Dry field. -->
+    <path d="M0 366c80-14 170-16 256-12s180 2 256-6V512H0z" fill="url(#field)"/>
+    <path d="M0 366c80-14 170-16 256-12s180 2 256-6" fill="none" stroke="#6a5842" stroke-width="2.5"/>
+    <path d="M0 430c90-10 200-12 300-6s150 2 212-6V512H0z" fill="#33281c" opacity="0.06"/>
+
+    <!-- Shadow of the headframe and the house. -->
+    <path d="M60 384H360l40 14H90z" fill="#33281c" opacity="0.2"/>
+
+    <!-- The hoist house: brick walls, roof caved in, its door gone. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <!-- Side wall in shade. -->
+      <path d="M150 270 196 284V376L150 386z" fill="#875f42" stroke-width="3.5"/>
+      <path d="M150 270 196 284V376L150 386z" fill="url(#hatch)" stroke="none"/>
+      <!-- Front gable wall. -->
+      <path d="M50 386V280L100 236 150 270V386z" fill="url(#bricks)" stroke-width="3.5"/>
+      <path d="M50 300h100M50 318h100M50 336h100M50 354h100M50 372h100" stroke-width="1.3" opacity="0.45"/>
+      <path d="M66 300v18M90 318v18M114 300v18M134 336v18M76 354v18M120 354v18M100 336v18M60 336v18" stroke-width="1.3" opacity="0.45"/>
+      <!-- The roof's broken ridge and bare rafters. -->
+      <path d="M100 236 146 250 194 282 150 270z" fill="#5e4428" stroke-width="3"/>
+      <path d="M118 242l-4 16M136 248l-6 18M160 260l-6 16M178 270l-6 14" stroke-width="2.4"/>
+      <path d="M100 236l-50 44M100 236 150 270" fill="none" stroke-width="3.5"/>
+      <!-- A tall arched window, empty, and the doorway. -->
+      <path d="M84 300a16 16 0 0 1 32 0v34H84z" fill="#2a2016" stroke-width="3"/>
+      <path d="M100 284v50M84 312h32" stroke="#6a5842" stroke-width="2"/>
+      <path d="M160 386V330l24 4v48z" fill="#2a2016" stroke-width="3"/>
+      <!-- A gap knocked out of the wall. -->
+      <path d="M50 340l10 6-4 10 8 8-14 4z" fill="#d4bf86" stroke-width="2.5"/>
+    </g>
+
+    <!-- The headframe: two lattice legs, a back strut, the winding wheel on top. -->
+    <g stroke="#33281c" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <!-- Back strut, in the distance. -->
+      <path d="M300 120 376 384M312 116 392 382" stroke-width="4"/>
+      <path d="M306 150l26 6M316 190l26 6M328 230l24 6M338 270l26 6M350 310l24 6M360 350l26 6" stroke-width="2"/>
+      <path d="M306 150l36 46M318 196l34 40M330 236l34 40M342 276l32 40M352 316l32 40" stroke-width="1.6"/>
+      <!-- Front legs. -->
+      <path d="M218 384 236 112M290 384 274 112" stroke="#6b5240" stroke-width="9"/>
+      <path d="M218 384 236 112M290 384 274 112" stroke-width="3.5"/>
+      <!-- Cross bracing between the legs. -->
+      <path d="M234 140h42M231 186h50M228 232h56M225 278h62M222 324h68M220 366h72" stroke-width="3"/>
+      <path d="M234 140l47 46M276 140l-45 46M231 186l53 46M281 186l-53 46M228 232l59 46M284 232l-59 46M225 278l65 46M287 278l-65 46M222 324l70 42" stroke-width="1.8"/>
+      <!-- One brace torn loose and hanging. -->
+      <path d="M287 278l18 40" stroke-width="3"/>
+      <!-- The top platform with a railing. -->
+      <path d="M222 112h92v10h-92z" fill="#6b5240" stroke-width="3"/>
+      <path d="M224 112V96M246 112V96M268 112V100M290 112V96M312 112V96M224 96h88" stroke-width="2"/>
+    </g>
+    <!-- The winding wheel, a spoke broken. -->
+    <g transform="translate(268 84)" stroke="#33281c" stroke-linecap="round" fill="none">
+      <circle r="40" stroke-width="7"/>
+      <circle r="40" stroke="#6b5240" stroke-width="2.5"/>
+      <circle r="33" stroke-width="2"/>
+      <path d="M0-33V33M-33 0H33M-23-23 23 23M23-23-6 6" stroke-width="2.6"/>
+      <circle r="7" fill="#5e4428" stroke-width="3"/>
+    </g>
+    <!-- The cable from the house up to the wheel, snapped and hanging. -->
+    <path d="M150 276 240 106M236 56c-16 30-24 90-26 150" fill="none" stroke="#33281c" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- Rails running out of the shaft, with a mine cart tipped over and its rock spilled. -->
+    <g stroke="#33281c" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M232 390 150 512M276 390 246 512" stroke-width="4"/>
+      <path d="M226 400h46M218 414h52M209 428h58M199 444h64M187 462h72M174 482h80M160 504h88" stroke="#6b5240" stroke-width="5"/>
+      <path d="M232 390 150 512M276 390 246 512" stroke-width="3"/>
+    </g>
+    <g transform="translate(330 432) rotate(-24)" stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M-44-38h88l-10 42h-68z" fill="#7a6a58" stroke-width="3.5"/>
+      <path d="M8-38h36l-10 42H8z" fill="url(#hatch)" stroke="none"/>
+      <path d="M-40-26h80M-36-12h74" stroke-width="1.8" opacity="0.7"/>
+      <circle cx="-22" cy="12" r="9" fill="#5e4428" stroke-width="3"/>
+      <circle cx="22" cy="12" r="9" fill="#5e4428" stroke-width="3"/>
+      <circle cx="-22" cy="12" r="2" fill="#33281c"/>
+      <circle cx="22" cy="12" r="2" fill="#33281c"/>
+    </g>
+    <g fill="#8a8377" stroke="#33281c" stroke-width="2.2" stroke-linejoin="round">
+      <path d="M262 452l12-8 10 6-4 10h-14z"/>
+      <path d="M286 466l10-6 8 8-8 8z"/>
+      <path d="M296 444l8-4 6 6-6 6z"/>
+    </g>
+
+    <!-- A red danger plate still wired to the headframe. -->
+    <g stroke="#33281c" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M236 318l-4-10M276 316l4-10" fill="none" stroke-width="1.6"/>
+      <path d="M232 306l48-2 2 30-48 4z" fill="#b4432b" stroke="#5a1e10" stroke-width="2.5"/>
+      <path d="M256 312l-10 18h20z" fill="none" stroke="#ece0c0" stroke-width="2.4"/>
+      <path d="M256 318v6" stroke="#ece0c0" stroke-width="2"/>
+    </g>
+    <!-- Rubble fallen from the house. -->
+    <g fill="#9c7050" stroke="#33281c" stroke-width="2.2" stroke-linejoin="round">
+      <path d="M60 396l14-6 10 8-6 8H62z"/>
+      <path d="M88 402l10-4 8 6-6 6z"/>
+      <path d="M140 398l12-4 8 8-10 4z"/>
+    </g>
+
+    <!-- Tall dry grass. -->
+    <g fill="none" stroke="#5c6a2c" stroke-width="2.6" stroke-linecap="round">
+      <path d="M30 470c4-20 8-32 16-44M40 474c2-18 2-30-2-44M52 472c4-14 10-24 18-30"/>
+      <path d="M96 490c2-16 6-26 12-34M106 492c0-14-2-24-8-32M116 490c4-12 8-20 16-24"/>
+      <path d="M380 492c4-18 10-28 18-36M392 494c0-16-2-26-8-34"/>
+      <path d="M196 390c2-10 4-16 8-20M300 392c2-10 6-16 10-20M44 388c2-10 4-16 8-18"/>
+      <path d="M118 446c3-16 8-26 16-34M128 448c1-14-1-24-6-32M138 446c4-12 9-18 16-22M150 450c2-10 5-16 10-20"/>
+      <path d="M340 480c3-14 8-22 14-28M350 482c0-12-2-20-6-26M360 480c4-10 8-16 14-18"/>
+    </g>
+  </g>
+
+  <!-- The medallion's frame. -->
+  <circle cx="256" cy="256" r="232" fill="none" stroke="#33281c" stroke-width="5"/>
+  <circle cx="256" cy="256" r="244" fill="none" stroke="#33281c" stroke-width="9"/>
+  <circle cx="256" cy="256" r="238" fill="none" stroke="#ece0c0" stroke-width="3"/>
+</svg>

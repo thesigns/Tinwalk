@@ -1,0 +1,175 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- An abandoned gas station in the ruins: a sagging canopy over dead pumps, a kiosk
+       with smashed glass, a bent price sign, an oil drum on its side and a red jerrycan. -->
+  <defs>
+    <clipPath id="disc"><circle cx="256" cy="256" r="232"/></clipPath>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cdb98c"/>
+      <stop offset="0.45" stop-color="#e6d7b0"/>
+      <stop offset="0.7" stop-color="#f3e9cc"/>
+    </linearGradient>
+    <linearGradient id="asphalt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9d968a"/>
+      <stop offset="1" stop-color="#857e72"/>
+    </linearGradient>
+    <linearGradient id="facade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#cbc2ad"/>
+      <stop offset="1" stop-color="#b3a992"/>
+    </linearGradient>
+    <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <path d="M0 0v7" stroke="#33281c" stroke-width="1.6" opacity="0.55"/>
+    </pattern>
+    <pattern id="hatch-sky" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-20)">
+      <path d="M0 0v8" stroke="#6a5842" stroke-width="1.4" opacity="0.45"/>
+    </pattern>
+    <!-- A fuel pump, 40 by 78, drawn from its top-left corner. -->
+    <g id="pump" stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M2 10h36v68H2z" fill="#d8cfb8" stroke-width="3.5"/>
+      <path d="M28 10h10v68H28z" fill="url(#hatch)" stroke="none"/>
+      <path d="M0 0h40v12H0z" fill="#8a8377" stroke-width="3"/>
+      <path d="M8 20h24v16H8z" fill="#2a2016" stroke-width="2.5"/>
+      <path d="M11 24h8M11 30h12" stroke="#8fa0a0" stroke-width="2"/>
+      <path d="M8 44h24M8 50h24" stroke-width="1.6" opacity="0.6"/>
+      <path d="M6 60h12v8H6z" fill="#6a5842" stroke-width="2"/>
+      <path d="M2 78h36" stroke-width="3.5"/>
+    </g>
+  </defs>
+
+  <g clip-path="url(#disc)">
+    <rect width="512" height="512" fill="url(#sky)"/>
+    <g stroke="#6a5842" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M268 92c10-22 36-28 52-14 10-24 46-28 60-6 18-12 44-4 48 16 14 0 24 10 22 22H268z" fill="#eadcb6"/>
+      <path d="M268 100h182v12H268z" fill="url(#hatch-sky)" stroke="none"/>
+    </g>
+    <path d="M150 110q7-7 14 0q7-7 14 0M190 92q5-5 10 0q5-5 10 0" fill="none" stroke="#33281c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Ruined blocks in the distance. -->
+    <g fill="#b9b2a2" stroke="#6a5842" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M150 330V226h30l8 10 8-14h40V330z"/>
+      <path d="M396 330V214h30l6 12 10-8h70V330z"/>
+    </g>
+    <g fill="#8a8377">
+      <path d="M160 240h10v12h-10zM200 240h10v12h-10zM180 264h10v12h-10zM220 264h10v12h-10zM160 288h10v12h-10zM200 288h10v12h-10z"/>
+      <path d="M440 232h10v12h-10zM480 232h10v12h-10zM460 256h10v12h-10zM440 280h10v12h-10zM480 280h10v12h-10z"/>
+    </g>
+
+    <!-- Cracked forecourt. -->
+    <path d="M0 330H512V512H0z" fill="url(#asphalt)"/>
+    <path d="M0 330H512" stroke="#33281c" stroke-width="2.5"/>
+    <g fill="none" stroke="#5f594f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M40 440l26 8 14 20 28 4M80 468l-4 28M330 470l24-10 22 12 28-6M376 472l6 24M200 494l26-8 26 8"/>
+    </g>
+    <path d="M60 400h50M410 410h50M240 470h50" stroke="#ece0c0" stroke-width="5" stroke-linecap="round" stroke-dasharray="18 14" opacity="0.45"/>
+
+    <!-- The kiosk behind the pumps: a flat roof and smashed shop windows. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M396 222 432 232V326L396 334z" fill="#9c937f" stroke-width="3.5"/>
+      <path d="M396 222 432 232V326L396 334z" fill="url(#hatch)" stroke="none"/>
+      <path d="M262 222H396V334H262z" fill="url(#facade)" stroke-width="3.5"/>
+      <path d="M256 212h144v12H256z" fill="#a39d90" stroke-width="3"/>
+      <path d="M396 212l40 12v10l-36-10z" fill="#8a8377" stroke-width="3"/>
+      <!-- Shop windows: frames with only shards left. -->
+      <path d="M272 250h70v62h-70z" fill="#2a2016" stroke-width="3"/>
+      <path d="M272 250h70v14l-10-8-12 14-8-10-14 12-10-8-16 10z" fill="#8fa0a0" stroke-width="1.6"/>
+      <path d="M272 312l14-14 8 14M330 312l12-10" fill="none" stroke="#8fa0a0" stroke-width="2"/>
+      <path d="M307 250v62" stroke="#6a5842" stroke-width="2.4"/>
+      <path d="M352 260h30v74h-30z" fill="#2a2016" stroke-width="3"/>
+      <path d="M382 260l12 6v66l-12 2z" fill="#5d6a6a" stroke-width="2.5"/>
+      <path d="M268 312h78v6h-78z" fill="#a39d90" stroke-width="2.5"/>
+    </g>
+
+    <!-- The price sign on its pole, leaning and missing panels. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <g transform="rotate(5 80 352)">
+        <path d="M80 352V262" stroke-width="7"/>
+        <path d="M80 352V262" stroke="#a39d90" stroke-width="3"/>
+        <path d="M46 196h76v70H46z" fill="#d8cfb8" stroke-width="3.5"/>
+        <path d="M46 196h76v16H46z" fill="#33281c" stroke-width="3"/>
+        <path d="M54 220h60v12H54zM54 238h60v12H54z" fill="#2a2016" stroke-width="2"/>
+        <path d="M58 226h6M70 226h6M82 226h6M58 244h6M82 244h6" stroke="#d8cfb8" stroke-width="2.4"/>
+        <path d="M82 256h32v10l-10 4-8-6-14 4z" fill="#b9b2a2" stroke-width="2"/>
+      </g>
+      <path d="M66 352h28" stroke-width="4"/>
+    </g>
+
+    <!-- Shadow under the canopy. -->
+    <path d="M110 350H420l30 12H150z" fill="#33281c" opacity="0.25"/>
+
+    <!-- Pump island and its two dead pumps, one hose cut. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M176 340h168v14H176z" fill="#a39d90" stroke-width="3"/>
+      <path d="M344 340l14-4v14l-14 4z" fill="#8a8377" stroke-width="2.5"/>
+    </g>
+    <use href="#pump" x="196" y="262"/>
+    <use href="#pump" x="282" y="262"/>
+    <g fill="none" stroke="#33281c" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M200 326c-14 6-24 20-18 40s28 26 44 28" stroke-width="5"/>
+      <path d="M226 394l14-2 4 6" stroke-width="5"/>
+      <path d="M318 322c10 6 14 14 12 22" stroke-width="5"/>
+      <path d="M330 344l4 4M326 346l2 6" stroke-width="2"/>
+    </g>
+
+    <!-- The canopy, sagging at one corner, on two rusty pillars. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M150 182h18v168h-18zM350 186h18v162h-18z" fill="#a39d90" stroke-width="3.5"/>
+      <path d="M160 182h8v168h-8zM360 186h8v162h-8z" fill="url(#hatch)" stroke="none"/>
+      <path d="M156 196c2 20-2 40 2 60M356 210c-2 16 2 30 0 44" fill="none" stroke="#82301c" stroke-width="2" opacity="0.5"/>
+      <!-- Underside and the shaded end. -->
+      <path d="M110 176 400 180 446 192 150 192z" fill="#5f594f" stroke-width="3"/>
+      <path d="M110 176 400 180 446 192 150 192z" fill="url(#hatch)" stroke="none"/>
+      <path d="M400 142 446 156 450 196 400 182z" fill="#9c937f" stroke-width="3.5"/>
+      <path d="M400 142 446 156 450 196 400 182z" fill="url(#hatch)" stroke="none"/>
+      <!-- Front fascia with a stripe. -->
+      <path d="M100 140 400 142V182L104 178z" fill="#ece0c0" stroke-width="3.5"/>
+      <path d="M102 164 400 166v8L103 172z" fill="#33281c" stroke="none"/>
+      <!-- Torn panels hanging from the underside. -->
+      <path d="M220 190l10 0 4 30-6 2z" fill="#d8cfb8" stroke-width="2.5"/>
+      <path d="M300 190l12 2-14 26-6-4z" fill="#d8cfb8" stroke-width="2.5"/>
+      <path d="M252 190v12M258 190l2 10" fill="none" stroke-width="1.6"/>
+      <!-- The sign letters, one fallen askew. -->
+      <text x="200" y="160" font-family="'Arial Black', Impact, sans-serif" font-weight="900" font-size="20" letter-spacing="6" fill="#33281c" stroke="none">FUE</text>
+      <text x="0" y="0" transform="translate(250 218) rotate(16)" font-family="'Arial Black', Impact, sans-serif" font-weight="900" font-size="30" fill="#ece0c0" stroke="#33281c" stroke-width="2.5" paint-order="stroke">L</text>
+      <!-- A gap torn in the fascia. -->
+      <path d="M340 141l14 0-4 12 8 8-6 18-12-2z" fill="#5f594f" stroke-width="2.5"/>
+    </g>
+    <!-- A sapling growing out of the forecourt. -->
+    <g stroke="#33281c" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M456 372c2-30-2-60 4-90M458 322l-14-16M459 302l12-14" fill="none" stroke-width="3"/>
+      <path d="M430 302c4-10 14-14 22-8-2 10-12 14-22 8zM466 286c4-10 14-12 20-6-4 10-12 12-20 6zM448 276c2-12 12-16 18-10-2 10-10 14-18 10zM440 318c2-8 10-10 14-6-2 8-8 10-14 6z" fill="#6f7f45" stroke-width="2"/>
+    </g>
+
+    <!-- An oil drum on its side, leaking a dark stain. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <ellipse cx="394" cy="418" rx="44" ry="8" fill="#2a2016" opacity="0.35" stroke="none"/>
+      <path d="M356 384h60v34h-60z" fill="#7d7a73" stroke-width="3.5"/>
+      <path d="M356 384h60v34h-60z" fill="url(#hatch)" stroke="none"/>
+      <ellipse cx="416" cy="401" rx="9" ry="17" fill="#a39d90" stroke-width="3.5"/>
+      <path d="M376 384v34M396 384v34" stroke-width="2"/>
+      <path d="M362 390c6 4 10 2 14 8" fill="none" stroke="#82301c" stroke-width="2" opacity="0.6"/>
+    </g>
+    <!-- A tyre. -->
+    <g stroke="#33281c" fill="none">
+      <ellipse cx="296" cy="440" rx="28" ry="10" fill="#2a2016" stroke-width="3"/>
+      <ellipse cx="296" cy="438" rx="12" ry="4" fill="#857e72" stroke-width="2"/>
+    </g>
+    <!-- The jerrycan someone dropped. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M140 430h40v-34l-6-6h-28l-6 6z" fill="#b4432b" stroke="#5a1e10" stroke-width="3"/>
+      <path d="M146 400l28 24M174 400l-28 24" stroke="#82301c" stroke-width="2"/>
+      <path d="M150 390v-6h10v6M164 390l4-8 8 2-2 6" fill="none" stroke-width="2.5"/>
+    </g>
+
+    <!-- Weeds in the cracks. -->
+    <g fill="none" stroke="#5c6a2c" stroke-width="2.6" stroke-linecap="round">
+      <path d="M70 470c2-12 6-20 12-26M78 472c0-12-2-20-6-26M86 470c4-8 8-14 14-16"/>
+      <path d="M420 470c2-14 6-22 12-28M430 472c0-14-2-22-8-30M440 470c4-10 10-16 16-18"/>
+      <path d="M230 360c2-8 4-12 8-16M236 360c0-6-2-10-4-14M330 360c2-8 6-12 10-14"/>
+      <path d="M216 500c2-12 6-20 12-26M226 502c0-12-2-20-6-26"/>
+    </g>
+  </g>
+
+  <!-- The medallion's frame. -->
+  <circle cx="256" cy="256" r="232" fill="none" stroke="#33281c" stroke-width="5"/>
+  <circle cx="256" cy="256" r="244" fill="none" stroke="#33281c" stroke-width="9"/>
+  <circle cx="256" cy="256" r="238" fill="none" stroke="#ece0c0" stroke-width="3"/>
+</svg>

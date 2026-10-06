@@ -1,0 +1,159 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- A small high-wing plane crashed nose first into the forest floor, seen from the side:
+       a bent propeller, the tail up against the sky with a red band on the fin, and the near
+       wing torn off and lying in the ferns in front. -->
+  <defs>
+    <clipPath id="disc"><circle cx="256" cy="256" r="232"/></clipPath>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cdb98c"/>
+      <stop offset="0.45" stop-color="#e6d7b0"/>
+      <stop offset="0.7" stop-color="#f3e9cc"/>
+    </linearGradient>
+    <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8f8a5c"/>
+      <stop offset="1" stop-color="#6f6a44"/>
+    </linearGradient>
+    <linearGradient id="hull" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ece4cc"/>
+      <stop offset="1" stop-color="#c2b9a1"/>
+    </linearGradient>
+    <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <path d="M0 0v7" stroke="#33281c" stroke-width="1.6" opacity="0.55"/>
+    </pattern>
+    <pattern id="hatch-sky" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-20)">
+      <path d="M0 0v8" stroke="#6a5842" stroke-width="1.4" opacity="0.45"/>
+    </pattern>
+    <!-- A spruce 100 tall, standing on its origin. -->
+    <g id="spruce" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M-3 0V-14h6V0z" fill="#5e4428" stroke="#33281c" stroke-width="2" vector-effect="non-scaling-stroke"/>
+      <path d="M0-100-9-80h4l-11 22h5L-25-32h6L-34-10H34L19-32h6L11-58h5L5-80h4z" stroke="#33281c" stroke-width="2.5" vector-effect="non-scaling-stroke"/>
+    </g>
+  </defs>
+
+  <g clip-path="url(#disc)">
+    <rect width="512" height="512" fill="url(#sky)"/>
+    <g stroke="#6a5842" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M150 92c8-18 30-24 44-12 10-20 40-22 52-4 16-8 36 2 38 18 12 0 20 8 18 18H150z" fill="#eadcb6"/>
+      <path d="M150 102h152v10H150z" fill="url(#hatch-sky)" stroke="none"/>
+    </g>
+    <path d="M330 120q6-6 12 0q6-6 12 0M364 104q5-5 10 0q5-5 10 0" fill="none" stroke="#33281c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Ground under the trees. -->
+    <path d="M0 270H512V360H0z" fill="#7d7d55"/>
+    <!-- Far forest, pale. -->
+    <g fill="#979a6c">
+      <use href="#spruce" transform="translate(30 290) scale(1.7)"/>
+      <use href="#spruce" transform="translate(90 284) scale(1.3)"/>
+      <use href="#spruce" transform="translate(200 288) scale(1.2)"/>
+      <use href="#spruce" transform="translate(260 284) scale(1.6)"/>
+      <use href="#spruce" transform="translate(320 288) scale(1.3)"/>
+      <use href="#spruce" transform="translate(486 290) scale(1.8)"/>
+    </g>
+    <!-- Near forest, a gap torn through it by the plane. -->
+    <g fill="#6f7f45">
+      <use href="#spruce" transform="translate(30 340) scale(2.4)"/>
+      <use href="#spruce" transform="translate(490 344) scale(2.4)"/>
+    </g>
+
+    <!-- Broken spruces, their tops sheared off. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M150 350V206l6 10 4-14 4 12 4-6V350z" fill="#7a5c3a" stroke-width="3.5"/>
+      <path d="M160 350V214" stroke-width="1.6" opacity="0.6"/>
+      <path d="M150 250l-22-12M168 276l20-10" fill="none" stroke-width="3"/>
+      <path d="M130 238c-10-2-18 2-22 8 8 4 18 4 24-2zM186 266c10-4 20-2 26 4-8 6-18 6-26 0z" fill="#6f7f45" stroke-width="2.2"/>
+      <path d="M430 346V236l5 8 5-12 4 10 4-4V346z" fill="#7a5c3a" stroke-width="3.5"/>
+      <path d="M448 276l20-10M430 304l-18-8" fill="none" stroke-width="3"/>
+      <path d="M466 264c10-4 20-2 26 4-8 6-18 6-26 0zM414 294c-10-2-18 2-22 8 8 4 18 4 24-2z" fill="#6f7f45" stroke-width="2.2"/>
+    </g>
+
+    <!-- Forest floor. -->
+    <path d="M0 346c80-8 170-10 256-6s180 2 256-4V512H0z" fill="url(#floor)"/>
+    <path d="M0 346c80-8 170-10 256-6s180 2 256-4" fill="none" stroke="#33281c" stroke-width="2.5"/>
+    <path d="M0 440c90-8 200-10 300-4s150 2 212-4V512H0z" fill="#33281c" opacity="0.1"/>
+
+    <!-- Shadow of the plane. -->
+    <ellipse cx="276" cy="398" rx="150" ry="12" fill="#33281c" opacity="0.25"/>
+
+    <!-- The plane, drawn level with its nose at the origin, then tipped nose down. -->
+    <g transform="translate(100 372) scale(1.08) rotate(-16)" stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <!-- Main landing gear, one leg bent. -->
+      <path d="M124 18l16 30" fill="none" stroke-width="5"/>
+      <circle cx="142" cy="50" r="12" fill="#48453e" stroke-width="3"/>
+      <circle cx="142" cy="50" r="4" fill="#a39d90" stroke-width="2"/>
+
+      <!-- Tailplane, seen edge-on. -->
+      <path d="M282 -16 348 -16 348 -8 286 -6z" fill="#c9c0a9" stroke-width="3"/>
+      <!-- The fin, swept back, with a red band near its top. -->
+      <path d="M246 -30 290 -100H318L332 -18z" fill="url(#hull)" stroke-width="3.5"/>
+      <path d="M281 -86H322L324 -72H273z" fill="#b4432b" stroke="none"/>
+      <path d="M246 -30 290 -100H318L332 -18z" fill="none" stroke-width="3.5"/>
+      <path d="M318 -100 322 -36" stroke-width="1.6" opacity="0.6"/>
+
+      <!-- Fuselage: cowling, cabin and the tail boom. -->
+      <path d="M0 -6C0 -22 8 -30 20 -32L52 -36 72 -52H152L330 -20 334 -12 326 -6 152 20H50L14 16C4 12 0 6 0 -6z" fill="url(#hull)" stroke-width="3.5"/>
+      <!-- Shade along the belly. -->
+      <path d="M2 4C6 12 12 16 20 16H150L326 -6 330 -12 152 10H50z" fill="url(#hatch)" stroke="none"/>
+      <!-- Stripe along the side. -->
+      <path d="M10 0 150 -2 326 -14" fill="none" stroke-width="7"/>
+      <path d="M10 0 150 -2 326 -14" fill="none" stroke="#5d6a6a" stroke-width="3.5"/>
+      <!-- Cowling seam, exhaust and dents. -->
+      <path d="M46 -34 48 18" stroke-width="2"/>
+      <path d="M30 10h10" stroke-width="3"/>
+      <path d="M20 -24c6 4 8 10 6 16M206 -26c4 6 4 14 0 20" fill="none" stroke-width="1.6" opacity="0.7"/>
+      <!-- Windshield and side windows, one smashed. -->
+      <path d="M56 -36 74 -50H88V-36z" fill="#8fa0a0" stroke-width="2.5"/>
+      <path d="M94 -48H128V-30H94z" fill="#2a2016" stroke-width="2.5"/>
+      <path d="M94 -48h34v8l-8-4-6 8-8-6-6 6-6-4z" fill="#8fa0a0" stroke-width="1.6"/>
+      <path d="M134 -48H156L150 -32H134z" fill="#8fa0a0" stroke-width="2.5"/>
+      <!-- The door outline and a row of rivets on the boom. -->
+      <path d="M92 -50V16H130V-50" fill="none" stroke-width="1.8" opacity="0.7"/>
+      <path d="M180 -36h.01M200 -32h.01M220 -28h.01M240 -24h.01M260 -21h.01M280 -18h.01" stroke-width="3"/>
+      <!-- Rust running from the rivets. -->
+      <path d="M200 -30l2 10M240 -22l2 12" stroke="#8a5a3a" stroke-width="2.5" opacity="0.6"/>
+
+      <!-- The far wing on the cabin roof, edge-on, and its strut. -->
+      <path d="M58 -52 60 -60C62 -64 66 -66 72 -66L160 -64 162 -54z" fill="#d4cbb3" stroke-width="3.5"/>
+      <path d="M140 -64 142 -54" stroke-width="1.6" opacity="0.6"/>
+      <path d="M118 16 96 -52" stroke-width="4"/>
+      <!-- Moss on the wing root. -->
+      <path d="M74 -66c8-6 20-6 28 0z" fill="#6f7f45" stroke-width="2"/>
+      <!-- The near wing's strut, torn and hanging. -->
+      <path d="M112 18l14 22 -4 6" fill="none" stroke-width="4"/>
+
+      <!-- The propeller: the spinner, one blade bent back over the cowling. -->
+      <path d="M-4 -10C-8 -24 -10 -36 -6 -46 0 -54 8 -56 14 -54L12 -48C6 -50 2 -48 0 -42 -2 -34 0 -24 2 -12z" fill="#6b665c" stroke-width="3"/>
+      <path d="M-8 -6C-8 -14 -4 -18 2 -18 4 -12 4 0 2 6 -4 6 -8 2 -8 -6z" fill="#48453e" stroke-width="3"/>
+    </g>
+
+    <!-- Earth heaped where the nose dug in. -->
+    <path d="M36 398C54 370 78 356 104 360 128 364 150 380 168 398 176 406 180 414 178 422H36z" fill="#5e4428" stroke="#33281c" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M60 390c8-8 16-12 24-12M124 374c10 4 18 10 24 16" fill="none" stroke="#33281c" stroke-width="2" stroke-linecap="round"/>
+    <path d="M70 410h.01M96 400h.01M130 404h.01M150 412h.01" stroke="#33281c" stroke-width="4" stroke-linecap="round"/>
+
+    <!-- The near wing, torn off and lying in the ferns. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M198 426 410 396C426 394 438 402 434 416L220 462 206 452 212 444z" fill="#d4cbb3" stroke-width="3.5"/>
+      <!-- Aileron and the underside in shade. -->
+      <path d="M320 428 428 410M320 428l4 14M250 420l6 26" fill="none" stroke-width="1.8"/>
+      <path d="M220 462 434 416 432 424 222 470z" fill="#9c937f" stroke-width="2.5"/>
+      <!-- Torn skin at the root, with a spar sticking out. -->
+      <path d="M212 444l-8-4 4-6-6-4" fill="none" stroke-width="2.2"/>
+      <path d="M206 442l-20 4" stroke-width="4"/>
+      <!-- Leaves and moss on it. -->
+      <path d="M276 428c10-6 22-6 32-2l-30 6z" fill="#6f7f45" stroke-width="2"/>
+    </g>
+
+    <!-- Ferns. -->
+    <g fill="none" stroke="#3f5a22" stroke-width="3" stroke-linecap="round">
+      <path d="M190 486c10-16 24-24 40-26M200 478l-4-10M210 472l-2-10M220 466l2-8M190 486c-6-14-16-22-30-24M180 476l2-10"/>
+      <path d="M470 454c-10-16-24-24-40-26M460 446l4-10M450 440l2-10M470 454c6-14 16-20 30-22M480 444l-2-10"/>
+      <path d="M300 500c4-14 10-22 18-28M312 502c0-14-2-22-8-30M380 496c2-14 6-24 12-30M392 498c0-14-2-22-6-30"/>
+      <path d="M50 450c10-12 22-18 34-20M60 444l-2-8M70 438l0-8M90 470c4-14 10-22 18-28M102 472c0-14-2-22-8-30"/>
+    </g>
+  </g>
+
+  <!-- The medallion's frame. -->
+  <circle cx="256" cy="256" r="232" fill="none" stroke="#33281c" stroke-width="5"/>
+  <circle cx="256" cy="256" r="244" fill="none" stroke="#33281c" stroke-width="9"/>
+  <circle cx="256" cy="256" r="238" fill="none" stroke="#ece0c0" stroke-width="3"/>
+</svg>

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <!-- Map badge: a mine headframe with its winding wheel, a brick engine house and a spoil heap. -->
+  <defs>
+    <clipPath id="inside"><circle cx="48" cy="48" r="42"/></clipPath>
+  </defs>
+
+  <circle cx="48" cy="48" r="45" fill="#ece0c0"/>
+  <g clip-path="url(#inside)">
+    <!-- Spoil heap behind. -->
+    <path d="M58 75 72 46q4-4 8 0l14 29z" fill="#6b665c" stroke="#33281c" stroke-width="2.6" stroke-linejoin="round"/>
+    <path d="M0 75H96V96H0z" fill="#cdb67c"/>
+    <path d="M0 75H96" stroke="#33281c" stroke-width="2.4"/>
+  </g>
+
+  <!-- Engine house. -->
+  <g stroke="#33281c" stroke-width="2.8" stroke-linejoin="round">
+    <path d="M15 56h19v19H15z" fill="#b0603f"/>
+    <path d="M13 57 24.5 47 36 57z" fill="#6b4f30"/>
+  </g>
+  <path d="M21 64h7v11h-7z" fill="#33281c"/>
+
+  <!-- Headframe: two legs, cross braces, a back strut. -->
+  <g stroke="#33281c" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M53 26 70 75" stroke-width="3.2"/>
+    <path d="M38 75 45 26M60 75 53 26" stroke-width="3.6"/>
+    <path d="M40 62h18M42 48h14M44 36h10M40 62l16-14M42 48l12-12" stroke-width="2.2"/>
+  </g>
+  <path d="M42 24h14v4H42z" fill="#6b4f30" stroke="#33281c" stroke-width="2.4" stroke-linejoin="round"/>
+
+  <!-- Winding wheel. -->
+  <circle cx="49" cy="18" r="8.5" fill="#ece0c0" stroke="#33281c" stroke-width="2.8"/>
+  <path d="M49 9.5v17M40.5 18h17M43 12l12 12M55 12 43 24" stroke="#33281c" stroke-width="1.6"/>
+  <circle cx="49" cy="18" r="2.2" fill="#33281c"/>
+
+  <circle cx="48" cy="48" r="45" fill="none" stroke="#33281c" stroke-width="4"/>
+</svg>

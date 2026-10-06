@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <!-- Map badge: a whitewashed cottage under a steep thatched roof, with a well sweep beside it. -->
+  <defs>
+    <clipPath id="inside"><circle cx="48" cy="48" r="42"/></clipPath>
+  </defs>
+
+  <circle cx="48" cy="48" r="45" fill="#ece0c0"/>
+  <g clip-path="url(#inside)">
+    <path d="M0 75H96V96H0z" fill="#cdb67c"/>
+    <path d="M0 75H96" stroke="#33281c" stroke-width="2.4"/>
+  </g>
+
+  <!-- Well sweep: post, long beam, the rope and its bucket, the well. -->
+  <g stroke="#33281c" stroke-linecap="round" fill="none">
+    <path d="M20 75V42" stroke-width="3.4"/>
+    <path d="M9 58 34 20" stroke-width="3.2"/>
+    <path d="M33 22V48" stroke-width="1.6"/>
+  </g>
+  <path d="M29 48h8l-1 7h-6z" fill="#b4432b" stroke="#33281c" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M13 66h15v9H13z" fill="#a39d90" stroke="#33281c" stroke-width="2.6" stroke-linejoin="round"/>
+
+  <!-- Cottage: walls, chimney, the steep thatch. -->
+  <g stroke="#33281c" stroke-width="2.8" stroke-linejoin="round">
+    <path d="M41 52h40v23H41z" fill="#f6ecd6"/>
+    <path d="M66 22h6v12h-6z" fill="#a39d90"/>
+    <path d="M36 55 52 27h18l16 28z" fill="#a8814f"/>
+  </g>
+  <path d="M44 45h38M48 38h28" stroke="#6b4f30" stroke-width="1.6"/>
+  <g fill="#33281c">
+    <path d="M46 60h9v8h-9zM69 59h7v16h-7z"/>
+  </g>
+
+  <circle cx="48" cy="48" r="45" fill="none" stroke="#33281c" stroke-width="4"/>
+</svg>

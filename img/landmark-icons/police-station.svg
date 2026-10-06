@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <!-- Map badge: a two-storey police station with a radio mast and its red light. -->
+  <defs>
+    <clipPath id="inside"><circle cx="48" cy="48" r="42"/></clipPath>
+  </defs>
+
+  <circle cx="48" cy="48" r="45" fill="#ece0c0"/>
+  <g clip-path="url(#inside)">
+    <path d="M0 73H96V96H0z" fill="#a39d90"/>
+    <path d="M0 73H96" stroke="#33281c" stroke-width="2.4"/>
+  </g>
+
+  <!-- Radio mast with its light. -->
+  <path d="M60 35 64 16l4 19M61.5 28h5" stroke="#33281c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="64" cy="14" r="3.4" fill="#b4432b" stroke="#33281c" stroke-width="2"/>
+
+  <!-- The building: the shaded side, the front, the parapet. -->
+  <g stroke="#33281c" stroke-width="2.8" stroke-linejoin="round">
+    <path d="M70 38l8 3v30l-8 2z" fill="#8f877a"/>
+    <path d="M20 38h50v35H20z" fill="#cbc2ad"/>
+    <path d="M18 34h54v5H18z" fill="#a39d90"/>
+  </g>
+
+  <!-- Windows, door and the dark sign over it. -->
+  <g fill="#33281c">
+    <path d="M26 44h7v8h-7zM41.5 44h7v8h-7zM57 44h7v8h-7zM26 60h7v8h-7zM57 60h7v8h-7z"/>
+    <path d="M41 63h8v10h-8z"/>
+    <path d="M37 56h16v4H37z"/>
+  </g>
+
+  <circle cx="48" cy="48" r="45" fill="none" stroke="#33281c" stroke-width="4"/>
+</svg>

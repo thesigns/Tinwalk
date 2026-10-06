@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <!-- Map badge: a concrete bunker dug into a mound, with its gun slit and a spruce on top. -->
+  <defs>
+    <clipPath id="inside"><circle cx="48" cy="48" r="42"/></clipPath>
+  </defs>
+
+  <circle cx="48" cy="48" r="45" fill="#ece0c0"/>
+  <g clip-path="url(#inside)">
+    <!-- The earth mound around it. -->
+    <path d="M0 74C8 50 22 40 48 40s40 10 48 34z" fill="#6f7f45" stroke="#33281c" stroke-width="2.6" stroke-linejoin="round"/>
+    <path d="M0 74H96V96H0z" fill="#6f7f45"/>
+    <path d="M0 74H96" stroke="#33281c" stroke-width="2.4"/>
+  </g>
+
+  <!-- A young spruce growing from the roof. -->
+  <path d="M50 44 58 18l8 26z" fill="#5c6a2c" stroke="#33281c" stroke-width="2.4" stroke-linejoin="round"/>
+
+  <!-- The bunker: the front face, the side in shade, the slab roof. -->
+  <g stroke="#33281c" stroke-width="2.8" stroke-linejoin="round">
+    <path d="M68 50l8 4v20h-8z" fill="#8f877a"/>
+    <path d="M20 50h48v24H20z" fill="#b9b2a2"/>
+    <path d="M16 44h56l6 8H20z" fill="#a39d90"/>
+  </g>
+  <!-- Gun slit and the side door. -->
+  <path d="M28 56h32v7H28z" fill="#33281c"/>
+  <path d="M70 60l5 2v12h-5z" fill="#33281c"/>
+
+  <circle cx="48" cy="48" r="45" fill="none" stroke="#33281c" stroke-width="4"/>
+</svg>

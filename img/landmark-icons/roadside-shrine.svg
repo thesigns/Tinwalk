@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <!-- Map badge: a whitewashed roadside pillar shrine with a niche, a little roof and an iron cross, a candle at its foot. -->
+  <defs>
+    <clipPath id="inside"><circle cx="48" cy="48" r="42"/></clipPath>
+  </defs>
+
+  <circle cx="48" cy="48" r="45" fill="#ece0c0"/>
+  <g clip-path="url(#inside)">
+    <path d="M0 75H96V96H0z" fill="#cdb67c"/>
+    <path d="M0 75H96" stroke="#33281c" stroke-width="2.4"/>
+  </g>
+
+  <!-- Iron cross on top. -->
+  <path d="M48 24V9M43 14h10" stroke="#33281c" stroke-width="2.8" stroke-linecap="round" fill="none"/>
+
+  <!-- Stone base, pillar, cornice and the tin roof. -->
+  <g stroke="#33281c" stroke-width="2.8" stroke-linejoin="round">
+    <path d="M33 65h30v10H33z" fill="#a39d90"/>
+    <path d="M36 37h24v28H36z" fill="#f6ecd6"/>
+    <path d="M33 33h30v5H33z" fill="#a39d90"/>
+    <path d="M30 34 48 20 66 34z" fill="#6b665c"/>
+  </g>
+
+  <!-- The niche with a pale figure. -->
+  <path d="M41 57V46a7 7 0 0 1 14 0V57z" fill="#33281c"/>
+  <path d="M48 43.5a2 2 0 1 1 0 .01M45 56l3-9.5 3 9.5z" fill="#f6ecd6"/>
+
+  <!-- A grave candle at its foot. -->
+  <path d="M66 68h6v7h-6z" fill="#b4432b" stroke="#33281c" stroke-width="2" stroke-linejoin="round"/>
+
+  <circle cx="48" cy="48" r="45" fill="none" stroke="#33281c" stroke-width="4"/>
+</svg>

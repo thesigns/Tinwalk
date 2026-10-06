@@ -1,0 +1,191 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- An abandoned forester's lodge among spruces: a log house with antlers on the gable,
+       a sagging porch, a broken chimney, a woodpile gone to moss and a red fire-danger board. -->
+  <defs>
+    <clipPath id="disc"><circle cx="256" cy="256" r="232"/></clipPath>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cdb98c"/>
+      <stop offset="0.45" stop-color="#e6d7b0"/>
+      <stop offset="0.7" stop-color="#f3e9cc"/>
+    </linearGradient>
+    <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8f8a5c"/>
+      <stop offset="1" stop-color="#6f6a44"/>
+    </linearGradient>
+    <linearGradient id="logs" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#a8814f"/>
+      <stop offset="1" stop-color="#8f6c40"/>
+    </linearGradient>
+    <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <path d="M0 0v7" stroke="#33281c" stroke-width="1.6" opacity="0.55"/>
+    </pattern>
+    <pattern id="hatch-sky" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-20)">
+      <path d="M0 0v8" stroke="#6a5842" stroke-width="1.4" opacity="0.45"/>
+    </pattern>
+    <!-- A spruce 100 tall, standing on its origin. -->
+    <g id="spruce" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M-3 0V-14h6V0z" fill="#5e4428" stroke="#33281c" stroke-width="2" vector-effect="non-scaling-stroke"/>
+      <path d="M0-100-9-80h4l-11 22h5L-25-32h6L-34-10H34L19-32h6L11-58h5L5-80h4z" stroke="#33281c" stroke-width="2.5" vector-effect="non-scaling-stroke"/>
+    </g>
+  </defs>
+
+  <g clip-path="url(#disc)">
+    <rect width="512" height="512" fill="url(#sky)"/>
+    <g stroke="#6a5842" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M190 84c8-18 30-24 44-12 10-20 40-22 52-4 16-8 36 2 38 18 12 0 20 8 18 18H190z" fill="#eadcb6"/>
+      <path d="M190 94h152v10H190z" fill="url(#hatch-sky)" stroke="none"/>
+    </g>
+    <path d="M330 140q6-6 12 0q6-6 12 0M362 124q5-5 10 0q5-5 10 0" fill="none" stroke="#33281c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Ground under the trees, deep in shade. -->
+    <path d="M0 296H512V360H0z" fill="#7d7d55"/>
+    <!-- Far forest, pale with distance. -->
+    <g fill="#979a6c">
+      <use href="#spruce" transform="translate(20 300) scale(1.1)"/>
+      <use href="#spruce" transform="translate(64 296) scale(1.4)"/>
+      <use href="#spruce" transform="translate(104 300) scale(1.0)"/>
+      <use href="#spruce" transform="translate(300 300) scale(1.2)"/>
+      <use href="#spruce" transform="translate(410 300) scale(1.5)"/>
+      <use href="#spruce" transform="translate(456 300) scale(1.1)"/>
+      <use href="#spruce" transform="translate(496 302) scale(1.3)"/>
+    </g>
+    <!-- Near forest behind the lodge. -->
+    <g fill="#6f7f45">
+      <use href="#spruce" transform="translate(40 336) scale(1.9)"/>
+      <use href="#spruce" transform="translate(96 330) scale(2.4)"/>
+      <use href="#spruce" transform="translate(436 336) scale(2.2)"/>
+      <use href="#spruce" transform="translate(484 340) scale(1.7)"/>
+      <use href="#spruce" transform="translate(380 330) scale(1.6)"/>
+    </g>
+
+    <!-- Forest floor. -->
+    <path d="M0 340c80-8 170-10 256-6s180 2 256-4V512H0z" fill="url(#floor)"/>
+    <path d="M0 340c80-8 170-10 256-6s180 2 256-4" fill="none" stroke="#33281c" stroke-width="2.5"/>
+    <path d="M0 430c90-8 200-10 300-4s150 2 212-4V512H0z" fill="#33281c" opacity="0.1"/>
+
+    <!-- The lodge and everything at its walls, scaled up from its base to fill the frame. -->
+    <g transform="translate(262 364) scale(1.12) translate(-262 -364)">
+    <!-- Shadow of the lodge. -->
+    <path d="M110 362H410l30 14H130z" fill="#33281c" opacity="0.25"/>
+
+    <!-- The lodge. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <!-- Long side wall, in shade, logs running back. -->
+      <path d="M250 252 402 262V350L250 364z" fill="#7a5c3a" stroke-width="3.5"/>
+      <path d="M250 252 402 262V350L250 364z" fill="url(#hatch)" stroke="none"/>
+      <path d="M250 266 402 274M250 280 402 286M250 294 402 298M250 308 402 310M250 322 402 322M250 336 402 334M250 350 402 344" stroke-width="1.6" opacity="0.7"/>
+      <!-- Side windows: one dark, one with a fallen shutter. -->
+      <path d="M268 280h22v30h-22z" fill="#2a2016" stroke-width="3"/>
+      <path d="M279 280v30M268 295h22" stroke="#6a5842" stroke-width="1.8"/>
+      <path d="M360 284h22v28h-22z" fill="#2a2016" stroke-width="3"/>
+      <path d="M382 286l12 2v26l-12-2z" fill="#6f7f45" stroke-width="2.5"/>
+      <path d="M352 314l-4 26 10 2 4-26z" fill="#6f7f45" stroke-width="2.5"/>
+      <!-- Door. -->
+      <path d="M310 290h26v66l-26 2z" fill="#2a2016" stroke-width="3"/>
+      <path d="M310 290l-10 4v62l10 2z" fill="#5e4428" stroke-width="2.5"/>
+      <!-- The porch, its right post gone and its roof slumped. -->
+      <path d="M296 276 350 278l18 30-8 3-14-24-46-2z" fill="#8f7048" stroke-width="3"/>
+      <path d="M298 280v80M342 286l-10 70" stroke-width="4"/>
+      <path d="M298 280v80" stroke="#9c7a4c" stroke-width="1.6"/>
+      <path d="M290 358h60v8h-60z" fill="#8b6a42" stroke-width="2.5"/>
+
+      <!-- Front gable wall of logs. -->
+      <path d="M124 252H250V364H124z" fill="url(#logs)" stroke-width="3.5"/>
+      <path d="M124 266H250M124 280H250M124 294H250M124 308H250M124 322H250M124 336H250M124 350H250" stroke-width="1.6" opacity="0.6"/>
+      <path d="M124 252 187 176 250 252z" fill="#a07a4c" stroke-width="3.5"/>
+      <path d="M140 232H234M156 212H218M170 194H204" stroke-width="1.6" opacity="0.6"/>
+      <!-- Log ends at the corner. -->
+      <g fill="#c9a571" stroke-width="2">
+        <circle cx="250" cy="259" r="6"/><circle cx="250" cy="273" r="6"/><circle cx="250" cy="287" r="6"/>
+        <circle cx="250" cy="301" r="6"/><circle cx="250" cy="315" r="6"/><circle cx="250" cy="329" r="6"/>
+        <circle cx="250" cy="343" r="6"/><circle cx="250" cy="357" r="6"/>
+        <circle cx="124" cy="259" r="6"/><circle cx="124" cy="273" r="6"/><circle cx="124" cy="287" r="6"/>
+        <circle cx="124" cy="301" r="6"/><circle cx="124" cy="315" r="6"/><circle cx="124" cy="329" r="6"/>
+        <circle cx="124" cy="343" r="6"/><circle cx="124" cy="357" r="6"/>
+      </g>
+      <!-- Front windows with shutters, one hanging. -->
+      <path d="M146 280h26v34h-26z" fill="#2a2016" stroke-width="3"/>
+      <path d="M146 280h26v12l-8-6-6 10-6-8-6 6z" fill="#8fa0a0" stroke-width="1.6"/>
+      <path d="M159 280v34M146 297h26" stroke="#6a5842" stroke-width="1.8"/>
+      <path d="M134 280h12v34h-12zM172 280h12v34h-12z" fill="#6f7f45" stroke-width="2.5"/>
+      <path d="M202 280h26v34h-26z" fill="#2a2016" stroke-width="3"/>
+      <path d="M202 282h26M202 296h26M202 310h26" stroke="#a07a4c" stroke-width="5"/>
+      <path d="M190 280h12v34h-12z" fill="#6f7f45" stroke-width="2.5"/>
+      <path d="M228 284l14 18-8 6-12-16z" fill="#6f7f45" stroke-width="2.5"/>
+      <!-- Attic window. -->
+      <path d="M178 214h18v20h-18z" fill="#2a2016" stroke-width="2.5"/>
+      <!-- Antlers over the attic window. -->
+      <g fill="none" stroke-width="3">
+        <path d="M187 206c-4-8-12-10-18-18M175 194l-8-2M171 190l-2-8M187 206c4-8 12-10 18-18M199 194l8-2M203 190l2-8"/>
+        <path d="M182 206h10v4h-10z" fill="#ece0c0" stroke-width="2"/>
+      </g>
+
+      <!-- Roof: the long plane, shingles missing in patches. -->
+      <path d="M187 168 340 178 414 268 258 258z" fill="#5e4428" stroke-width="3.5"/>
+      <path d="M187 168 340 178 414 268 258 258z" fill="url(#hatch)" stroke="none"/>
+      <path d="M200 184 352 193M213 200l152 8M226 216l152 7M239 232l152 6M250 246l152 5" stroke-width="1.6" opacity="0.7"/>
+      <path d="M300 206l30 2 10 14-28-2z" fill="#2a2016" stroke-width="2"/>
+      <path d="M306 208v10M318 209v12" stroke="#8f7048" stroke-width="2"/>
+      <!-- Moss on the roof. -->
+      <path d="M262 246c10-6 22-2 30 4l-30-1zM350 254c8-6 20-4 28 4z" fill="#6f7f45" stroke-width="2"/>
+      <!-- Front gable roof edge, overhanging. -->
+      <path d="M112 262 187 164 266 262l-8 2L187 176 120 264z" fill="#8f7048" stroke-width="3.5"/>
+      <!-- Chimney, its top broken off. -->
+      <path d="M296 192v-34l8 4 6-6 6 8v32z" fill="#a39d90" stroke-width="3"/>
+      <path d="M296 172h20M296 184h20M306 162v10M302 172v12M310 184v10" stroke-width="1.6"/>
+    </g>
+
+    <!-- Woodpile by the wall, gone to moss. -->
+    <g stroke="#33281c" stroke-width="2.5">
+      <path d="M402 300h46v52h-46z" fill="#6a5842"/>
+      <g fill="#c9a571">
+        <circle cx="410" cy="345" r="7"/><circle cx="424" cy="345" r="7"/><circle cx="438" cy="345" r="7"/>
+        <circle cx="417" cy="332" r="7"/><circle cx="431" cy="332" r="7"/><circle cx="445" cy="332" r="6"/>
+        <circle cx="410" cy="319" r="7"/><circle cx="424" cy="319" r="7"/><circle cx="438" cy="319" r="7"/>
+      </g>
+      <path d="M400 306c12-8 30-10 50-2l-2 8c-14-6-30-4-46 2z" fill="#6f7f45"/>
+    </g>
+
+    </g>
+
+    <!-- A fallen spruce in the foreground. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M262 452 470 404l4 14-206 50z" fill="#7a5c3a" stroke-width="3.5"/>
+      <path d="M262 452 470 404l4 14-206 50z" fill="url(#hatch)" stroke="none"/>
+      <path d="M266 466a8 8 0 0 1-4-14" fill="#c9a571" stroke-width="2.5"/>
+      <path d="M330 440l-14-18M380 428l-8-20M420 418l10-18M350 446l6 18M440 422l8 14" fill="none" stroke-width="3"/>
+      <path d="M440 410c14-14 30-18 48-14l-6 10c10 2 18 8 22 16l-20 0 6 12c-16 0-30-6-42-16z" fill="#6f7f45" stroke-width="2.5"/>
+    </g>
+
+    <!-- The fire-danger board on its post. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M120 452V396" stroke-width="5"/>
+      <path d="M120 452V396" stroke="#9c7a4c" stroke-width="2"/>
+      <g transform="rotate(-6 120 392)">
+        <path d="M96 374h48v30H96z" fill="#b4432b" stroke-width="3"/>
+        <path d="M120 381l-10 18h20z" fill="none" stroke="#ece0c0" stroke-width="2.6"/>
+        <path d="M120 387v6M120 396v.5" stroke="#ece0c0" stroke-width="2.4"/>
+      </g>
+    </g>
+
+    <!-- Ferns and undergrowth. -->
+    <g fill="none" stroke="#3f5a22" stroke-width="3" stroke-linecap="round">
+      <path d="M20 440c10-16 24-24 40-26M30 432l-4-10M40 426l-2-10M50 420l2-8M20 440c4-18 2-30-6-40M16 424l-8 2M14 412l-8-2"/>
+      <path d="M120 470c10-16 24-24 40-26M130 462l-4-10M140 456l-2-10M150 450l2-8M120 470c-6-14-16-22-30-24M110 460l2-10M100 452l0-10"/>
+      <path d="M196 380c6-10 14-14 24-16M206 374l-2-8M196 380c-4-8-10-12-18-14M190 374l0-8"/>
+      <path d="M470 470c-10-16-24-24-40-26M460 462l4-10M450 456l2-10M470 470c6-14 16-20 30-22M480 460l-2-10"/>
+      <path d="M380 490c4-14 10-22 18-28M392 492c0-14-2-22-8-30M220 500c2-14 6-24 12-30M232 500c0-14-2-22-6-30"/>
+    </g>
+    <!-- A rusty bucket in the grass. -->
+    <g stroke="#33281c" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M178 412l4 22h20l4-22z" fill="#8a7a62"/>
+      <ellipse cx="192" cy="412" rx="14" ry="4" fill="#2a2016"/>
+      <path d="M180 412c0-14 24-14 24 0" fill="none" stroke-width="2"/>
+    </g>
+  </g>
+
+  <!-- The medallion's frame. -->
+  <circle cx="256" cy="256" r="232" fill="none" stroke="#33281c" stroke-width="5"/>
+  <circle cx="256" cy="256" r="244" fill="none" stroke="#33281c" stroke-width="9"/>
+  <circle cx="256" cy="256" r="238" fill="none" stroke="#ece0c0" stroke-width="3"/>
+</svg>

@@ -1,0 +1,183 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512">
+  <!-- An abandoned wooden post mill on a dry field: one sail snapped off, torn red cloth on another. -->
+  <defs>
+    <clipPath id="disc"><circle cx="256" cy="256" r="232"/></clipPath>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cdb98c"/>
+      <stop offset="0.45" stop-color="#e6d7b0"/>
+      <stop offset="0.7" stop-color="#f3e9cc"/>
+    </linearGradient>
+    <linearGradient id="field" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d4bf86"/>
+      <stop offset="1" stop-color="#b89c5e"/>
+    </linearGradient>
+    <linearGradient id="planks" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#b48b55"/>
+      <stop offset="1" stop-color="#94703f"/>
+    </linearGradient>
+    <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <path d="M0 0v7" stroke="#33281c" stroke-width="1.6" opacity="0.55"/>
+    </pattern>
+    <pattern id="hatch-sky" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-20)">
+      <path d="M0 0v8" stroke="#6a5842" stroke-width="1.4" opacity="0.45"/>
+    </pattern>
+    <!-- One sail pointing up from the hub: the stock and its lattice frame. -->
+    <g id="sail" fill="none" stroke="#33281c" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 -40h36V-164H4z" fill="#33281c" fill-opacity="0.08" stroke-width="3.5"/>
+      <path d="M22 -40V-164" stroke-width="2"/>
+      <path d="M4 -55h36M4 -70h36M4 -85h36M4 -100h36M4 -115h36M4 -130h36M4 -145h36" stroke-width="2"/>
+      <path d="M-4 -12V-172h8V-12z" fill="#a07a4c" stroke-width="3.5"/>
+    </g>
+  </defs>
+
+  <g clip-path="url(#disc)">
+    <!-- Heavy sky, darker overhead. -->
+    <rect width="512" height="512" fill="url(#sky)"/>
+    <!-- A pale sun low behind the clouds. -->
+    <circle cx="376" cy="250" r="34" fill="#f7efd8"/>
+    <circle cx="376" cy="250" r="34" fill="none" stroke="#c9b48a" stroke-width="2"/>
+    <!-- Clouds: rounded tops, hatched bellies. -->
+    <g stroke="#6a5842" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M18 112c10-22 36-28 52-14 10-24 46-28 60-6 18-12 44-4 48 16 14 0 24 10 22 22H18z" fill="#eadcb6"/>
+      <path d="M18 120h182v12H18z" fill="url(#hatch-sky)" stroke="none"/>
+      <path d="M300 82c8-18 30-24 44-12 10-20 40-22 52-4 16-8 36 2 38 18 12 0 20 8 18 18H300z" fill="#eadcb6"/>
+      <path d="M300 92h152v10H300z" fill="url(#hatch-sky)" stroke="none"/>
+      <path d="M330 218c6-12 22-16 32-8 8-12 28-12 36 0 12-4 24 4 24 14H330z" fill="#efe3c2"/>
+    </g>
+    <!-- Crows. -->
+    <path d="M150 168q7-7 14 0q7-7 14 0M424 160q5-5 10 0q5-5 10 0M190 146q5-5 10 0q5-5 10 0" fill="none" stroke="#33281c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Distant hills and a tree line. -->
+    <path d="M0 330c50-22 90-28 140-18s70 4 110-6 90-14 130 0 90 16 132 8V512H0z" fill="#a9ab7c"/>
+    <path d="M0 330c50-22 90-28 140-18s70 4 110-6 90-14 130 0 90 16 132 8" fill="none" stroke="#6a5842" stroke-width="2.5"/>
+    <g fill="#6f7f45" stroke="#33281c" stroke-width="2.2" stroke-linejoin="round">
+      <path d="M352 318c4-16 10-24 16-24s10 10 12 24z"/>
+      <path d="M376 320c3-12 8-18 13-18s9 8 10 18z"/>
+      <path d="M398 322c4-16 10-24 16-24s10 10 11 24z"/>
+      <path d="M422 322c3-10 7-15 11-15s8 7 9 15z"/>
+      <path d="M40 318c3-12 7-18 12-18s9 8 10 18z"/>
+      <path d="M60 316c4-15 9-22 14-22s10 9 11 22z"/>
+      <path d="M84 316c3-10 6-14 10-14s8 6 9 14z"/>
+    </g>
+    <!-- A telegraph line, its wire slack. -->
+    <g stroke="#33281c" stroke-linecap="round" fill="none">
+      <path d="M118 316V272M110 278h16M462 322V286M455 291h14" stroke-width="2.6"/>
+      <path d="M126 278q160 30 336 13M110 278q-60 6-120 2" stroke-width="1.4"/>
+    </g>
+
+    <!-- Dry field with furrows running away to the horizon. -->
+    <path d="M0 360c80-16 170-20 256-14s180 4 256-6V512H0z" fill="url(#field)"/>
+    <path d="M0 360c80-16 170-20 256-14s180 4 256-6" fill="none" stroke="#6a5842" stroke-width="2.5"/>
+    <g stroke="#8a7348" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.8">
+      <path d="M40 357-60 520M86 352 20 520M132 349 100 520M178 347 178 520M224 346 256 520M380 344 470 520M426 343 548 520M472 342 600 520"/>
+    </g>
+    <path d="M0 420c90-10 200-12 300-6s150 2 212-6V512H0z" fill="#33281c" opacity="0.06"/>
+
+    <!-- Shadow of the mill on the field. -->
+    <ellipse cx="290" cy="396" rx="104" ry="14" fill="#33281c" opacity="0.22"/>
+
+    <!-- Trestle: the post, its braces, cross-trees and stone piers. -->
+    <g stroke="#33281c" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M238 296V384h16V296z" fill="#8b6a42" stroke-width="3.5"/>
+      <path d="M246 296V384h8V296z" fill="url(#hatch)" stroke="none"/>
+      <path d="M240 318 196 386M252 318l46 68" fill="none" stroke-width="7"/>
+      <path d="M240 318 196 386M252 318l46 68" fill="none" stroke="#9c7a4c" stroke-width="3"/>
+      <path d="M176 384h140v10H176z" fill="#8b6a42" stroke-width="3.5"/>
+      <path d="M170 392h24v12h-24zM298 392h24v12h-24z" fill="#a39d90" stroke-width="3"/>
+      <path d="M176 398h6M306 397h8" stroke-width="1.6"/>
+    </g>
+
+    <!-- Steps and the tail pole running down to the ground. -->
+    <g stroke="#33281c" stroke-linecap="round" fill="none">
+      <path d="M302 292 352 396M318 290l50 104" stroke-width="3.5"/>
+      <path d="M307 304h16M313 316h16M319 328h16M331 352h16M337 364h16M343 376h16M349 388h16" stroke-width="2.4"/>
+      <path d="M325 340l14-3" stroke-width="2.4"/>
+      <path d="M330 270 404 392" stroke-width="6.5"/>
+      <path d="M330 270 404 392" stroke="#9c7a4c" stroke-width="2.6"/>
+    </g>
+
+    <!-- The mill body: a weathered plank box with a gabled roof, seen three-quarter. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <!-- Side wall, in shade. -->
+      <path d="M296 178 336 190V290L296 300z" fill="#6f5233" stroke-width="3.5"/>
+      <path d="M296 178 336 190V290L296 300z" fill="url(#hatch)" stroke="none"/>
+      <path d="M306 181V298M316 184V296M326 187V293" stroke-width="1.6" opacity="0.7"/>
+      <!-- Front wall. -->
+      <path d="M186 178H296V300H186z" fill="url(#planks)" stroke-width="3.5"/>
+      <path d="M200 178V300M214 178V300M228 178V300M242 178V300M256 178V300M270 178V300M284 178V300" stroke-width="1.6" opacity="0.6"/>
+      <!-- Knots, nails and a darker patched plank. -->
+      <path d="M214 196h14v46h-14z" fill="#7a5c3a" stroke-width="1.6"/>
+      <path d="M193 206h.01M207 230h.01M235 190h.01M249 282h.01M277 214h.01M221 204h.01M221 236h.01" stroke-width="3"/>
+      <path d="M190 222h8M262 192h12M232 286h10" stroke-width="1.4" opacity="0.7"/>
+      <!-- Missing planks show the dark inside. -->
+      <path d="M256 238h14v34l-7 6-7-6z" fill="#2a2016" stroke-width="2"/>
+      <path d="M270 252h14v22h-14z" fill="#2a2016" stroke-width="2"/>
+      <path d="M186 300H296" stroke-width="3.5"/>
+      <!-- Door, hanging off one hinge, and a small window. -->
+      <path d="M262 300V274h24v26z" fill="#2a2016" stroke-width="2.5"/>
+      <path d="M286 274l14 4v26l-14-4z" fill="#5e4428" stroke-width="3"/>
+      <path d="M196 252h18v20h-18z" fill="#2a2016" stroke-width="3"/>
+      <path d="M205 252v20M196 262h18" stroke="#a8814f" stroke-width="2"/>
+      <!-- Roof. -->
+      <path d="M180 182 241 132 302 182z" fill="#8f7048" stroke-width="3.5"/>
+      <path d="M241 132 284 140 342 194 302 182z" fill="#5e4428" stroke-width="3.5"/>
+      <path d="M241 132 284 140 342 194 302 182z" fill="url(#hatch)" stroke="none"/>
+      <path d="M200 166h82M214 154h54M226 144h30" stroke-width="1.6" opacity="0.6"/>
+      <!-- A gap in the roof boards. -->
+      <path d="M298 156l16 16-6 5-14-13z" fill="#2a2016" stroke-width="2"/>
+    </g>
+
+    <!-- Sails around the hub; one is snapped short. -->
+    <g transform="translate(241 204)">
+      <use xlink:href="#sail" href="#sail" transform="rotate(-24)"/>
+      <use xlink:href="#sail" href="#sail" transform="rotate(66)"/>
+      <use xlink:href="#sail" href="#sail" transform="rotate(156)"/>
+      <!-- The broken sail: a splintered stock and what's left of its frame. -->
+      <g transform="rotate(246)" fill="none" stroke="#33281c" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 -40h36V-74M4 -55h36M4 -70h20" stroke-width="2.5"/>
+        <path d="M40 -74l-4 -12" stroke-width="2.5"/>
+        <path d="M-4 -12V-96l3 7 3-12 2 7V-12z" fill="#a07a4c" stroke-width="3.5"/>
+      </g>
+      <!-- Torn red cloth still tied to one sail, flapping. -->
+      <g transform="rotate(66)">
+        <path d="M5 -96h34V-150l-7 9-5-7-6 11-5-5-11 8z" fill="#b4432b" stroke="#5a1e10" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M5 -96h34V-150l-7 9-5-7-6 11-5-5-11 8z" fill="url(#hatch-sky)"/>
+        <path d="M14 -96l-5 16M28 -96l3 12" fill="none" stroke="#82301c" stroke-width="2.6" stroke-linecap="round"/>
+      </g>
+      <circle r="12" fill="#5e4428" stroke="#33281c" stroke-width="3.5"/>
+      <circle r="4" fill="#33281c"/>
+    </g>
+
+    <!-- The snapped-off sail, half sunk in the grass. -->
+    <g transform="translate(236 452) rotate(-6)" fill="none" stroke="#33281c" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M8 -4v-26h40v26M21 -30v26M34 -30v26M8 -17h40" stroke-width="2.2"/>
+      <path d="M0 0h72l4-5 3 7 3-4v6H0z" fill="#a07a4c" stroke-width="3"/>
+    </g>
+
+    <!-- A broken fence in the foreground. -->
+    <g stroke="#33281c" stroke-linecap="round" stroke-linejoin="round">
+      <!-- Rails: two whole, one hanging off its post. -->
+      <path d="M38 412 104 418v8L38 420zM38 436l66 4v8l-66-4z" fill="#a07a4c" stroke-width="3"/>
+      <path d="M106 424 166 460l-4 7-60-35z" fill="#a07a4c" stroke-width="3"/>
+      <!-- Posts, the last one leaning. -->
+      <path d="M32 456V400l6-5 6 5V456z" fill="#8b6a42" stroke-width="3"/>
+      <path d="M98 462V404l6-5 6 5V462z" fill="#8b6a42" stroke-width="3"/>
+      <path d="M160 472l12-56 7-3 4 7-12 54z" fill="#8b6a42" stroke-width="3"/>
+      <path d="M41 404v48M107 408v50" stroke-width="1.4" opacity="0.6"/>
+    </g>
+    <!-- Tall dry grass. -->
+    <g fill="none" stroke="#5c6a2c" stroke-width="2.6" stroke-linecap="round">
+      <path d="M8 470c4-20 8-32 16-44M18 474c2-18 2-30-2-44M30 472c4-14 10-24 18-30"/>
+      <path d="M120 480c2-16 6-26 12-34M130 482c0-14-2-24-8-32M140 480c4-12 8-20 16-24"/>
+      <path d="M404 470c4-20 10-32 18-42M416 474c2-18 0-30-4-42M428 470c6-14 12-22 20-26M440 476c2-12 6-22 12-28"/>
+      <path d="M470 420c3-12 6-20 12-26M480 424c0-12-2-20-6-28"/>
+      <path d="M210 498c2-14 6-24 12-30M222 500c0-14-2-22-6-30"/>
+    </g>
+    <path d="M300 480l9-16 5 18 7-20 4 20M360 440l7-12 4 14 6-16 3 16" fill="none" stroke="#6b7a3a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- The medallion's frame. -->
+  <circle cx="256" cy="256" r="232" fill="none" stroke="#33281c" stroke-width="5"/>
+  <circle cx="256" cy="256" r="244" fill="none" stroke="#33281c" stroke-width="9"/>
+  <circle cx="256" cy="256" r="238" fill="none" stroke="#ece0c0" stroke-width="3"/>
+</svg>

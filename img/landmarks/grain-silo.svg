@@ -1,0 +1,161 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- An abandoned grain silo on the plains: corrugated steel bins streaked with rust, one torn
+       open with its grain spilled, an elevator tower with a dead red lamp, a trailer left to rot. -->
+  <defs>
+    <clipPath id="disc"><circle cx="256" cy="256" r="232"/></clipPath>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cdb98c"/>
+      <stop offset="0.45" stop-color="#e6d7b0"/>
+      <stop offset="0.7" stop-color="#f3e9cc"/>
+    </linearGradient>
+    <linearGradient id="field" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d4bf86"/>
+      <stop offset="1" stop-color="#b89c5e"/>
+    </linearGradient>
+    <!-- Rounded steel: lit on the left, in shade on the right. -->
+    <linearGradient id="steel" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#b3ad9f"/>
+      <stop offset="0.35" stop-color="#cdc6b4"/>
+      <stop offset="1" stop-color="#7f796d"/>
+    </linearGradient>
+    <linearGradient id="steel-far" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#a39d90"/>
+      <stop offset="0.35" stop-color="#b9b2a2"/>
+      <stop offset="1" stop-color="#746f64"/>
+    </linearGradient>
+    <linearGradient id="cone" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#a39d90"/>
+      <stop offset="0.4" stop-color="#bdb6a6"/>
+      <stop offset="1" stop-color="#6e695f"/>
+    </linearGradient>
+    <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <path d="M0 0v7" stroke="#33281c" stroke-width="1.6" opacity="0.55"/>
+    </pattern>
+    <pattern id="hatch-sky" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-20)">
+      <path d="M0 0v8" stroke="#6a5842" stroke-width="1.4" opacity="0.45"/>
+    </pattern>
+  </defs>
+
+  <g clip-path="url(#disc)">
+    <!-- Heavy sky. -->
+    <rect width="512" height="512" fill="url(#sky)"/>
+    <g stroke="#6a5842" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M24 120c10-22 36-28 52-14 10-24 46-28 60-6 18-12 44-4 48 16 14 0 24 10 22 22H24z" fill="#eadcb6"/>
+      <path d="M24 128h182v12H24z" fill="url(#hatch-sky)" stroke="none"/>
+      <path d="M380 150c6-12 22-16 32-8 8-12 28-12 36 0 12-4 24 4 24 14H380z" fill="#efe3c2"/>
+    </g>
+    <!-- Crows circling. -->
+    <path d="M330 92q7-7 14 0q7-7 14 0M372 120q5-5 10 0q5-5 10 0M352 70q5-5 10 0q5-5 10 0" fill="none" stroke="#33281c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Distant hills and a tree line. -->
+    <path d="M0 330c50-20 100-24 150-14s80 2 120-6 90-10 130 2 80 12 112 6V512H0z" fill="#a9ab7c"/>
+    <path d="M0 330c50-20 100-24 150-14s80 2 120-6 90-10 130 2 80 12 112 6" fill="none" stroke="#6a5842" stroke-width="2.5"/>
+    <g fill="#6f7f45" stroke="#33281c" stroke-width="2.2" stroke-linejoin="round">
+      <path d="M420 330c4-16 10-24 16-24s10 10 12 24z"/>
+      <path d="M444 332c3-12 8-18 13-18s9 8 10 18z"/>
+      <path d="M466 334c4-14 9-20 14-20s9 9 10 20z"/>
+      <path d="M30 322c3-12 7-18 12-18s9 8 10 18z"/>
+      <path d="M50 320c4-15 9-22 14-22s10 9 11 22z"/>
+    </g>
+
+    <!-- Dry field. -->
+    <path d="M0 368c80-14 170-16 256-12s180 2 256-6V512H0z" fill="url(#field)"/>
+    <path d="M0 368c80-14 170-16 256-12s180 2 256-6" fill="none" stroke="#6a5842" stroke-width="2.5"/>
+    <g stroke="#8a7348" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.8">
+      <path d="M40 366-60 520M100 362 30 520M420 356 500 520M470 354 580 520"/>
+    </g>
+    <path d="M0 430c90-10 200-12 300-6s150 2 212-6V512H0z" fill="#33281c" opacity="0.06"/>
+
+    <!-- Shadow of the silos. -->
+    <path d="M96 382H420l40 16H130z" fill="#33281c" opacity="0.22"/>
+
+    <!-- A low machine shed on the left, its sliding door off the track. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M40 384V316h114v68z" fill="#b9b2a2" stroke-width="3.5"/>
+      <path d="M34 318 98 290 160 318z" fill="#8a8377" stroke-width="3.5"/>
+      <path d="M98 290 160 318" stroke-width="3.5"/>
+      <path d="M54 330V384M68 326V384M82 322V384M128 322V384M142 326V384" stroke-width="1.4" opacity="0.55"/>
+      <path d="M86 384V336h34v48z" fill="#2a2016" stroke-width="3"/>
+      <path d="M100 336l30 6v44l-30-4z" fill="#a39d90" stroke-width="2.8"/>
+      <path d="M84 332h48" stroke-width="2.5"/>
+      <path d="M110 300l14 6-4 8-14-6z" fill="#2a2016" stroke-width="2"/>
+    </g>
+
+    <!-- The far bin on the right. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M318 196V376q46 12 92 0V196z" fill="url(#steel-far)" stroke-width="3.5"/>
+      <path d="M318 196l46-40 46 40q-46 12-92 0z" fill="url(#cone)" stroke-width="3.5"/>
+      <path d="M318 222q46 12 92 0M318 248q46 12 92 0M318 274q46 12 92 0M318 300q46 12 92 0M318 326q46 12 92 0M318 352q46 12 92 0" fill="none" stroke-width="1.5" opacity="0.6"/>
+      <path d="M380 210v60M394 206v40M372 290v50" stroke="#82301c" stroke-width="4" opacity="0.35"/>
+    </g>
+
+    <!-- The elevator tower: a tall shaft, the head house on top, a gallery over to the main bin. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M156 380V120h40V380z" fill="#a39d90" stroke-width="3.5"/>
+      <path d="M178 120h18V380h-18z" fill="url(#hatch)" stroke="none"/>
+      <path d="M156 150h40M156 186h40M156 222h40M156 258h40M156 294h40M156 330h40M156 366h40" stroke-width="1.5" opacity="0.6"/>
+      <!-- Head house. -->
+      <path d="M144 120V84h66v36z" fill="#b9b2a2" stroke-width="3.5"/>
+      <path d="M188 84h22v36h-22z" fill="url(#hatch)" stroke="none"/>
+      <path d="M138 86 177 66 216 86z" fill="#746f64" stroke-width="3"/>
+      <path d="M154 94h14v14h-14z" fill="#2a2016" stroke-width="2.5"/>
+      <!-- The dead red warning lamp on the roof. -->
+      <path d="M177 66V56" stroke-width="2.5"/>
+      <path d="M171 56a6 6 0 0 1 12 0z" fill="#b4432b" stroke="#5a1e10" stroke-width="2.2"/>
+      <!-- The gallery over to the main bin, its end broken off. -->
+      <path d="M210 98 240 88" stroke-width="10"/>
+      <path d="M210 98 240 88" stroke="#8a8377" stroke-width="5"/>
+      <path d="M240 88l6-6M240 88l8 2" stroke-width="2"/>
+      <!-- A ladder up the shaft, its lower rungs gone. -->
+      <path d="M148 380V128M154 380V128" stroke-width="1.8"/>
+      <path d="M148 140h6M148 154h6M148 168h6M148 182h6M148 196h6M148 210h6M148 224h6M148 238h6M148 252h6M148 266h6" stroke-width="1.8"/>
+    </g>
+
+    <!-- The main bin, tallest, with a tear in its side. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M190 132V384q62 16 124 0V132z" fill="url(#steel)" stroke-width="3.5"/>
+      <path d="M190 132l62-56 62 56q-62 16-124 0z" fill="url(#cone)" stroke-width="3.5"/>
+      <path d="M252 76v-8M244 68h16" stroke-width="3"/>
+      <path d="M220 104l32-28 4 4-30 30z" fill="url(#hatch)" stroke="none"/>
+      <path d="M190 162q62 16 124 0M190 192q62 16 124 0M190 222q62 16 124 0M190 252q62 16 124 0M190 282q62 16 124 0M190 312q62 16 124 0M190 342q62 16 124 0" fill="none" stroke-width="1.6" opacity="0.6"/>
+      <!-- Rust running down from the seams. -->
+      <path d="M210 140v80M232 146v40M290 144v110M300 260v70M222 250v60" stroke="#82301c" stroke-width="5" opacity="0.3"/>
+      <!-- The ladder with its safety cage. -->
+      <path d="M282 384V140M294 384V138" stroke-width="2"/>
+      <path d="M282 156h12M282 172h12M282 188h12M282 204h12M282 220h12M282 236h12M282 252h12M282 268h12" stroke-width="1.8"/>
+      <path d="M278 150q10-10 20 0M278 180q10-10 20 0M278 210q10-10 20 0M278 240q10-10 20 0" fill="none" stroke-width="1.8"/>
+      <path d="M298 240l12 30" stroke-width="1.8"/>
+      <!-- The tear, peeled steel around a dark hole. -->
+      <path d="M210 262l16-14 20 6 14-8 6 22-10 18 6 22-20 10-18-8-16 4z" fill="#2a2016" stroke-width="3"/>
+      <path d="M226 248l-8-18 16 10zM266 268l16-6-6 14zM248 320l4 16-14-8z" fill="#cdc6b4" stroke-width="2.2"/>
+      <!-- Grain pouring out into a heap at the foot of the bin. -->
+      <path d="M222 312c-6 24-12 44-14 64M236 316c0 22-2 42 0 60" fill="none" stroke="#c9a35a" stroke-width="7"/>
+      <path d="M176 396c14-24 34-34 54-34s38 12 56 34z" fill="#c9a35a" stroke-width="3"/>
+      <path d="M196 384h.01M214 376h.01M236 372h.01M256 384h.01M226 390h.01M204 392h.01" stroke-width="3"/>
+    </g>
+
+    <!-- A grain trailer left in the field, a wheel off. -->
+    <g transform="translate(390 432) rotate(-4)" stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M-74-40h112l-6 36h-100z" fill="#8b6a42" stroke-width="3.5"/>
+      <path d="M-74-40h112l-6 36h-100z" fill="url(#hatch)" stroke="none" opacity="0.6"/>
+      <path d="M-72-28h108M-70-16h104" stroke-width="1.8" opacity="0.7"/>
+      <path d="M-68-4-74 14" stroke-width="3.5"/>
+      <path d="M38-24h24l-4 6h-20" fill="none" stroke-width="3"/>
+      <circle cx="-30" cy="8" r="13" fill="#2a2016" stroke-width="3"/>
+      <circle cx="-30" cy="8" r="4" fill="#6b5240" stroke-width="1.6"/>
+    </g>
+
+    <!-- Tall dry grass. -->
+    <g fill="none" stroke="#5c6a2c" stroke-width="2.6" stroke-linecap="round">
+      <path d="M96 450c4-20 8-32 16-44M106 454c2-18 2-30-2-44M118 452c4-14 10-24 18-30"/>
+      <path d="M160 490c2-16 6-26 12-34M170 492c0-14-2-24-8-32M180 490c4-12 8-20 16-24"/>
+      <path d="M290 486c3-14 8-22 14-28M300 488c0-12-2-20-6-26M310 486c4-10 8-16 14-18"/>
+      <path d="M318 396c2-10 4-16 8-20M412 386c2-8 6-14 10-16M130 392c2-10 4-16 8-18M300 400c2-8 4-12 8-14"/>
+    </g>
+  </g>
+
+  <!-- The medallion's frame. -->
+  <circle cx="256" cy="256" r="232" fill="none" stroke="#33281c" stroke-width="5"/>
+  <circle cx="256" cy="256" r="244" fill="none" stroke="#33281c" stroke-width="9"/>
+  <circle cx="256" cy="256" r="238" fill="none" stroke="#ece0c0" stroke-width="3"/>
+</svg>

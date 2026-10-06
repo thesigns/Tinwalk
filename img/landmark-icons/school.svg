@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <!-- Map badge: a long, low school block with ribbon windows and a clock over the entrance. -->
+  <defs>
+    <clipPath id="inside"><circle cx="48" cy="48" r="42"/></clipPath>
+  </defs>
+
+  <circle cx="48" cy="48" r="45" fill="#ece0c0"/>
+  <g clip-path="url(#inside)">
+    <path d="M0 73H96V96H0z" fill="#a39d90"/>
+    <path d="M0 73H96" stroke="#33281c" stroke-width="2.4"/>
+  </g>
+
+  <!-- The long wings. -->
+  <path d="M12 45h72v28H12z" fill="#d6c49a" stroke="#33281c" stroke-width="2.8" stroke-linejoin="round"/>
+  <!-- Ribbon windows split by mullions. -->
+  <path d="M16 50h21v6H16zM59 50h21v6H59zM16 62h21v6H16zM59 62h21v6H59z" fill="#33281c"/>
+  <path d="M23 50v6M30 50v6M66 50v6M73 50v6M23 62v6M30 62v6M66 62v6M73 62v6" stroke="#d6c49a" stroke-width="1.6"/>
+
+  <!-- The entrance block rising in the middle, with the clock and the door. -->
+  <g stroke="#33281c" stroke-width="2.8" stroke-linejoin="round">
+    <path d="M38 28h20v45H38z" fill="#cbc2ad"/>
+    <circle cx="48" cy="40" r="7" fill="#f6ecd6"/>
+  </g>
+  <path d="M48 40v-4.5M48 40h3.5" stroke="#33281c" stroke-width="2" stroke-linecap="round"/>
+  <path d="M43 60h10v13H43z" fill="#33281c"/>
+
+  <circle cx="48" cy="48" r="45" fill="none" stroke="#33281c" stroke-width="4"/>
+</svg>

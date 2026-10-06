@@ -1,0 +1,151 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- A concrete bunker half sunk in the forest floor: a dark firing slit, a rusted door ajar,
+       a spruce growing from its earth-covered roof, barbed wire and a red arrow left by survivors. -->
+  <defs>
+    <clipPath id="disc"><circle cx="256" cy="256" r="232"/></clipPath>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cdb98c"/>
+      <stop offset="0.45" stop-color="#e6d7b0"/>
+      <stop offset="0.7" stop-color="#f3e9cc"/>
+    </linearGradient>
+    <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8f8a5c"/>
+      <stop offset="1" stop-color="#6f6a44"/>
+    </linearGradient>
+    <linearGradient id="concrete" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#c2baa6"/>
+      <stop offset="1" stop-color="#aaa18c"/>
+    </linearGradient>
+    <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <path d="M0 0v7" stroke="#33281c" stroke-width="1.6" opacity="0.55"/>
+    </pattern>
+    <pattern id="hatch-sky" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-20)">
+      <path d="M0 0v8" stroke="#6a5842" stroke-width="1.4" opacity="0.45"/>
+    </pattern>
+    <!-- A spruce 100 tall, standing on its origin. -->
+    <g id="spruce" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M-3 0V-14h6V0z" fill="#5e4428" stroke="#33281c" stroke-width="2" vector-effect="non-scaling-stroke"/>
+      <path d="M0-100-9-80h4l-11 22h5L-25-32h6L-34-10H34L19-32h6L11-58h5L5-80h4z" stroke="#33281c" stroke-width="2.5" vector-effect="non-scaling-stroke"/>
+    </g>
+  </defs>
+
+  <g clip-path="url(#disc)">
+    <rect width="512" height="512" fill="url(#sky)"/>
+    <g stroke="#6a5842" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M40 104c10-22 36-28 52-14 10-24 46-28 60-6 18-12 44-4 48 16 14 0 24 10 22 22H40z" fill="#eadcb6"/>
+      <path d="M40 112h182v12H40z" fill="url(#hatch-sky)" stroke="none"/>
+    </g>
+    <path d="M300 116q6-6 12 0q6-6 12 0M334 100q5-5 10 0q5-5 10 0" fill="none" stroke="#33281c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Ground under the trees, deep in shade. -->
+    <path d="M0 270H512V360H0z" fill="#7d7d55"/>
+    <!-- Far forest. -->
+    <g fill="#979a6c">
+      <use href="#spruce" transform="translate(16 280) scale(1.6)"/>
+      <use href="#spruce" transform="translate(70 276) scale(2.0)"/>
+      <use href="#spruce" transform="translate(130 280) scale(1.4)"/>
+      <use href="#spruce" transform="translate(186 276) scale(1.8)"/>
+      <use href="#spruce" transform="translate(300 278) scale(1.5)"/>
+      <use href="#spruce" transform="translate(360 276) scale(2.1)"/>
+      <use href="#spruce" transform="translate(420 280) scale(1.6)"/>
+      <use href="#spruce" transform="translate(480 278) scale(1.9)"/>
+    </g>
+    <!-- Near forest. -->
+    <g fill="#6f7f45">
+      <use href="#spruce" transform="translate(30 320) scale(2.4)"/>
+      <use href="#spruce" transform="translate(100 316) scale(1.7)"/>
+      <use href="#spruce" transform="translate(424 316) scale(1.8)"/>
+      <use href="#spruce" transform="translate(486 322) scale(2.5)"/>
+    </g>
+
+    <!-- Forest floor. -->
+    <path d="M0 330c80-8 170-10 256-6s180 2 256-4V512H0z" fill="url(#floor)"/>
+    <path d="M0 430c90-8 200-10 300-4s150 2 212-4V512H0z" fill="#33281c" opacity="0.1"/>
+
+    <!-- The earth mound the bunker is sunk into. -->
+    <path d="M40 360c10-50 40-90 90-108 50-18 190-22 240-8 50 14 90 50 104 116z" fill="#7f7a4e" stroke="#33281c" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M60 340c20-30 40-50 70-60M400 290c20 14 34 34 40 60" fill="none" stroke="#5c6a2c" stroke-width="2.4" stroke-linecap="round"/>
+
+    <!-- The bunker, scaled up from its base to fill the frame. -->
+    <g transform="translate(265 368) scale(1.1) translate(-265 -368)">
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <!-- Side wall, in shade. -->
+      <path d="M340 262 412 276 414 344 346 366z" fill="#8c846f" stroke-width="3.5"/>
+      <path d="M340 262 412 276 414 344 346 366z" fill="url(#hatch)" stroke="none"/>
+      <!-- The rusted door, ajar. -->
+      <path d="M356 290 396 298V350L358 360z" fill="#1f1810" stroke-width="3"/>
+      <path d="M356 290l-16 10 2 58 16 2z" fill="#8a5a3a" stroke-width="3"/>
+      <path d="M346 306h.01M346 320h.01M347 334h.01M347 348h.01" stroke-width="3.5"/>
+      <path d="M344 300l8 50" stroke="#5a3a24" stroke-width="2"/>
+      <path d="M352 362l46-10 6 8-50 10z" fill="#a39d90" stroke-width="2.5"/>
+
+      <!-- Front wall of concrete. -->
+      <path d="M124 270 340 262 346 366 116 374z" fill="url(#concrete)" stroke-width="3.5"/>
+      <!-- Board marks left by the formwork. -->
+      <path d="M122 296 342 288M121 322l222-8M119 348l225-8" stroke-width="1.4" opacity="0.4"/>
+      <!-- Rust stains running down from the slit. -->
+      <path d="M180 312v26M196 312l-2 18M262 310v34M280 310l2 20" stroke="#8a5a3a" stroke-width="3" opacity="0.6"/>
+      <!-- The firing slit, chamfered. -->
+      <path d="M156 286 310 280 300 312 166 316z" fill="#8c846f" stroke-width="3"/>
+      <path d="M172 292 294 288 288 306 178 308z" fill="#1f1810" stroke-width="3"/>
+      <!-- A gun barrel's rusted stump in the slit. -->
+      <path d="M226 298l-24 6" stroke="#5a3a24" stroke-width="5"/>
+      <!-- Chipped corner with bent rebar. -->
+      <path d="M116 374l2-30 12 8 6-14 10 12-4 26z" fill="#8c846f" stroke-width="2.5"/>
+      <path d="M124 350l-8-12M134 346l-2-14" stroke="#5a3a24" stroke-width="2"/>
+      <!-- Cracks. -->
+      <path d="M318 264l-8 20 6 10-10 18M240 330l10 14-6 12 8 10" fill="none" stroke-width="2"/>
+      <!-- The red arrow survivors painted toward the door. -->
+      <path d="M262 334h40v-8l18 14-18 14v-8h-40z" fill="#b4432b" stroke="#82301c" stroke-width="2"/>
+
+      <!-- The thick roof slab, its edge showing under the earth. -->
+      <path d="M112 274 120 252 344 242 342 264 124 272z" fill="#b5ad98" stroke-width="3.5"/>
+      <path d="M344 242 418 258 412 276 340 262z" fill="#8c846f" stroke-width="3.5"/>
+      <path d="M344 242 418 258 412 276 340 262z" fill="url(#hatch)" stroke="none"/>
+      <!-- Earth and moss heaped over the roof. -->
+      <path d="M108 256c14-20 40-26 64-22 20-14 50-14 70-6 24-12 60-12 84 0 24-4 56 2 72 14 14 6 24 10 26 18-30-4-56-8-80-12l-222 10z" fill="#6f7f45" stroke-width="3"/>
+      <path d="M150 244c6-6 14-8 22-6M280 236c8-4 18-4 26 0M380 252c6-2 12 0 16 4" fill="none" stroke="#3f5a22" stroke-width="2.4"/>
+    </g>
+    <!-- A young spruce growing out of the roof. -->
+    <g fill="#5c6a2c">
+      <use href="#spruce" transform="translate(234 240) scale(1.25)"/>
+    </g>
+    </g>
+    <!-- Grass along the foot of the wall. -->
+    <path d="M128 372c2-10 4-16 8-20M136 374c0-8-2-14-6-18M200 370c2-12 6-18 10-22M210 372c0-10-2-16-6-22M300 368c2-10 6-16 10-20M330 366c0-10-2-16-6-20" fill="none" stroke="#3f5a22" stroke-width="2.6" stroke-linecap="round"/>
+
+    <!-- Barbed wire on crossed stakes in the foreground. -->
+    <g stroke="#33281c" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M92 452 120 398M90 400l32 50M240 466l26-58M236 408l32 54M388 448l24-52M384 398l32 48" stroke="#7a5c3a" stroke-width="6"/>
+      <path d="M92 452 120 398M90 400l32 50M240 466l26-58M236 408l32 54M388 448l24-52M384 398l32 48" stroke-width="1.6" opacity="0.6"/>
+      <path d="M100 424c40 14 70 22 150 10s110-20 154-12" stroke="#5f594f" stroke-width="2"/>
+      <path d="M100 440c40 6 90 16 150 4s110-12 154-18" stroke="#5f594f" stroke-width="2"/>
+      <!-- Barbs. -->
+      <path d="M140 434l4 6M144 434l-4 6M186 438l4 6M190 438l-4 6M300 426l4 6M304 426l-4 6M346 420l4 6M350 420l-4 6" stroke-width="2"/>
+      <path d="M160 446l4 6M164 446l-4 6M210 446l4 6M214 446l-4 6M310 436l4 6M314 436l-4 6M360 430l4 6M364 430l-4 6" stroke-width="2"/>
+      <!-- A broken strand hanging loose. -->
+      <path d="M404 422c12 8 18 22 16 38" stroke="#5f594f" stroke-width="2"/>
+    </g>
+
+    <!-- A rusted helmet in the leaves. -->
+    <g stroke="#33281c" stroke-width="3" stroke-linejoin="round" transform="translate(10 -16)">
+      <path d="M150 486c0-22 16-34 34-34s34 12 34 34z" fill="#6b6a4a"/>
+      <path d="M144 486h80" stroke-width="4"/>
+      <path d="M168 466c4-6 10-8 16-8" fill="none" stroke="#a39d90" stroke-width="2"/>
+      <path d="M196 470h.01M178 476h.01" stroke="#8a5a3a" stroke-width="5"/>
+    </g>
+
+    <!-- Ferns. -->
+    <g fill="none" stroke="#3f5a22" stroke-width="3" stroke-linecap="round">
+      <path d="M20 400c10-16 24-24 40-26M30 392l-4-10M40 386l-2-10M50 380l2-8"/>
+      <path d="M300 492c10-16 24-24 40-26M310 484l-4-10M320 478l-2-10M330 472l2-8M300 492c-6-14-16-22-30-24M290 482l2-10"/>
+      <path d="M470 400c-10-16-24-24-40-26M460 392l4-10M450 386l2-10"/>
+      <path d="M90 500c2-14 6-24 12-30M102 500c0-14-2-22-6-30M400 490c4-14 10-22 18-28M412 492c0-14-2-22-8-30"/>
+    </g>
+  </g>
+
+  <!-- The medallion's frame. -->
+  <circle cx="256" cy="256" r="232" fill="none" stroke="#33281c" stroke-width="5"/>
+  <circle cx="256" cy="256" r="244" fill="none" stroke="#33281c" stroke-width="9"/>
+  <circle cx="256" cy="256" r="238" fill="none" stroke="#ece0c0" stroke-width="3"/>
+</svg>

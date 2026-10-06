@@ -33,11 +33,11 @@ Rodzaj landmarku jest losowany z listy dla biomu w miejscu odkrycia, z równymi 
 | Bus Wreck       | Bunker         | Water Tower    |
 | Roadside Shrine | Plane Wreck    | Church         |
 
-Każdy rodzaj ma własną ikonę.
+Każdy rodzaj ma własną ikonę w interfejsie, własną odznakę na mapie i własną dużą ilustrację. Ilustracje (`img/landmarks/`) czekają na ekran landmarku i na razie nie są nigdzie pokazywane.
 
 ### Na mapie
 
-- Landmark jest na mapie małą ikoną swojego rodzaju, bez nazwy, żeby nie zaśmiecać mapy.
+- Landmark jest na mapie okrągłą odznaką swojego rodzaju (uproszczony, czytelny rysunek na papierowym krążku, z paskiem gruntu w kolorze biomu), bez nazwy, żeby nie zaśmiecać mapy. Odznaka ma stały rozmiar przy każdym zbliżeniu.
 - Po odkryciu, za komunikatem o zasobach, aplikacja pokazuje komunikat, np. „You've discovered an Abandoned Mine”, a ikona zostaje wbita w mapę krótką animacją.
 - Sam landmark nic nie daje. Odkrycie jest nagrodą samą w sobie, a landmark jest celem misji ratunkowych.
 

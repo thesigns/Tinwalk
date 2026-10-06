@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <!-- Map badge: a gas station canopy on two posts over a pair of pumps. -->
+  <defs>
+    <clipPath id="inside"><circle cx="48" cy="48" r="42"/></clipPath>
+  </defs>
+
+  <circle cx="48" cy="48" r="45" fill="#ece0c0"/>
+  <g clip-path="url(#inside)">
+    <path d="M0 73H96V96H0z" fill="#a39d90"/>
+    <path d="M0 73H96" stroke="#33281c" stroke-width="2.4"/>
+  </g>
+
+  <!-- Posts holding the canopy. -->
+  <g stroke="#33281c" stroke-width="2.8" stroke-linejoin="round">
+    <path d="M22 37h6v36h-6zM68 37h6v36h-6z" fill="#8f877a"/>
+  </g>
+
+  <!-- Pumps, each with its dark display. -->
+  <g stroke="#33281c" stroke-width="2.8" stroke-linejoin="round">
+    <path d="M34 48h11v25H34zM51 48h11v25H51z" fill="#cbc2ad"/>
+    <path d="M32 72h32v3H32z" fill="#8f877a" stroke-width="2"/>
+  </g>
+  <path d="M36.5 52h6v6h-6zM53.5 52h6v6h-6z" fill="#33281c"/>
+  <path d="M62 56c6 0 6 6 3 10" fill="none" stroke="#33281c" stroke-width="2.4" stroke-linecap="round"/>
+
+  <!-- The canopy, its fascia striped red. -->
+  <g stroke="#33281c" stroke-width="2.8" stroke-linejoin="round">
+    <path d="M14 26h68v11H14z" fill="#f6ecd6"/>
+    <path d="M14 31h68v6H14z" fill="#b4432b"/>
+  </g>
+
+  <circle cx="48" cy="48" r="45" fill="none" stroke="#33281c" stroke-width="4"/>
+</svg>

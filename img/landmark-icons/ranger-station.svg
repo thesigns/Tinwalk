@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <!-- Map badge: a forester's log lodge among spruces. -->
+  <defs>
+    <clipPath id="inside"><circle cx="48" cy="48" r="42"/></clipPath>
+  </defs>
+
+  <circle cx="48" cy="48" r="45" fill="#ece0c0"/>
+  <g clip-path="url(#inside)">
+    <!-- Spruces behind the lodge. -->
+    <g fill="#5c6a2c" stroke="#33281c" stroke-width="2.4" stroke-linejoin="round">
+      <path d="M14 66 24 24l10 42z"/>
+      <path d="M64 66 76 22l12 44z"/>
+    </g>
+    <path d="M0 74H96V96H0z" fill="#6f7f45"/>
+    <path d="M0 74H96" stroke="#33281c" stroke-width="2.4"/>
+  </g>
+
+  <!-- Chimney. -->
+  <path d="M58 26h6v12h-6z" fill="#a39d90" stroke="#33281c" stroke-width="2.6" stroke-linejoin="round"/>
+
+  <!-- The lodge: the gable end in front, the long side in shade. -->
+  <g stroke="#33281c" stroke-width="2.8" stroke-linejoin="round">
+    <path d="M48 48h26v26H48z" fill="#7a5c3a"/>
+    <path d="M22 48h26v26H22z" fill="#a8814f"/>
+    <path d="M18 50 35 30 52 50z" fill="#a8814f"/>
+    <path d="M35 30 62 30 78 50 52 50z" fill="#6b4f30"/>
+    <path d="M18 50 35 30 52 50" fill="none"/>
+  </g>
+  <!-- Log courses, window and door. -->
+  <path d="M22 56h26M22 64h26" stroke="#33281c" stroke-width="1.6"/>
+  <g fill="#33281c">
+    <path d="M31 40h8v7h-8z"/>
+    <path d="M54 56h7v8h-7zM65 56h6v8h-6z"/>
+    <path d="M30 60h10v14H30z"/>
+  </g>
+
+  <circle cx="48" cy="48" r="45" fill="none" stroke="#33281c" stroke-width="4"/>
+</svg>

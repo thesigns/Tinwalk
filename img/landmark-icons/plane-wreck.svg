@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <!-- Map badge: a small plane crashed nose first into the forest floor, its tail in the air. -->
+  <defs>
+    <clipPath id="inside"><circle cx="48" cy="48" r="42"/></clipPath>
+  </defs>
+
+  <circle cx="48" cy="48" r="45" fill="#ece0c0"/>
+  <g clip-path="url(#inside)">
+    <path d="M10 68 20 30l10 38z" fill="#5c6a2c" stroke="#33281c" stroke-width="2.4" stroke-linejoin="round"/>
+    <path d="M0 74H96V96H0z" fill="#6f7f45"/>
+    <path d="M0 74H96" stroke="#33281c" stroke-width="2.4"/>
+  </g>
+
+  <!-- The plane, tilted nose down. -->
+  <g transform="translate(24 68) rotate(-30)" stroke="#33281c" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Far wing, reaching back behind the fuselage. -->
+    <path d="M19 -9h9l14 -27h-8z" fill="#cbc2ad"/>
+    <!-- Far tailplane. -->
+    <path d="M56 -6h6l6 -11h-5z" fill="#cbc2ad"/>
+    <!-- Fuselage. -->
+    <path d="M0 -5Q2 -11 12 -11L58 -7 66 -7 64 1 14 5Q2 5 0 1z" fill="#e6dfcc"/>
+    <!-- Tail fin with a red stripe. -->
+    <path d="M54 -7 60 -26h7l-1 19z" fill="#e6dfcc"/>
+    <path d="M59.5 -20.5h7" stroke="#b4432b" stroke-width="3.6" stroke-linecap="butt"/>
+    <path d="M60 -26h7" stroke-width="2.6"/>
+    <!-- Cabin window. -->
+    <path d="M10 -9h12v5H9z" fill="#33281c" stroke-width="1.4"/>
+    <!-- Near wing and tailplane, swept toward the viewer. -->
+    <path d="M19 -3h9l-8 25h-8z" fill="#d8cfb8"/>
+    <path d="M57 -1h6l-3 10h-5z" fill="#d8cfb8"/>
+    <!-- Propeller. -->
+    <path d="M-2 -14V8" stroke-width="3"/>
+  </g>
+  <!-- The heap of earth thrown up at the nose. -->
+  <path d="M10 74Q16 62 30 66T42 74z" fill="#8b6a42" stroke="#33281c" stroke-width="2.6" stroke-linejoin="round"/>
+
+  <circle cx="48" cy="48" r="45" fill="none" stroke="#33281c" stroke-width="4"/>
+</svg>

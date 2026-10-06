@@ -1,0 +1,179 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- An abandoned PRL-era school: a three-storey block with ribbon windows, a stopped clock
+       over the entrance, a schoolyard with a bent hoop, climbing ladders and a lost red ball. -->
+  <defs>
+    <clipPath id="disc"><circle cx="256" cy="256" r="232"/></clipPath>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cdb98c"/>
+      <stop offset="0.45" stop-color="#e6d7b0"/>
+      <stop offset="0.7" stop-color="#f3e9cc"/>
+    </linearGradient>
+    <linearGradient id="yard" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a59e90"/>
+      <stop offset="1" stop-color="#8d867a"/>
+    </linearGradient>
+    <linearGradient id="facade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d3c7aa"/>
+      <stop offset="1" stop-color="#bcae8e"/>
+    </linearGradient>
+    <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <path d="M0 0v7" stroke="#33281c" stroke-width="1.6" opacity="0.55"/>
+    </pattern>
+    <pattern id="hatch-sky" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-20)">
+      <path d="M0 0v8" stroke="#6a5842" stroke-width="1.4" opacity="0.45"/>
+    </pattern>
+    <!-- Window kinds, 38 by 36, drawn from their top-left corner. -->
+    <g id="window-glass" stroke="#33281c" stroke-linejoin="round">
+      <path d="M0 0h38v36H0z" fill="#aab4ae" stroke-width="2.5"/>
+      <path d="M4 30 16 6M12 32 26 4" stroke="#d8dcd2" stroke-width="2"/>
+      <path d="M13 0v36M25 0v36M0 12h38" stroke="#5f594f" stroke-width="2"/>
+    </g>
+    <g id="window-broken" stroke="#33281c" stroke-linejoin="round">
+      <path d="M0 0h38v36H0z" fill="#2a2016" stroke-width="2.5"/>
+      <path d="M0 0h38v10l-8-6-6 10-6-8-8 8-10-6z" fill="#aab4ae" stroke-width="1.6"/>
+      <path d="M13 0v36M25 0v36M0 12h38" stroke="#5f594f" stroke-width="2"/>
+    </g>
+    <g id="window-boarded" stroke="#33281c" stroke-linejoin="round">
+      <path d="M0 0h38v36H0z" fill="#2a2016" stroke-width="2.5"/>
+      <path d="M-2 4 40 1v8L-2 12zM-2 16l42 3v8l-42-3zM-2 30l42-3v8l-42 2z" fill="#a07a4c" stroke-width="2"/>
+    </g>
+  </defs>
+
+  <g clip-path="url(#disc)">
+    <rect width="512" height="512" fill="url(#sky)"/>
+    <g stroke="#6a5842" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M300 74c8-18 30-24 44-12 10-20 40-22 52-4 16-8 36 2 38 18 12 0 20 8 18 18H300z" fill="#eadcb6"/>
+      <path d="M300 84h152v10H300z" fill="url(#hatch-sky)" stroke="none"/>
+      <path d="M130 92c6-14 22-18 32-10 8-14 30-14 38 0 12-6 26 2 26 14 10 0 16 6 14 14H130z" fill="#eadcb6"/>
+      <path d="M130 100h110v10H130z" fill="url(#hatch-sky)" stroke="none"/>
+    </g>
+    <path d="M134 132q5-5 10 0q5-5 10 0M330 140q5-5 10 0q5-5 10 0" fill="none" stroke="#33281c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Ruined blocks in the distance. -->
+    <g fill="#b9b2a2" stroke="#6a5842" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M420 330V206h24l6 10 8-8h54V330z"/>
+    </g>
+    <g fill="#8a8377">
+      <path d="M432 222h10v12h-10zM470 222h10v12h-10zM450 246h10v12h-10zM432 270h10v12h-10zM470 270h10v12h-10zM450 294h10v12h-10z"/>
+    </g>
+
+    <!-- The schoolyard: concrete slabs, weeds and a faded hopscotch. -->
+    <path d="M0 330H512V512H0z" fill="url(#yard)"/>
+    <path d="M0 330H512" stroke="#33281c" stroke-width="2.5"/>
+    <g stroke="#5f594f" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.8">
+      <path d="M0 380H512M0 440H512M80 330 40 512M180 330l-20 182M290 330l10 182M400 330l40 182"/>
+    </g>
+    <g fill="none" stroke="#ece0c0" stroke-width="3" opacity="0.55" stroke-linejoin="round">
+      <path d="M262 476l50 0 0-26-50 0zM278 450l22 0 0-22-22 0zM268 428l20 0 0-20-20 0zM288 428l20 0 0-20-20 0zM276 408l22 0 0-18-22 0z"/>
+    </g>
+
+    <!-- Shadow of the school. -->
+    <path d="M64 334H430l40 16H100z" fill="#33281c" opacity="0.22"/>
+
+    <!-- The school block, seen three-quarter. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <!-- Side wall, in shade. -->
+      <path d="M364 150 430 166V318L364 334z" fill="#a1957a" stroke-width="3.5"/>
+      <path d="M364 150 430 166V318L364 334z" fill="url(#hatch)" stroke="none"/>
+      <path d="M376 172l40 9v26l-40-6zM376 230l40 5v26l-40-3zM376 290l40 1v20l-40 2z" fill="#2a2016" stroke-width="2.5"/>
+      <!-- Front wall. -->
+      <path d="M64 150H364V334H64z" fill="url(#facade)" stroke-width="3.5"/>
+      <path d="M64 210H364M64 272H364" stroke-width="2.4"/>
+      <path d="M64 204H364M64 266H364" stroke-width="1.4" opacity="0.5"/>
+      <!-- Roof edge. -->
+      <path d="M58 140H368v12H58z" fill="#a39d90" stroke-width="3"/>
+      <path d="M368 140l66 18v10l-66-16z" fill="#8a8377" stroke-width="3"/>
+      <!-- Rust stains and a crack. -->
+      <path d="M120 152c2 16-2 30 2 44M306 214c-2 14 2 26 0 40" fill="none" stroke="#6a5842" stroke-width="2" opacity="0.5"/>
+      <path d="M330 152l-8 20 10 14-8 22 6 16-10 18" fill="none" stroke-width="2"/>
+    </g>
+    <!-- Ribbon windows. -->
+    <use href="#window-glass" x="76" y="164"/>
+    <use href="#window-broken" x="120" y="164"/>
+    <use href="#window-glass" x="164" y="164"/>
+    <use href="#window-broken" x="250" y="164"/>
+    <use href="#window-glass" x="294" y="164"/>
+    <use href="#window-broken" x="76" y="226"/>
+    <use href="#window-boarded" x="120" y="226"/>
+    <use href="#window-glass" x="164" y="226"/>
+    <use href="#window-broken" x="250" y="226"/>
+    <use href="#window-broken" x="294" y="226"/>
+    <use href="#window-boarded" x="76" y="286"/>
+    <use href="#window-broken" x="120" y="286"/>
+    <use href="#window-boarded" x="270" y="286"/>
+    <use href="#window-broken" x="314" y="286"/>
+    <!-- The stairwell over the entrance, glazed top to bottom, with a stopped clock above. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M208 110h40v52h-40z" fill="url(#facade)" stroke-width="3.5"/>
+      <path d="M204 104h48v8h-48z" fill="#a39d90" stroke-width="3"/>
+      <circle cx="228" cy="136" r="17" fill="#ece0c0" stroke-width="3.5"/>
+      <path d="M228 124v2M240 136h-2M228 148v-2M216 136h2" stroke-width="2.4"/>
+      <path d="M228 136l-6-8M228 136l9 3" stroke-width="2.6"/>
+      <path d="M210 164h36v100h-36z" fill="#aab4ae" stroke-width="3"/>
+      <path d="M210 196h36M210 230h36M228 164v100" stroke="#5f594f" stroke-width="2"/>
+      <path d="M210 196h18v34h-18zM228 230h18v34h-18z" fill="#2a2016" stroke-width="2"/>
+      <path d="M216 186l10-16M232 220l10-18" stroke="#d8dcd2" stroke-width="2"/>
+      <!-- Entrance canopy and double door, one leaf gone. -->
+      <path d="M196 270h64v8h-64z" fill="#a39d90" stroke-width="3"/>
+      <path d="M202 278v56M254 278v56" stroke-width="3.5"/>
+      <path d="M208 284h40v50h-40z" fill="#2a2016" stroke-width="3"/>
+      <path d="M228 284h20v50h-20z" fill="#5d6a6a" stroke-width="2.5"/>
+      <path d="M232 292h12v18h-12z" fill="#aab4ae" stroke-width="2"/>
+      <path d="M196 334h64v6h-64zM190 340h76v6h-76z" fill="#a39d90" stroke-width="2.5"/>
+    </g>
+    <!-- Ivy climbing up a corner. -->
+    <g stroke="#33281c" stroke-width="2" stroke-linejoin="round">
+      <path d="M64 334c8-20-4-40 6-60s-2-40 8-64" fill="none" stroke="#5c6a2c" stroke-width="3"/>
+      <path d="M62 320c-6-6-2-14 6-12 2 8-2 12-6 12zM72 296c-2-8 6-12 10-6-2 6-6 8-10 6zM60 268c-4-6 2-12 8-8 0 6-4 9-8 8zM74 240c-2-8 6-10 10-4-2 6-6 6-10 4zM66 220c-4-6 2-10 8-6 0 6-4 8-8 6z" fill="#6f7f45"/>
+    </g>
+    <!-- A bare flagpole by the door. -->
+    <path d="M286 336V200M282 200h8" stroke="#33281c" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M287 204c8 4 10 10 6 16" fill="none" stroke="#33281c" stroke-width="1.4"/>
+
+    <!-- Climbing ladders in the yard, one rung hanging. -->
+    <g stroke="#33281c" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M112 440V356M162 440V356M212 440V364" stroke-width="5"/>
+      <path d="M112 440V356M162 440V356M212 440V364" stroke="#7d7a73" stroke-width="2"/>
+      <path d="M108 356h58M112 376h50M112 396h50M112 416h50M162 376h50M162 396h50" stroke-width="3"/>
+      <path d="M162 416l48 14" stroke-width="3"/>
+      <path d="M158 364l58 4" stroke-width="3"/>
+      <path d="M104 440h16M154 440h16M204 440h16" stroke-width="3"/>
+    </g>
+
+    <!-- The basketball hoop, its board cracked and the rim bent down. -->
+    <g stroke="#33281c" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M452 470V266" stroke-width="7"/>
+      <path d="M452 470V266" stroke="#7d7a73" stroke-width="3"/>
+      <path d="M452 270l-22 4" stroke-width="5"/>
+      <path d="M396 230h52v40h-52z" fill="#ece0c0" stroke-width="3.5"/>
+      <path d="M410 246h24v18h-24z" fill="none" stroke-width="2.5"/>
+      <path d="M420 230l-6 14 8 8-4 12" fill="none" stroke-width="1.8"/>
+      <path d="M408 266c-6 10-10 14-20 18M434 266c-8 12-16 18-26 22" fill="none" stroke-width="3"/>
+      <path d="M390 286l4 10M398 290l2 10M406 290l-2 10" fill="none" stroke-width="1.6"/>
+      <path d="M440 470h24" stroke-width="4"/>
+    </g>
+
+    <!-- The deflated red ball, the yard's only colour. -->
+    <g stroke="#5a1e10" stroke-linejoin="round">
+      <path d="M352 420c-4-14 6-24 18-24s22 8 20 22c-10 4-28 6-38 2z" fill="#b4432b" stroke-width="3"/>
+      <path d="M360 402c6 6 8 12 6 18M378 398c-2 8 0 16 6 20" fill="none" stroke="#82301c" stroke-width="2"/>
+    </g>
+    <ellipse cx="372" cy="424" rx="24" ry="5" fill="#33281c" opacity="0.25"/>
+
+    <!-- Scattered papers and weeds in the cracks. -->
+    <g fill="#ece0c0" stroke="#33281c" stroke-width="1.8" stroke-linejoin="round">
+      <path d="M232 386l16-4 4 12-16 4zM330 452l14 2-2 12-14-2zM70 380l12-6 6 10-12 6z"/>
+    </g>
+    <g fill="none" stroke="#5c6a2c" stroke-width="2.6" stroke-linecap="round">
+      <path d="M228 450c2-12 6-20 12-26M236 452c0-12-2-20-6-26"/>
+      <path d="M88 400c2-12 6-20 12-26M96 402c0-12-2-20-6-26M104 400c4-8 8-14 14-16"/>
+      <path d="M402 384c2-10 4-16 8-20M410 384c0-8-2-14-4-18"/>
+      <path d="M120 344c2-8 4-12 8-16M330 346c2-8 6-12 10-14"/>
+    </g>
+  </g>
+
+  <!-- The medallion's frame. -->
+  <circle cx="256" cy="256" r="232" fill="none" stroke="#33281c" stroke-width="5"/>
+  <circle cx="256" cy="256" r="244" fill="none" stroke="#33281c" stroke-width="9"/>
+  <circle cx="256" cy="256" r="238" fill="none" stroke="#ece0c0" stroke-width="3"/>
+</svg>

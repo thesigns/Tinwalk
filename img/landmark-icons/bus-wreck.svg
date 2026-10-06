@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <!-- Map badge: an old bus seen from the side, slumped into a ditch on flat tyres. -->
+  <defs>
+    <clipPath id="inside"><circle cx="48" cy="48" r="42"/></clipPath>
+  </defs>
+
+  <circle cx="48" cy="48" r="45" fill="#ece0c0"/>
+  <g clip-path="url(#inside)">
+    <path d="M0 73H96V96H0z" fill="#cdb67c"/>
+    <path d="M0 73H96" stroke="#33281c" stroke-width="2.4"/>
+  </g>
+
+  <g transform="rotate(-6 48 60)">
+    <!-- Body: roof, window band and the lower panels. -->
+    <g stroke="#33281c" stroke-width="2.8" stroke-linejoin="round">
+      <path d="M14 38q0-5 5-5h59q4 0 5 5v28H14z" fill="#a9ab7c"/>
+      <path d="M14 54h69v12H14z" fill="#7d8a52"/>
+    </g>
+    <!-- Windscreen and side windows. -->
+    <g fill="#33281c">
+      <path d="M17 38h8v12h-8zM29 38h10v10H29zM43 38h10v10H43zM57 38h10v10H57zM71 38h9v10h-9z"/>
+    </g>
+    <path d="M18 58h5" stroke="#33281c" stroke-width="2.4" stroke-linecap="round"/>
+    <!-- Wheels, flattened. -->
+    <path d="M22 70a7 6 0 0 1 14 0zM62 70a7 6 0 0 1 14 0z" fill="#33281c" stroke="#33281c" stroke-width="2.4" stroke-linejoin="round"/>
+  </g>
+
+  <circle cx="48" cy="48" r="45" fill="none" stroke="#33281c" stroke-width="4"/>
+</svg>

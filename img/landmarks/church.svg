@@ -1,0 +1,171 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- An abandoned brick church in the ruins: a front tower whose spire has snapped and
+       hangs by its frame, a holed roof over the nave, a churchyard of leaning crosses,
+       a dead tree full of crows and one red grave candle still standing. -->
+  <defs>
+    <clipPath id="disc"><circle cx="256" cy="256" r="232"/></clipPath>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cdb98c"/>
+      <stop offset="0.45" stop-color="#e6d7b0"/>
+      <stop offset="0.7" stop-color="#f3e9cc"/>
+    </linearGradient>
+    <linearGradient id="grass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a9ab7c"/>
+      <stop offset="1" stop-color="#8b8d5e"/>
+    </linearGradient>
+    <linearGradient id="brick" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#9a6448"/>
+      <stop offset="1" stop-color="#a86f50"/>
+    </linearGradient>
+    <linearGradient id="patina" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8f9c7c"/>
+      <stop offset="1" stop-color="#6b7a5c"/>
+    </linearGradient>
+    <pattern id="bricks" width="20" height="10" patternUnits="userSpaceOnUse">
+      <path d="M0 0h20M0 5h20M0 0v5M10 5v5" stroke="#4a2c1c" stroke-width="1.2" opacity="0.45" fill="none"/>
+    </pattern>
+    <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <path d="M0 0v7" stroke="#33281c" stroke-width="1.6" opacity="0.55"/>
+    </pattern>
+    <pattern id="hatch-sky" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-20)">
+      <path d="M0 0v8" stroke="#6a5842" stroke-width="1.4" opacity="0.45"/>
+    </pattern>
+    <!-- A lancet window, 16 by 46, drawn from the bottom-left corner. -->
+    <path id="lancet" d="M0 0V-34Q0 -46 8 -50Q16 -46 16 -34V0z"/>
+  </defs>
+
+  <g clip-path="url(#disc)">
+    <rect width="512" height="512" fill="url(#sky)"/>
+    <g stroke="#6a5842" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M300 92c8-18 30-24 44-12 10-20 40-22 52-4 16-8 36 2 38 18 12 0 20 8 18 18H300z" fill="#eadcb6"/>
+      <path d="M300 102h152v10H300z" fill="url(#hatch-sky)" stroke="none"/>
+    </g>
+
+    <!-- Ruins far behind. -->
+    <g fill="#b9b2a2" stroke="#6a5842" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M420 330V232h20l8 10 8-8h56V330z"/>
+    </g>
+    <g fill="#8a8377">
+      <path d="M432 248h10v12h-10zM470 248h10v12h-10zM450 272h10v12h-10zM432 296h10v12h-10zM470 296h10v12h-10z"/>
+    </g>
+
+    <!-- A dead tree full of crows. -->
+    <g stroke="#33281c" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M70 360c4-40-6-80 2-130" stroke-width="7"/>
+      <path d="M72 262 40 220M70 240l24-40M73 290l34-26M54 240l-14-30M86 222l18-10M42 222l-16-6M96 270l14-20" stroke-width="3.5"/>
+      <path d="M72 232 66 180M66 196l-14-12M68 186l10-14" stroke-width="2.5"/>
+    </g>
+    <path d="M30 206q4-6 10-2q6-6 10 0M96 206q4-6 10-2q6-6 10 0M100 254q4-6 10-2q6-6 10 0" fill="#33281c" stroke="#33281c" stroke-width="2.6" stroke-linejoin="round"/>
+    <path d="M120 130q7-7 14 0q7-7 14 0M150 112q5-5 10 0q5-5 10 0" fill="none" stroke="#33281c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Overgrown churchyard. -->
+    <path d="M0 330H512V512H0z" fill="url(#grass)"/>
+    <path d="M0 330H512" stroke="#33281c" stroke-width="2.5"/>
+    <path d="M0 410c90-10 200-12 300-6s150 2 212-6V512H0z" fill="#33281c" opacity="0.06"/>
+
+    <!-- Shadow of the church. -->
+    <path d="M120 384H440l40 20H170z" fill="#33281c" opacity="0.22"/>
+
+    <!-- The nave, running back to the right: buttresses, lancets, a holed roof. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M280 214 446 240V364L280 384z" fill="#8c5a40" stroke-width="3.5"/>
+      <path d="M280 214 446 240V364L280 384z" fill="url(#bricks)" stroke="none"/>
+      <path d="M280 214 446 240V364L280 384z" fill="url(#hatch)" stroke="none" opacity="0.6"/>
+      <use href="#lancet" x="296" y="350" fill="#2a2016" stroke-width="2.5"/>
+      <use href="#lancet" x="340" y="350" fill="#2a2016" stroke-width="2.5"/>
+      <use href="#lancet" x="384" y="348" fill="#2a2016" stroke-width="2.5"/>
+      <path d="M296 330l8-8 8 6M340 316l8 6 8-10" fill="none" stroke="#8fa0a0" stroke-width="1.6"/>
+      <!-- Buttresses. -->
+      <path d="M318 222l12 2v158l-12 1zM362 229l12 2v148l-12 2zM406 235l12 2v126l-12 2z" fill="#9a6448" stroke-width="2.5"/>
+      <path d="M318 222l12 2-6 10zM362 229l12 2-6 10zM406 235l12 2-6 10z" fill="#6b665c" stroke-width="2"/>
+      <!-- Roof, slate grey, with a hole down to the rafters. -->
+      <path d="M206 140 404 184 452 244 280 216z" fill="#6b665c" stroke-width="3.5"/>
+      <path d="M206 140 404 184 452 244 280 216z" fill="url(#hatch)" stroke="none"/>
+      <path d="M240 170 420 204M262 194 436 224" stroke-width="1.4" opacity="0.5"/>
+      <path d="M336 186l40 8 12 18-8 12-30-6-18-16z" fill="#e6d7b0" stroke-width="2.5"/>
+      <path d="M342 188l14 26M356 190l14 26M370 193l12 24M338 204l46 8" stroke-width="2.5"/>
+    </g>
+
+    <!-- The front gable with its small lancets. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M130 384V214L206 140 282 214V384z" fill="url(#brick)" stroke-width="3.5"/>
+      <path d="M130 384V214L206 140 282 214V384z" fill="url(#bricks)" stroke="none"/>
+      <path d="M124 216 206 134 288 216" fill="none" stroke-width="5"/>
+      <use href="#lancet" x="144" y="340" fill="#2a2016" stroke-width="2.5"/>
+      <use href="#lancet" x="252" y="340" fill="#2a2016" stroke-width="2.5"/>
+      <path d="M144 300l6 6 6-4 4 8" fill="none" stroke="#8fa0a0" stroke-width="1.6"/>
+      <path d="M126 384h160v6H126z" fill="#a39d90" stroke-width="2.5"/>
+    </g>
+
+    <!-- The tower in front of the gable. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M174 390V124H238V390z" fill="url(#brick)" stroke-width="3.5"/>
+      <path d="M174 390V124H238V390z" fill="url(#bricks)" stroke="none"/>
+      <path d="M222 124h16v266h-16z" fill="url(#hatch)" stroke="none"/>
+      <path d="M170 124h72v10h-72zM170 240h72v8h-72z" fill="#8a5a40" stroke-width="2.5"/>
+      <!-- Corner pinnacles. -->
+      <path d="M168 124v-16l6-10 6 10v16zM232 124v-16l6-10 6 10v16z" fill="#9a6448" stroke-width="2.5"/>
+      <!-- Belfry openings, louvres gone. -->
+      <path d="M186 196v-36q0-12 10-16 10 4 10 16v36zM210 196v-36q0-12 8-14 8 2 8 14v36z" fill="#2a2016" stroke-width="2.5"/>
+      <path d="M186 176h20M210 176h16" stroke="#6a5842" stroke-width="2"/>
+      <!-- A round window, its tracery broken. -->
+      <circle cx="206" cy="282" r="18" fill="#2a2016" stroke-width="3"/>
+      <path d="M206 264v36M188 282h18M193 270l13 12" stroke="#8a5a40" stroke-width="3"/>
+      <!-- The portal, one door leaf hanging open. -->
+      <path d="M186 390V346q0-22 20-30 20 8 20 30V390z" fill="#2a2016" stroke-width="3"/>
+      <path d="M180 390V344q0-28 26-36 26 8 26 36V390" fill="none" stroke-width="2.5"/>
+      <path d="M206 330V390M206 330q-10 4-14 14" stroke-width="2" opacity="0.5"/>
+      <path d="M206 330l20 10v50h-20z" fill="#5e4428" stroke-width="2.5"/>
+      <path d="M186 344l-16 10v42l16-6z" fill="#5e4428" stroke-width="2.5"/>
+      <path d="M172 390h68v6h-68z" fill="#a39d90" stroke-width="2.5"/>
+    </g>
+
+    <!-- The spire: only its lower part still stands, the frame showing where the top snapped off. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M170 110 242 110 226 66H186z" fill="url(#patina)" stroke-width="3.5"/>
+      <path d="M212 110h30l-16-44h-8z" fill="url(#hatch)" stroke="none"/>
+      <path d="M190 110l4-44M206 110V66M222 110l-4-44" stroke-width="1.4" opacity="0.6"/>
+      <path d="M186 66l4-8 6 4 6-6 6 6 6-4 6 8" fill="none" stroke-width="2.5"/>
+      <!-- Bare frame where the plating fell off. -->
+      <path d="M194 66l4-14M214 66l-2-16M206 66V48" stroke-width="2.5"/>
+    </g>
+
+    <!-- Churchyard crosses, gravestones and the red candle. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M100 430 104 380l-14-2 2-8 14 2 2-12h8l-2 12 14 2-2 8-14-2-4 50z" fill="#a07a4c" stroke-width="2.5"/>
+      <path d="M380 436l10-52-14-4 2-8 14 4 4-12 8 2-4 12 14 4-2 8-14-4-10 52z" fill="#7d7a73" stroke-width="2.5"/>
+      <path d="M300 440v-34q0-12 16-12t16 12v34z" fill="#a39d90" stroke-width="2.5"/>
+      <path d="M308 410h16M308 418h12" stroke-width="1.6" opacity="0.7"/>
+      <path d="M160 470l-4-40q2-12 18-12t20 12l2 40z" fill="#b9b2a2" stroke-width="2.5"/>
+      <path d="M170 438v10M164 443h12" stroke-width="2"/>
+      <!-- Grave mounds. -->
+      <path d="M70 436c20-10 60-10 80 0zM280 446c20-8 56-8 72 0zM360 444c20-8 50-8 66 0z" fill="#7f8150" stroke-width="2"/>
+      <!-- The grave candle. -->
+      <path d="M238 470v-24h16v24z" fill="#b4432b" stroke="#5a1e10" stroke-width="2.5"/>
+      <path d="M236 446h20v-6h-20z" fill="#a39d90" stroke-width="2"/>
+      <path d="M242 452v14" stroke="#82301c" stroke-width="2"/>
+    </g>
+    <ellipse cx="246" cy="472" rx="16" ry="4" fill="#33281c" opacity="0.25"/>
+
+    <!-- The fallen top of the spire, its cross dug into the grass. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M352 432l8 22-82 10z" fill="url(#patina)" stroke-width="3"/>
+      <path d="M356 443l4 11-82 10z" fill="url(#hatch)" stroke="none"/>
+      <path d="M352 432l-4 6 8 2 0 8 6 2" fill="none" stroke-width="2"/>
+      <path d="M278 464l-18 2M268 458l2 14" stroke-width="3.5"/>
+    </g>
+
+    <!-- Long grass and nettles. -->
+    <g fill="none" stroke="#5c6a2c" stroke-width="2.6" stroke-linecap="round">
+      <path d="M40 470c4-20 8-32 16-44M50 474c2-18 2-30-2-44M62 472c4-14 10-24 18-30"/>
+      <path d="M200 494c2-14 6-24 12-30M212 496c0-14-2-22-6-30M222 494c4-10 8-18 14-22"/>
+      <path d="M420 470c4-20 10-32 18-42M432 474c2-18 0-30-4-42M444 470c6-14 12-22 20-26"/>
+      <path d="M130 400c2-10 4-16 8-20M138 400c0-8-2-14-4-18M286 400c2-10 6-16 10-18M450 380c2-10 4-16 8-20"/>
+    </g>
+  </g>
+
+  <!-- The medallion's frame. -->
+  <circle cx="256" cy="256" r="232" fill="none" stroke="#33281c" stroke-width="5"/>
+  <circle cx="256" cy="256" r="244" fill="none" stroke="#33281c" stroke-width="9"/>
+  <circle cx="256" cy="256" r="238" fill="none" stroke="#ece0c0" stroke-width="3"/>
+</svg>

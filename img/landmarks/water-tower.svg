@@ -1,0 +1,176 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- An old brick water tower over the ruins: a holed tank under a broken conical roof,
+       a ladder torn off the shaft, a boarded door, a sagging fence with a red warning sign. -->
+  <defs>
+    <clipPath id="disc"><circle cx="256" cy="256" r="232"/></clipPath>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cdb98c"/>
+      <stop offset="0.45" stop-color="#e6d7b0"/>
+      <stop offset="0.7" stop-color="#f3e9cc"/>
+    </linearGradient>
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#aaa184"/>
+      <stop offset="1" stop-color="#8e866c"/>
+    </linearGradient>
+    <linearGradient id="brick" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#9a6448"/>
+      <stop offset="0.55" stop-color="#a86f50"/>
+      <stop offset="1" stop-color="#7c4c34"/>
+    </linearGradient>
+    <linearGradient id="plaster" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#cfc4a8"/>
+      <stop offset="0.5" stop-color="#ddd2b6"/>
+      <stop offset="1" stop-color="#ab9f84"/>
+    </linearGradient>
+    <pattern id="bricks" width="20" height="10" patternUnits="userSpaceOnUse">
+      <path d="M0 0h20M0 5h20M0 0v5M10 5v5" stroke="#4a2c1c" stroke-width="1.2" opacity="0.45" fill="none"/>
+    </pattern>
+    <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <path d="M0 0v7" stroke="#33281c" stroke-width="1.6" opacity="0.55"/>
+    </pattern>
+    <pattern id="hatch-sky" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-20)">
+      <path d="M0 0v8" stroke="#6a5842" stroke-width="1.4" opacity="0.45"/>
+    </pattern>
+    <pattern id="mesh" width="10" height="10" patternUnits="userSpaceOnUse">
+      <path d="M0 5 5 0 10 5 5 10z" stroke="#5f594f" stroke-width="1.2" fill="none"/>
+    </pattern>
+  </defs>
+
+  <g clip-path="url(#disc)">
+    <rect width="512" height="512" fill="url(#sky)"/>
+    <g stroke="#6a5842" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M22 132c10-22 36-28 52-14 10-24 46-28 60-6 18-12 44-4 44 16H22z" fill="#eadcb6"/>
+      <path d="M22 140h156v10H22z" fill="url(#hatch-sky)" stroke="none"/>
+      <path d="M352 168c8-18 30-24 44-12 10-20 40-22 52-4 16-8 36 2 38 18H352z" fill="#eadcb6"/>
+      <path d="M352 176h134v10H352z" fill="url(#hatch-sky)" stroke="none"/>
+    </g>
+    <!-- Crows circling the roof. -->
+    <path d="M340 78q7-7 14 0q7-7 14 0M372 104q5-5 10 0q5-5 10 0M140 72q6-6 12 0q6-6 12 0M164 96q5-5 10 0q5-5 10 0" fill="none" stroke="#33281c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Ruined blocks in the distance. -->
+    <g fill="#b9b2a2" stroke="#6a5842" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M0 330V236h36l8 10 6-8h44l10 14V330z"/>
+      <path d="M392 330V244h34l6 10 10-8h80V330z"/>
+    </g>
+    <g fill="#8a8377">
+      <path d="M12 250h10v12H12zM50 250h10v12H50zM30 274h10v12H30zM70 274h10v12H70zM12 298h10v12H12zM50 298h10v12H50z"/>
+      <path d="M404 258h10v12h-10zM444 258h10v12h-10zM480 258h10v12h-10zM424 282h10v12h-10zM464 282h10v12h-10zM404 306h10v12h-10z"/>
+    </g>
+
+    <!-- Rough ground of rubble and dry grass. -->
+    <path d="M0 330H512V512H0z" fill="url(#ground)"/>
+    <path d="M0 330H512" stroke="#33281c" stroke-width="2.5"/>
+    <g stroke="#6a5842" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.7">
+      <path d="M30 380h44M120 404h60M330 396h50M420 380h40M90 470h70M300 466h60"/>
+    </g>
+    <!-- A puddle reflecting the sky. -->
+    <ellipse cx="140" cy="440" rx="54" ry="12" fill="#e6d7b0" stroke="#5f594f" stroke-width="2.5"/>
+    <path d="M110 440h30M150 444h22" stroke="#a39d90" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- Shadow of the tower. -->
+    <path d="M196 384h120l100 26H230z" fill="#33281c" opacity="0.22"/>
+
+    <!-- The brick shaft, slightly tapering, with arched windows. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M198 386 206 182H306L314 386z" fill="url(#brick)" stroke-width="3.5"/>
+      <path d="M198 386 206 182H306L314 386z" fill="url(#bricks)" stroke="none"/>
+      <path d="M282 182H306L314 386H288z" fill="url(#hatch)" stroke="none"/>
+      <!-- Cornice bands. -->
+      <path d="M200 280h112v8H200z" fill="#8a5a40" stroke-width="2.5"/>
+      <path d="M194 380h124v8H194z" fill="#8a5a40" stroke-width="3"/>
+      <!-- Arched windows: one empty, one bricked up, a slit. -->
+      <path d="M244 256V212a12 12 0 0 1 24 0V256z" fill="#2a2016" stroke-width="3"/>
+      <path d="M244 230h24" stroke="#6a5842" stroke-width="2"/>
+      <path d="M244 220l6-6 6 8 6-10 6 6" fill="none" stroke="#8fa0a0" stroke-width="1.6"/>
+      <path d="M248 324V306a8 8 0 0 1 16 0V324z" fill="#7c4c34" stroke-width="2.5"/>
+      <path d="M248 314h16M256 306v8M252 320v4M260 320v4" stroke-width="1.2" opacity="0.6"/>
+      <path d="M220 230v24M292 230v24" stroke-width="4"/>
+      <!-- The boarded door. -->
+      <path d="M234 386V352a22 22 0 0 1 44 0V386z" fill="#2a2016" stroke-width="3"/>
+      <path d="M232 352l48-4v8l-48 4zM232 368l48 2v8l-48-2z" fill="#a07a4c" stroke-width="2"/>
+      <path d="M236 380l12-8 4 6-12 8z" fill="#a07a4c" stroke-width="2"/>
+      <path d="M232 386h48v4h-48z" fill="#a39d90" stroke-width="2"/>
+      <!-- Bricks knocked out of the shaft. -->
+      <path d="M210 330h20v10h-10v10h-14z" fill="#4a2c1c" stroke-width="2"/>
+      <path d="M286 200h12v10h-8v8h-8z" fill="#4a2c1c" stroke-width="2"/>
+      <!-- A rust streak from the tank above. -->
+      <path d="M298 186c2 20-2 36 2 58" fill="none" stroke="#4a2c1c" stroke-width="4" opacity="0.4"/>
+    </g>
+
+    <!-- The tank on corbels: a plastered drum with oculi, holed on one side. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M206 184 182 166H330L306 184z" fill="#8a5a40" stroke-width="3"/>
+      <path d="M206 184 182 166H330L306 184z" fill="url(#bricks)" stroke="none"/>
+      <path d="M214 182l-8-12M236 182l-4-14M256 182v-14M276 182l4-14M298 182l8-12" stroke-width="2"/>
+      <path d="M180 104H332V164Q256 176 180 164z" fill="url(#plaster)" stroke-width="3.5"/>
+      <path d="M300 104h32v60q-14 4-32 6z" fill="url(#hatch)" stroke="none"/>
+      <path d="M194 106v60M214 106v64M238 106v68M262 106v68M286 106v66M308 106v62M324 106v58" stroke-width="1.6" opacity="0.6"/>
+      <path d="M180 116Q256 126 332 116" fill="none" stroke-width="2"/>
+      <path d="M220 152v-12a6 6 0 0 1 12 0v12zM244 154v-12a6 6 0 0 1 12 0v12zM268 154v-12a6 6 0 0 1 12 0v12z" fill="#5d6a6a" stroke-width="2.5"/>
+      <path d="M200 150v-10a5 5 0 0 1 10 0v10z" fill="#5d6a6a" stroke-width="2.5"/>
+      <path d="M244 146l6-4 6 6M220 144l12 6" fill="none" stroke="#2a2016" stroke-width="2"/>
+      <!-- The hole torn in the tank, bricks showing round it. -->
+      <path d="M292 122l12-6 10 8 4 14-6 12-12 2-8-10z" fill="#2a2016" stroke-width="2.5"/>
+      <path d="M288 118l-6 4M310 112l4-6M318 136l6 2M300 152l-2 6" stroke-width="2"/>
+      <path d="M298 152c0 10 4 18 2 30" fill="none" stroke="#4a2c1c" stroke-width="3" opacity="0.5"/>
+    </g>
+
+    <!-- The conical roof, a patch blown out to the rafters, and the lantern on top. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M170 106Q256 94 342 106L256 46z" fill="#6b665c" stroke-width="3.5"/>
+      <path d="M256 46 342 106Q314 102 290 100z" fill="url(#hatch)" stroke="none"/>
+      <path d="M200 98l56-40M226 96l30-38M286 96l-30-38M312 98l-56-40" stroke-width="1.4" opacity="0.5"/>
+      <path d="M210 82l20-18 10 6-4 16-14 6z" fill="#e6d7b0" stroke-width="2.5"/>
+      <path d="M214 84l20-16M222 86l14-14M230 86l6-8" stroke-width="2"/>
+      <path d="M244 50h24v-14h-24z" fill="#a39d90" stroke-width="3"/>
+      <path d="M250 36v14M262 36v14" stroke-width="1.6"/>
+      <path d="M240 36h32l-16-12z" fill="#6b665c" stroke-width="3"/>
+      <path d="M256 24v-8l8-6" fill="none" stroke-width="2.5"/>
+    </g>
+
+    <!-- The iron ladder up the shaft, its lower part torn away and lying in the grass. -->
+    <g stroke="#33281c" stroke-linecap="round" fill="none">
+      <path d="M214 186l-4 116M228 186l-2 112" stroke-width="3.5"/>
+      <path d="M213 200h14M213 216h14M212 232h14M212 248h14M211 264h14M211 280h14M210 296h14" stroke-width="2.4"/>
+      <path d="M210 302l-10 18M226 298l-6 22" stroke-width="3.5"/>
+      <path d="M318 448l120-30M328 460l118-30" stroke-width="3.5"/>
+      <path d="M332 444l4 14M352 439l4 14M372 434l4 14M392 429l4 14M412 424l4 14" stroke-width="2.4"/>
+    </g>
+
+    <!-- Rubble and loose bricks at the foot. -->
+    <g stroke="#33281c" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M300 396l14-14 16 6 12-8 18 12 8 12z" fill="#a39d90"/>
+      <path d="M318 384l6 8M342 382l-2 10" fill="none" stroke-width="1.6"/>
+      <path d="M180 400h16v8h-16zM300 414l14-4 2 8-14 4zM270 420h14v8h-14z" fill="#9a6448"/>
+    </g>
+
+    <!-- A sagging wire fence in front, with a red warning sign. -->
+    <g stroke="#33281c" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M40 360 140 372V420L40 402z" fill="url(#mesh)" stroke="none"/>
+      <path d="M140 372 240 368l-30 52H140z" fill="url(#mesh)" stroke="none"/>
+      <path d="M40 360 140 372 240 368M40 402 140 420H212" fill="none" stroke="#5f594f" stroke-width="2"/>
+      <path d="M40 410V350M140 428V364" stroke-width="5"/>
+      <path d="M40 410V350M140 428V364" stroke="#7d7a73" stroke-width="2"/>
+      <path d="M240 368 212 428" stroke-width="5"/>
+      <path d="M240 368 212 428" stroke="#7d7a73" stroke-width="2"/>
+      <path d="M78 392l20-30 20 32z" fill="#b4432b" stroke="#5a1e10" stroke-width="3"/>
+      <path d="M98 372v10M98 388v.01" stroke="#ece0c0" stroke-width="3"/>
+    </g>
+
+    <!-- Weeds and a bush at the foot. -->
+    <g stroke="#33281c" stroke-width="2.2" stroke-linejoin="round">
+      <path d="M170 388c-4-14 8-24 20-18 6-10 20-8 22 4 10 0 12 10 8 16z" fill="#6f7f45"/>
+    </g>
+    <g fill="none" stroke="#5c6a2c" stroke-width="2.6" stroke-linecap="round">
+      <path d="M300 498c2-14 6-22 12-28M310 500c0-14-2-22-8-30M320 498c4-10 10-16 16-18"/>
+      <path d="M60 456c2-12 6-20 12-26M68 458c0-12-2-20-6-26M76 456c4-8 8-14 14-16"/>
+      <path d="M430 470c2-12 6-20 12-26M438 472c0-12-2-20-6-26"/>
+      <path d="M318 384c2-8 4-12 8-16M196 384c-2-8-4-12-8-16"/>
+    </g>
+  </g>
+
+  <!-- The medallion's frame. -->
+  <circle cx="256" cy="256" r="232" fill="none" stroke="#33281c" stroke-width="5"/>
+  <circle cx="256" cy="256" r="244" fill="none" stroke="#33281c" stroke-width="9"/>
+  <circle cx="256" cy="256" r="238" fill="none" stroke="#ece0c0" stroke-width="3"/>
+</svg>
