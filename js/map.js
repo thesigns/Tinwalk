@@ -1,6 +1,7 @@
 // Draws the map on a canvas: north-up, in Web Mercator, centered on the scene's
 // center unless the user has dragged it elsewhere. Handles dragging, zooming
-// (pinch, mouse wheel) and reports single taps via onTap.
+// (pinch, mouse wheel) and reports single taps via onLandmarkTap when they hit
+// a landmark, and via onTap otherwise.
 
 import { SEARCH_INFLUENCE, SEARCH_RADIUS, searchWeight } from './game.js';
 import { fromMercator, mercatorUnitsPerMeter, toMercator } from './geo.js';
@@ -12,6 +13,7 @@ const MIN_VIEW_WIDTH_METERS = 500;
 const MAX_VIEW_WIDTH_METERS = 5000;
 const WHEEL_ZOOM_SPEED = 0.0015;
 const TAP_TOLERANCE_PX = 10;
+const TAP_MARGIN_PX = 6;
 // Time per frame spent rendering missing tiles; the rest is drawn in later frames.
 const TILE_RENDER_BUDGET_MS = 12;
 const SCALE_BAR_LENGTHS = [50, 100, 200, 500, 1000, 2000, 5000];
@@ -70,6 +72,7 @@ export class MapView {
     this.viewWidthMeters = DEFAULT_VIEW_WIDTH_METERS;
     this.pendingFrame = null;
     this.onTap = null; // (point: { lat, lon }) => void
+    this.onLandmarkTap = null; // (landmark) => void, with a landmark from the scene
     this.onScaleChange = null; // (meters, pixels) => void
     this.scale = null;
     this.effects = []; // short animations drawn over the map
@@ -163,8 +166,10 @@ export class MapView {
     const release = (event) => {
       if (!pointers.delete(event.pointerId)) return;
       if (event.type === 'pointerup' && tap && pointers.size === 0) {
-        const point = this.screenToLatLon(tap.x, tap.y);
-        if (point) this.onTap?.(point);
+        const landmark = this.onLandmarkTap && this.landmarkAt(tap.x, tap.y);
+        const point = !landmark && this.screenToLatLon(tap.x, tap.y);
+        if (landmark) this.onLandmarkTap(landmark);
+        else if (point) this.onTap?.(point);
       }
       if (pointers.size < 2) pinch = null;
       if (pointers.size === 0) tap = null;
@@ -453,6 +458,24 @@ export class MapView {
       ctx.lineTo(x - arm, y + arm);
     }
     ctx.stroke();
+  }
+
+  // The landmark whose badge is under a screen point, the nearest if badges
+  // overlap, or null. A finger is coarse, so the badge gets a little margin.
+  landmarkAt(x, y) {
+    const { center } = this;
+    if (!center) return null;
+    let nearest = null;
+    let nearestDistance = LANDMARK_BADGE_PX / 2 + TAP_MARGIN_PX;
+    for (const landmark of this.scene.landmarks) {
+      const point = this.toScreen(center, landmark);
+      const distance = Math.hypot(point.x - x, point.y - y);
+      if (distance <= nearestDistance) {
+        nearest = landmark;
+        nearestDistance = distance;
+      }
+    }
+    return nearest;
   }
 
   // Landmarks are badges drawn from img/landmark-icons/<type>.svg, the same

@@ -4,7 +4,7 @@ import { now } from './clock.js';
 import { ENEMIES, ITEMS, LANDMARKS, MANUALS, RESOURCES, emptyResources } from './game.js';
 
 const STORAGE_KEY = 'tinwalk.state';
-export const STATE_VERSION = 10;
+export const STATE_VERSION = 11;
 
 const INVALID_SAVE = "This file isn't a valid Tinwalk save";
 const OTHER_VERSION = 'This save comes from a different version of Tinwalk';
@@ -94,6 +94,13 @@ const MIGRATIONS = {
     }
     save.version = 10;
   },
+  // Landmarks remember when they were last visited; until now, only when found.
+  10(save) {
+    for (const landmark of save.landmarks ?? []) {
+      if (isObject(landmark)) landmark.visitedAt = landmark.discoveredAt;
+    }
+    save.version = 11;
+  },
 };
 
 function migrate(save) {
@@ -110,7 +117,7 @@ export function createInitialState() {
     //   departedSurvivors: [{ name, arrivedAt, leftAt, reason }] }
     shelter: null,
     searchedAreas: [], // [{ lat, lon, searchedAt }]
-    landmarks: [], // [{ type, lat, lon, discoveredAt }]
+    landmarks: [], // [{ type, lat, lon, discoveredAt, visitedAt }]
     // The rescue mission under way: { survivor, landmark: { type, lat, lon }, calledAt }
     mission: null,
     enemies: [], // enemies not beaten yet, where they were met: [{ type, lat, lon, foundAt }]
@@ -197,7 +204,7 @@ const isManualList = (value) =>
   value.every((id) => Object.hasOwn(MANUALS, id)) &&
   new Set(value).size === value.length;
 const isLandmarkPoint = (value) => isPoint(value) && Object.hasOwn(LANDMARKS, value.type);
-const isLandmark = (value) => isLandmarkPoint(value) && isNumber(value.discoveredAt);
+const isLandmark = (value) => isLandmarkPoint(value) && isNumber(value.discoveredAt) && isNumber(value.visitedAt);
 const isEnemy = (value) => isPoint(value) && Object.hasOwn(ENEMIES, value.type) && isNumber(value.foundAt);
 const isMission = (value) =>
   isObject(value) && typeof value.survivor === 'string' && isLandmarkPoint(value.landmark) && isNumber(value.calledAt);

@@ -930,6 +930,19 @@ dialog input:focus {
   border-color: var(--paint);
 }
 
+.landmark-art {
+  display: block;
+  width: min(260px, 100%);
+  height: auto;
+  margin: -6px auto 14px;
+  filter: drop-shadow(0 3px 5px rgba(40, 28, 15, 0.35));
+}
+
+#landmark-dialog h2,
+#landmark-dialog p {
+  text-align: center;
+}
+
 .dialog-buttons {
   display: flex;
   justify-content: flex-end;

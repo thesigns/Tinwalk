@@ -38,6 +38,7 @@ import {
   hasGeigerCounter,
   hungerOf,
   isInShelter,
+  isMissionLandmark,
   isNight,
   isSick,
   isWounded,
@@ -52,6 +53,7 @@ import {
   packItem,
   pruneSearchedAreas,
   radiationAtPosition,
+  removeLandmark,
   runAway,
   search,
   searchBlocker,
@@ -232,6 +234,14 @@ const ui = {
   importInput: $('import-input'),
   importDialog: $('import-dialog'),
   resetDialog: $('reset-dialog'),
+  landmarkDialog: $('landmark-dialog'),
+  landmarkArt: $('landmark-art'),
+  landmarkName: $('landmark-name'),
+  landmarkVisited: $('landmark-visited'),
+  landmarkMission: $('landmark-mission'),
+  landmarkRemove: $('landmark-remove'),
+  removeLandmarkDialog: $('remove-landmark-dialog'),
+  removeLandmarkName: $('remove-landmark-name'),
   rewardCard: $('reward-card'),
   rewardMedalIcon: document.querySelector('#reward-medal .icon'),
   rewardIcon: $('reward-icon'),
@@ -1268,6 +1278,16 @@ function updateSurvivorBadge(badge, survivor, time) {
   treatButton.setAttribute('aria-label', `Treat ${survivor.name}`);
 }
 
+// How long ago something happened, e.g. "1d 23h ago" or "just now".
+function formatAgo(ms) {
+  const minutes = Math.floor(ms / (60 * 1000));
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  if (days > 0) return `${days}d ${hours % 24}h ago`;
+  if (hours > 0) return `${hours}h ${minutes % 60}min ago`;
+  return minutes > 0 ? `${minutes} min ago` : 'just now';
+}
+
 function formatDuration(ms) {
   const hours = ms / (60 * 60 * 1000);
   return hours >= 1 ? `${Math.ceil(hours)} h` : `${Math.max(1, Math.ceil(hours * 60))} min`;
@@ -1329,6 +1349,24 @@ async function importSave(file) {
   if ((await ask(ui.importDialog)) !== 'import') return;
   replaceState(result.state);
   showToast('Save imported', 'import');
+}
+
+// A tapped landmark's card: its illustration, when it was last visited, and
+// a way to take it off the map.
+async function openLandmark(landmark) {
+  const { label } = LANDMARKS[landmark.type];
+  const pinned = isMissionLandmark(state, landmark);
+  ui.landmarkArt.src = `img/landmarks/${landmark.type}.svg`;
+  ui.landmarkName.textContent = label;
+  ui.landmarkVisited.textContent = `Last visited: ${formatAgo(now() - landmark.visitedAt)}`;
+  ui.landmarkMission.hidden = !pinned;
+  ui.landmarkRemove.hidden = pinned;
+  if ((await ask(ui.landmarkDialog)) !== 'remove') return;
+  ui.removeLandmarkName.textContent = label;
+  if ((await ask(ui.removeLandmarkDialog)) !== 'remove') return;
+  if (!removeLandmark(state, landmark)) return;
+  saveAndUpdate();
+  showToast(`The ${label} is off your map`, landmark.type);
 }
 
 async function resetSave() {
@@ -1463,6 +1501,7 @@ document.addEventListener('visibilitychange', () => {
   else if (started) tracker.resume();
 });
 
+mapView.onLandmarkTap = openLandmark;
 if (isDebug) mapView.onTap = (point) => tracker.setManualPosition(point);
 
 setInterval(tick, TICK_MS);

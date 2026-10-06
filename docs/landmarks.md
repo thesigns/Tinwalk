@@ -33,13 +33,21 @@ Rodzaj landmarku jest losowany z listy dla biomu w miejscu odkrycia, z równymi 
 | Bus Wreck       | Bunker         | Water Tower    |
 | Roadside Shrine | Plane Wreck    | Church         |
 
-Każdy rodzaj ma własną ikonę w interfejsie, własną odznakę na mapie i własną dużą ilustrację. Ilustracje (`img/landmarks/`) czekają na ekran landmarku i na razie nie są nigdzie pokazywane.
+Każdy rodzaj ma własną ikonę w interfejsie, własną odznakę na mapie i własną dużą ilustrację na ekranie landmarku.
 
 ### Na mapie
 
 - Landmark jest na mapie okrągłą odznaką swojego rodzaju (uproszczony, czytelny rysunek na papierowym krążku, z paskiem gruntu w kolorze biomu), bez nazwy, żeby nie zaśmiecać mapy. Odznaka ma stały rozmiar przy każdym zbliżeniu.
 - Po odkryciu, za komunikatem o zasobach, aplikacja pokazuje komunikat, np. „You've discovered an Abandoned Mine”, a ikona zostaje wbita w mapę krótką animacją.
+- Landmark pamięta, kiedy był ostatnio odwiedzony: przy odkryciu i przy każdym przeszukaniu, którego obszar go obejmuje (ten sam zasięg, który kończy misję ratunkową).
 - Sam landmark nic nie daje. Odkrycie jest nagrodą samą w sobie, a landmark jest celem misji ratunkowych.
+
+### Ekran landmarku
+
+- Tapnięcie w landmark na mapie otwiera jego ekran: dużą ilustrację, nazwę (np. „Gas Station”) i drobnym drukiem, kiedy był ostatnio odwiedzony (np. „Last visited: 1d 23h ago”).
+- Przycisk „Remove landmark” trwale usuwa landmark z mapy, po potwierdzeniu w osobnym okienku. Miejsce zwalnia się dla nowych landmarków (zob. odstęp 600 m wyżej).
+- Landmarku, przy którym czeka ocalały z trwającej misji, nie da się usunąć; ekran mówi wtedy, że ktoś tam czeka.
+- „Close” zamyka ekran.
 
 ### Przeszukany landmark
 

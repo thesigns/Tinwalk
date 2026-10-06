@@ -431,6 +431,30 @@
     </form>
   </dialog>
 
+  <dialog id="landmark-dialog" class="paper">
+    <form method="dialog">
+      <img id="landmark-art" class="landmark-art" alt="" width="512" height="512">
+      <h2 id="landmark-name"></h2>
+      <p id="landmark-visited" class="muted"></p>
+      <p id="landmark-mission" class="muted">A survivor is waiting here, so the landmark stays on your map.</p>
+      <div class="dialog-buttons">
+        <button id="landmark-remove" class="btn btn-ink" value="remove">Remove landmark</button>
+        <button class="btn btn-paint" value="close" autofocus>Close</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="remove-landmark-dialog" class="paper">
+    <form method="dialog">
+      <h2>Remove landmark?</h2>
+      <p>The <span id="remove-landmark-name"></span> will be gone from your map for good. It can't be undone.</p>
+      <div class="dialog-buttons">
+        <button class="btn btn-ink" value="cancel" autofocus>Cancel</button>
+        <button class="btn btn-paint" value="remove">Remove</button>
+      </div>
+    </form>
+  </dialog>
+
   <dialog id="reset-dialog" class="paper">
     <form method="dialog">
       <h2>Reset data?</h2>

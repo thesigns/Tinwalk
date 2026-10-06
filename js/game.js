@@ -279,6 +279,7 @@ export function searchBlocker(state, position, time) {
 // Otherwise returns finishSearch()'s { loot, rescued }.
 export function search(state, position, time, random = Math.random) {
   state.searchedAreas.push({ lat: position.lat, lon: position.lon, searchedAt: time });
+  visitLandmarks(state, position, time);
   const waiting = enemyNear(state, position);
   if (waiting) return { encounter: { enemy: waiting, threat: drawThreat(waiting, random), returning: true } };
   const rescued = completeRescue(state, time);
@@ -290,6 +291,33 @@ export function search(state, position, time, random = Math.random) {
     return { encounter: { enemy, threat: drawThreat(enemy, random), returning: false } };
   }
   return { loot: collectLoot(state, position, time, 1, random), rescued };
+}
+
+// Landmarks that a search's area reaches count as visited, the same reach
+// that completes a rescue there.
+function visitLandmarks(state, position, time) {
+  const areas = activeSearchedAreas(state, time);
+  for (const landmark of state.landmarks) {
+    if (distanceMeters(landmark, position) < SEARCH_INFLUENCE && isSearched(areas, landmark)) {
+      landmark.visitedAt = time;
+    }
+  }
+}
+
+// Whether a rescue mission's survivor is waiting at the landmark.
+export function isMissionLandmark(state, landmark) {
+  const target = state.mission?.landmark;
+  return Boolean(target) && target.type === landmark.type && target.lat === landmark.lat && target.lon === landmark.lon;
+}
+
+// Takes a landmark off the map for good, which also frees the ground around
+// it for a new one. The landmark of a mission under way stays. Returns
+// whether it was removed.
+export function removeLandmark(state, landmark) {
+  const index = state.landmarks.indexOf(landmark);
+  if (index === -1 || isMissionLandmark(state, landmark)) return false;
+  state.landmarks.splice(index, 1);
+  return true;
 }
 
 // The rest of a search after a won fight: { loot, rescued }, with loot from
@@ -430,7 +458,7 @@ function findLandmark(state, position, biome, time, random) {
   if (places.some((place) => distanceMeters(place, position) < LANDMARK_SPACING)) return null;
   const types = Object.keys(LANDMARKS).filter((type) => LANDMARKS[type].biome === biome);
   const type = types[Math.floor(random() * types.length)];
-  const landmark = { type, lat: position.lat, lon: position.lon, discoveredAt: time };
+  const landmark = { type, lat: position.lat, lon: position.lon, discoveredAt: time, visitedAt: time };
   state.landmarks.push(landmark);
   return landmark;
 }
