@@ -1,10 +1,10 @@
 // Loads, saves, exports and imports the game state.
 
 import { now } from './clock.js';
-import { ENEMIES, ITEMS, LANDMARKS, MANUALS, RESOURCES, emptyResources, landmarkCorner } from './game.js';
+import { ENEMIES, ITEMS, LANDMARKS, MANUALS, RESOURCES, emptyResources } from './game.js';
 
 const STORAGE_KEY = 'tinwalk.state';
-export const STATE_VERSION = 9;
+export const STATE_VERSION = 10;
 
 const INVALID_SAVE = "This file isn't a valid Tinwalk save";
 const OTHER_VERSION = 'This save comes from a different version of Tinwalk';
@@ -56,15 +56,9 @@ const MIGRATIONS = {
     if (isObject(save.shelter)) save.shelter.radio = null;
     save.version = 5;
   },
-  // Landmarks moved to the corners of a grid around the shelter. A landmark
-  // found before takes the corner it stands near, so no new one turns up right
-  // next to it; one far from any corner stays as an extra.
+  // Landmarks moved to the corners of a grid around the shelter. Version 10
+  // dropped the grid again.
   5(save) {
-    for (const landmark of save.landmarks ?? []) {
-      if (!isObject(landmark)) continue;
-      const corner = isPoint(save.shelter) && isPoint(landmark) ? landmarkCorner(save.shelter, landmark) : null;
-      landmark.corner = corner && corner.distance <= LEGACY_CORNER_DISTANCE ? corner.key : null;
-    }
     save.version = 6;
   },
   // Cells, a new resource that powers the radio. No one has any yet.
@@ -93,9 +87,14 @@ const MIGRATIONS = {
     save.enemies = [];
     save.version = 9;
   },
+  // Landmarks no longer wait at grid corners, so they don't remember one.
+  9(save) {
+    for (const landmark of save.landmarks ?? []) {
+      if (isObject(landmark)) delete landmark.corner;
+    }
+    save.version = 10;
+  },
 };
-// Half the grid side: closer to this corner than to any other could be.
-const LEGACY_CORNER_DISTANCE = 350;
 
 function migrate(save) {
   while (isObject(save) && MIGRATIONS[save.version]) MIGRATIONS[save.version](save);
@@ -111,9 +110,7 @@ export function createInitialState() {
     //   departedSurvivors: [{ name, arrivedAt, leftAt, reason }] }
     shelter: null,
     searchedAreas: [], // [{ lat, lon, searchedAt }]
-    // corner: the grid corner the landmark was found at (see game.js), or null
-    // for one found before the grid
-    landmarks: [], // [{ type, lat, lon, discoveredAt, corner }]
+    landmarks: [], // [{ type, lat, lon, discoveredAt }]
     // The rescue mission under way: { survivor, landmark: { type, lat, lon }, calledAt }
     mission: null,
     enemies: [], // enemies not beaten yet, where they were met: [{ type, lat, lon, foundAt }]
@@ -200,8 +197,7 @@ const isManualList = (value) =>
   value.every((id) => Object.hasOwn(MANUALS, id)) &&
   new Set(value).size === value.length;
 const isLandmarkPoint = (value) => isPoint(value) && Object.hasOwn(LANDMARKS, value.type);
-const isLandmark = (value) =>
-  isLandmarkPoint(value) && isNumber(value.discoveredAt) && (value.corner === null || typeof value.corner === 'string');
+const isLandmark = (value) => isLandmarkPoint(value) && isNumber(value.discoveredAt);
 const isEnemy = (value) => isPoint(value) && Object.hasOwn(ENEMIES, value.type) && isNumber(value.foundAt);
 const isMission = (value) =>
   isObject(value) && typeof value.survivor === 'string' && isLandmarkPoint(value.landmark) && isNumber(value.calledAt);
