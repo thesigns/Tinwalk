@@ -2,7 +2,7 @@
 
 **Every walk is a supply run.**
 
-Tinwalk is an app that gamifies your walks, with a survival and scavenging twist. Set up a shelter at home, head out into the wasteland, search the areas you pass for supplies, and haul your loot and any survivors you meet back home.
+Tinwalk is an app that gamifies your walks, with a survival and scavenging twist. Set up a shelter at home, head out into the wasteland, search the areas you pass for supplies, find landmarks, and bring wounded survivors home before their time runs out.
 
 It runs in the browser, needs no account and no server, and your location never leaves your device.
 
@@ -13,26 +13,34 @@ It runs in the browser, needs no account and no server, and your location never 
 1. **Set up a shelter.** At home, tap **Create a Shelter** and give it a name. Your shelter is a circle with a 100 m radius around that spot.
 2. **Go for a walk.** Everything outside your shelter is the wasteland.
 3. **Search areas.** Tap **Search area** to scavenge the spot you're standing on. Each search marks a 400 m wide area, and nearby searches merge into one blob. You can search anywhere outside these blobs, at least 200 m from your shelter. Searched areas recover after 6 hours, so you can walk your favorite route twice a day, and loops beat out-and-back routes.
-4. **Fill your backpack.** Each search turns up Junk or Food. The further you are from your shelter, the more you find. Your backpack holds 50 units: tap it to see what you carry and drop what you don't need. Anything that doesn't fit is lost.
-5. **Meet survivors.** A search can turn up a survivor, more often far from home. Take them with you and they carry 30 extra units, but you can only escort one at a time.
-6. **Bring it home.** Back in your shelter, tap **Unload** to move your loot into storage and your survivor into the shelter.
-7. **Keep them fed.** Each survivor in your shelter eats 1 Food a day. Without food they get hungry, then starving, and after three days they leave. Tap **Shelter** to see how long each of them can wait.
+4. **Fill your backpack.** Each search turns up Junk, Food or Cells. The further you are from your shelter, the more you find. Your backpack holds 50 units: tap it to see what you carry and drop what you don't need. Anything that doesn't fit is lost.
+5. **Bring it home.** Back in your shelter, tap **Unload** to move everything into storage.
+6. **Find manuals and craft.** Searches sometimes turn up a manual. Once it's in your shelter, you can craft from Junk (and Cells): a radio, knives, first aid kits, a flashlight and a Geiger counter.
+7. **Rescue survivors.** With a radio and Cells to power it, listen for calls for help. A wounded survivor waits at one of your landmarks, and you have 24 hours to search the area around it and escort them home. This is the only way to get survivors.
+8. **Keep them fed.** Each survivor in your shelter eats 1 Food a day, 2 while wounded or sick. Without food they get hungry, then starving, and after three days they leave. Tap **Shelter** to see how long each of them can wait.
 
-| Distance from your shelter | Loot per search | Survivor chance |
-|---|---|---|
-| under 1 km | 1 | 1% |
-| 1–2 km | 1–2 | 2% |
-| 2–4 km | 2–4 | 4% |
-| 4–8 km | 3–6 | 6% |
-| over 8 km | 4–8 | 8% |
+| Distance from your shelter | Loot per search |
+|---|---|
+| under 1 km | 1 |
+| 1–2 km | 1–2 |
+| 2–4 km | 2–4 |
+| 4–8 km | 3–6 |
+| over 8 km | 4–8 |
 
-What you find depends on the terrain: ruins are full of Junk, forests of Food, and plains give a bit of both.
+What you find depends on the terrain: ruins are full of Junk and Cells, forests of Food, and plains give a bit of everything.
+
+## The wasteland
+
+- **Landmarks.** Every fourth search may discover a landmark, such as a windmill, a bunker or a police station, which stays on your map for good. Each kind has its own illustration: tap a landmark to see it, when you last visited it, and to remove it if you like.
+- **Enemies.** A search can end in a fight: the enemy draws a threat card, and you either run or draw a strike card, adding your weapon's bonus. Win and the loot is doubled. Lose or run and you drop some of your supplies, the enemy stays on your map, and a survivor walking with you may get wounded.
+- **Night.** Day and night follow the real sun where you are. In the dark, searches find less, unless you carry a flashlight.
+- **Radiation.** Invisible fallout zones cover part of the map. Food found there is contaminated and makes survivors sick. A Geiger counter reveals the zones by crackling, and lets you collect Isotopes there instead.
 
 ## Features
 
 - **Real GPS.** Readings less accurate than 50 m are ignored, so actions only unlock with a good signal. The shelter position is averaged over several seconds, since GPS is weakest indoors.
-- **A procedurally generated map.** Instead of a real map, you walk across a fictional wasteland of plains, forests and ruins, drawn like an old paper field map. The terrain is generated from your coordinates, so the same place on Earth always looks the same, and a typical walk crosses several kinds of terrain.
-- **Private by design.** There is no server: your progress is saved only in your browser, and your location is never sent anywhere. You can export your save to a file and import it back.
+- **A procedurally generated map.** Instead of a real map, you walk across a fictional wasteland of plains, forests and ruins, drawn like an old paper field map. The terrain is generated from your coordinates, so the same place on Earth always looks the same, and a typical walk crosses several kinds of terrain. Drag the map to look around, pinch or scroll to zoom, and tap the crosshair to center it on yourself again.
+- **Private by design.** There is no server: your progress is saved only in your browser, and your location is never sent anywhere. You can export your save to a file, import it back, or reset it from the menu.
 - **Sound and vibration.** Sound effects are synthesized in the browser, with no audio files. Vibration works on Android; iPhone browsers don't support it. Both can be turned off in the menu.
 - **Light on the battery.** The map is rendered into cached tiles, so it isn't redrawn constantly.
 
@@ -50,9 +58,9 @@ Then open <http://localhost:8000>. Browsers only share your location with secure
 
 Add `?debug` to the address (<http://localhost:8000/?debug>) to test the app at your desk:
 
-- Tap the map to set your position instead of using GPS.
-- Speed up time (60× or 3600×) to watch searched areas expire.
-- See GPS diagnostics: accuracy, how old the last reading is, and how many readings were accepted or rejected.
+- Tap the map to set your position instead of using GPS. A tap on a landmark opens its card instead, so tap beside it.
+- Speed up time (60× or 3600×) to watch searched areas expire, survivors get hungry and night fall.
+- See GPS diagnostics: accuracy, how old the last reading is, how many readings were accepted or rejected, and the radiation where you stand.
 
 ## Deploying
 
@@ -63,22 +71,26 @@ On your own server, make sure `.js` files are served with a JavaScript MIME type
 ## Project structure
 
 ```
-index.html      Page markup and the SVG icon sprite
-css/style.css   All styles
-js/             App code (ES modules), starting from main.js
-fonts/          Self-hosted fonts and their licenses
-docs/           Design notes (in Polish)
+index.html          Page markup and the SVG icon sprite
+css/style.css       All styles
+js/                 App code (ES modules), starting from main.js
+img/landmark-icons/ Landmark badges drawn on the map
+img/landmarks/      Landmark illustrations shown on their cards
+fonts/              Self-hosted fonts and their licenses
+docs/               Game rules and design notes (in Polish)
 ```
 
 ## Roadmap
 
-Tinwalk is a prototype. Resources are only collected and counted for now. Ideas for later:
+Tinwalk is a prototype. Ideas for later:
 
-- Building up the shelter and crafting things such as ammo from Junk
-- Survivors working in the shelter
-- Combat
+- Building up the shelter, and survivors working in it
+- More enemies, such as bandits, and armor
+- Making Cells in the shelter, e.g. a mini-reactor fueled by Isotopes
+- More devices and gear powered by Cells
+- Other missions to landmarks, and loot that depends on the landmark
 - More than one shelter
-- Installing to the home screen (PWA) and working offline
+- Installing to the home screen (PWA), working offline, and keeping the screen on during a walk
 
 ## Credits
 
