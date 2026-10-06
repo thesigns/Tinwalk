@@ -139,7 +139,8 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
   - pozycja użytkownika jako pinezka (z okręgiem dokładności GPS),
 - Pinezka jest zielona, gdy użytkownik może przeszukać obszar, a czerwona, gdy nie może (np. jest w przeszukanym obszarze, za blisko schronu albo w schronie). Przy słabym sygnale pinezka jest szara.
 - Domyślny widok obejmuje około 1–2 km wokół użytkownika i jest wycentrowany na użytkowniku.
-- Mapę można przybliżać i oddalać (gest szczypania oraz przyciski +/−) w zakresie od ok. 500 m do ok. 5 km szerokości widoku. W prototypie nie można jej przesuwać: zawsze jest wycentrowana na użytkowniku.
+- Mapę można przybliżać i oddalać (gest szczypania, na komputerze kółko myszy) w zakresie od ok. 500 m do ok. 5 km szerokości widoku.
+- Mapę można przesuwać palcem (na komputerze przeciąganiem myszą), żeby obejrzeć dłuższą trasę albo cel misji. Przesunięta mapa zostaje w miejscu, a przycisk z celownikiem przy menu wraca do śledzenia użytkownika.
 - Biom w miejscu przeszukania wpływa na to, jaki zasób się znajdzie (zob. [loot.md](loot.md)).
 - Oprócz biomów jest niewidoczna warstwa stref radiacji (zob. [radiation.md](radiation.md)). Mapa jej nie pokazuje.
 

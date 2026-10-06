@@ -1,5 +1,6 @@
-// Draws the map on a canvas: north-up, centered on a given point, in Web Mercator.
-// Handles zooming (pinch, mouse wheel, zoomBy) and reports single taps via onTap.
+// Draws the map on a canvas: north-up, in Web Mercator, centered on the scene's
+// center unless the user has dragged it elsewhere. Handles dragging, zooming
+// (pinch, mouse wheel) and reports single taps via onTap.
 
 import { SEARCH_INFLUENCE, SEARCH_RADIUS, searchWeight } from './game.js';
 import { fromMercator, mercatorUnitsPerMeter, toMercator } from './geo.js';
@@ -62,6 +63,8 @@ export class MapView {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
     this.scene = null;
+    // Where the user has dragged the map to; null while it follows the scene's center.
+    this.pannedCenter = null;
     this.tiles = new TerrainTiles();
     this.viewWidthMeters = DEFAULT_VIEW_WIDTH_METERS;
     this.pendingFrame = null;
@@ -92,8 +95,25 @@ export class MapView {
     return this.viewWidthMeters / Math.min(this.width, this.height);
   }
 
-  zoomBy(factor) {
-    this.setViewWidth(this.viewWidthMeters * factor);
+  // The point in the middle of the screen.
+  get center() {
+    return this.pannedCenter ?? this.scene?.center ?? null;
+  }
+
+  // Goes back to following the scene's center.
+  recenter() {
+    this.pannedCenter = null;
+    if (this.scene) this.render(this.scene);
+  }
+
+  // Moves the map by a drag of (dx, dy) screen pixels.
+  panBy(dx, dy) {
+    const { center } = this;
+    if (!center) return;
+    const c = toMercator(center);
+    const units = this.unitsPerPixel(center);
+    this.pannedCenter = fromMercator({ x: c.x - dx * units, y: c.y + dy * units });
+    this.render(this.scene);
   }
 
   setViewWidth(meters) {
@@ -106,6 +126,7 @@ export class MapView {
     const pointers = new Map(); // pointerId -> { x, y }
     let pinch = null; // { distance, viewWidth } when the pinch started
     let tap = null; // where a single pointer went down, while it may still be a tap
+    let drag = null; // the last position of a single pointer dragging the map
 
     const positionOf = (event) => {
       const rect = canvas.getBoundingClientRect();
@@ -120,6 +141,7 @@ export class MapView {
       canvas.setPointerCapture(event.pointerId);
       pointers.set(event.pointerId, positionOf(event));
       tap = pointers.size === 1 ? positionOf(event) : null;
+      drag = pointers.size === 1 ? positionOf(event) : null;
       if (pointers.size === 2) pinch = { distance: pinchDistance(), viewWidth: this.viewWidthMeters };
     });
 
@@ -128,6 +150,11 @@ export class MapView {
       const point = positionOf(event);
       pointers.set(event.pointerId, point);
       if (tap && Math.hypot(point.x - tap.x, point.y - tap.y) > TAP_TOLERANCE_PX) tap = null;
+      // Small jitters of a tap don't move the map.
+      if (drag && !tap) {
+        this.panBy(point.x - drag.x, point.y - drag.y);
+        drag = point;
+      }
       const distance = pointers.size === 2 ? pinchDistance() : 0;
       if (pinch && distance > 0) this.setViewWidth((pinch.viewWidth * pinch.distance) / distance);
     });
@@ -140,6 +167,8 @@ export class MapView {
       }
       if (pointers.size < 2) pinch = null;
       if (pointers.size === 0) tap = null;
+      // The finger left on the screen after a pinch carries on dragging from where it is.
+      drag = pointers.size === 1 ? [...pointers.values()][0] : null;
     };
     canvas.addEventListener('pointerup', release);
     canvas.addEventListener('pointercancel', release);
@@ -148,7 +177,7 @@ export class MapView {
       'wheel',
       (event) => {
         event.preventDefault();
-        this.zoomBy(Math.exp(event.deltaY * WHEEL_ZOOM_SPEED));
+        this.setViewWidth(this.viewWidthMeters * Math.exp(event.deltaY * WHEEL_ZOOM_SPEED));
       },
       { passive: false },
     );
@@ -165,27 +194,27 @@ export class MapView {
   // }
   render(scene) {
     this.scene = scene;
-    const { ctx } = this;
+    const { ctx, center } = this;
     ctx.fillStyle = COLORS.paper;
     ctx.fillRect(0, 0, this.width, this.height);
     this.updateScale();
-    if (!scene.center) {
+    if (!center) {
       // Nothing to animate over; let anyone waiting for an effect carry on.
       for (const effect of this.effects) effect.resolve();
       this.effects = [];
       return;
     }
 
-    const complete = this.drawTerrain(scene.center);
+    const complete = this.drawTerrain(center);
     if (!complete) this.requestFrame();
-    this.drawSearchedAreas(scene.center, scene.searchedAreas);
-    this.drawMarkers(scene.center, scene.landmarks, LANDMARK_STYLE);
-    this.drawMarkers(scene.center, scene.enemies, ENEMY_STYLE);
-    if (scene.target) this.drawTarget(scene.center, scene.target);
-    if (scene.shelter) this.drawShelter(scene.center, scene.shelter);
+    this.drawSearchedAreas(center, scene.searchedAreas);
+    this.drawMarkers(center, scene.landmarks, LANDMARK_STYLE);
+    this.drawMarkers(center, scene.enemies, ENEMY_STYLE);
+    if (scene.target) this.drawTarget(center, scene.target);
+    if (scene.shelter) this.drawShelter(center, scene.shelter);
     this.drawEffects();
-    if (scene.player) this.drawPlayer(scene.center, scene.player);
-    if (scene.target) this.drawTargetPointer(scene.center, scene.target);
+    if (scene.player) this.drawPlayer(center, scene.player);
+    if (scene.target) this.drawTargetPointer(center, scene.target);
   }
 
   requestFrame() {
@@ -221,7 +250,7 @@ export class MapView {
   playSweep(point, radiusMeters, duration) {
     return this.animate(duration, (progress) => {
       const { ctx } = this;
-      const { x, y } = this.toScreen(this.scene.center, point);
+      const { x, y } = this.toScreen(this.center, point);
       const radius = radiusMeters / this.metersPerPixel;
       const eased = progress < 0.5 ? 2 * progress ** 2 : 1 - (-2 * progress + 2) ** 2 / 2;
       const start = -Math.PI / 2;
@@ -252,7 +281,7 @@ export class MapView {
   playRipple(point, radiusMeters, duration) {
     return this.animate(duration, (progress) => {
       const { ctx } = this;
-      const { x, y } = this.toScreen(this.scene.center, point);
+      const { x, y } = this.toScreen(this.center, point);
       const radius = Math.max(radiusMeters / this.metersPerPixel, 20);
       for (const delay of [0, 0.25]) {
         const ring = Math.max(0, (progress - delay) / (1 - delay));
@@ -284,7 +313,7 @@ export class MapView {
   }
 
   screenToLatLon(x, y) {
-    const center = this.scene?.center;
+    const { center } = this;
     if (!center) return null;
     const c = toMercator(center);
     const units = this.unitsPerPixel(center);

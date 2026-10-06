@@ -41,7 +41,7 @@ All code is in `js/`, loaded from `index.html` via `js/main.js`.
 | `geo.js` | Haversine distances, Web Mercator projection, weighted position averaging |
 | `sun.js` | Sun elevation from time and position (simplified NOAA formulas), for telling day from night |
 | `clock.js` | Game time (`now()`), which debug mode can speed up |
-| `map.js` | `MapView`: canvas rendering, zoom gestures, markers (shelter, landmarks, enemies, the rescue target and an arrow to it), short map animations (`playSweep`, `playRipple`) |
+| `map.js` | `MapView`: canvas rendering, pan and zoom gestures, recentering, markers (shelter, landmarks, enemies, the rescue target and an arrow to it), short map animations (`playSweep`, `playRipple`) |
 | `terrain.js` | Procedural biomes (warped-noise forests, settlements with street grids), the invisible radiation layer, ground colors and icon drawing, as pure functions of Mercator coordinates |
 | `terrain-tiles.js` | Renders terrain into cached tiles per zoom level: sampled ground, settlements drawn as shapes, icons |
 | `noise.js` | Seeded simplex noise and integer hashing |

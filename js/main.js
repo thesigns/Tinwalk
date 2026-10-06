@@ -80,7 +80,6 @@ const REWARD_CARD_MS = 1_300;
 const RIPPLE_MS = 900;
 // How long the radio crackles before the player hears whether anyone called.
 const LISTEN_MS = 3_400;
-const ZOOM_STEP = 1.5;
 const TOAST_DURATION_MS = 4_000;
 // Holding a +/- button in the backpack keeps stepping after a short pause.
 const STEP_REPEAT_DELAY_MS = 400;
@@ -1364,8 +1363,7 @@ ui.radioListen.addEventListener('click', listenAction);
 ui.departureDialog.addEventListener('close', () => (departed = []));
 ui.sicknessDialog.addEventListener('close', () => (sickened = []));
 $('retry-location').addEventListener('click', () => tracker.start());
-$('zoom-in').addEventListener('click', () => mapView.zoomBy(1 / ZOOM_STEP));
-$('zoom-out').addEventListener('click', () => mapView.zoomBy(ZOOM_STEP));
+$('recenter').addEventListener('click', () => mapView.recenter());
 mapView.onScaleChange = (meters, pixels) => {
   ui.scaleLabel.textContent = meters >= 1000 ? `${meters / 1000} km` : `${meters} m`;
   ui.scaleLine.style.width = `${pixels}px`;
