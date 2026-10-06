@@ -25,6 +25,7 @@
     <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></symbol>
     <symbol id="i-export" viewBox="0 0 24 24"><path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></symbol>
     <symbol id="i-import" viewBox="0 0 24 24"><path d="M12 15V4"/><path d="m7 9 5-5 5 5"/><path d="M5 20h14"/></symbol>
+    <symbol id="i-reset" viewBox="0 0 24 24"><path d="M5.6 8.5A7.5 7.5 0 1 1 4.5 12"/><path d="M4.5 4v4.5H9"/></symbol>
     <symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a7.5 7.5 0 0 1 0 11"/></symbol>
     <symbol id="i-vibrate" viewBox="0 0 24 24"><rect x="8" y="4" width="8" height="16" rx="1.5"/><path d="M4.5 9v6M19.5 9v6M2 10.5v3M22 10.5v3"/></symbol>
     <symbol id="i-junk" viewBox="0 0 24 24"><path d="M12 3.5 19.4 7.75v8.5L12 20.5l-7.4-4.25v-8.5z"/><circle cx="12" cy="12" r="3.2"/></symbol>
@@ -411,6 +412,7 @@
     <div class="menu-buttons">
       <button id="export-button" class="btn btn-ink" type="button"><svg class="icon"><use href="#i-export"/></svg><span>Export save</span></button>
       <button id="import-button" class="btn btn-ink" type="button"><svg class="icon"><use href="#i-import"/></svg><span>Import save</span></button>
+      <button id="reset-button" class="btn btn-ink" type="button"><svg class="icon"><use href="#i-reset"/></svg><span>Reset data</span></button>
     </div>
     <div class="dialog-buttons">
       <button id="menu-close" class="btn btn-paint" type="button">Close</button>
@@ -425,6 +427,18 @@
       <div class="dialog-buttons">
         <button class="btn btn-ink" value="cancel">Cancel</button>
         <button class="btn btn-paint" value="import" autofocus>Import</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="reset-dialog" class="paper">
+    <form method="dialog">
+      <h2>Reset data?</h2>
+      <p>Are you sure? This deletes all your game progress: your shelter, survivors, backpack and everything found on the map. It can't be undone.</p>
+      <p class="muted">Export your save first if you might want it back.</p>
+      <div class="dialog-buttons">
+        <button class="btn btn-ink" value="cancel" autofocus>Cancel</button>
+        <button class="btn btn-paint" value="reset">Reset</button>
       </div>
     </form>
   </dialog>

@@ -168,6 +168,7 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
 
 - Stan aplikacji jest zapisywany w `localStorage` jako JSON po każdej zmianie.
 - Aplikacja pozwala wyeksportować stan do pliku JSON i zaimportować go z powrotem (ochrona przed utratą danych).
+- W menu jest „Reset data”: po potwierdzeniu w okienku (ostrzeżenie, że usuwa cały postęp gry) gra zaczyna się od nowa. Ustawienia dźwięku i wibracji zostają.
 - Zapisany stan ma pole `version`, żeby w przyszłości dało się migrować starsze zapisy. Import odrzuca plik o nieznanej wersji lub nieprawidłowej strukturze i pokazuje komunikat.
 - Przy starcie aplikacja wywołuje `navigator.storage.persist()`, żeby zmniejszyć ryzyko, że przeglądarka sama usunie dane (np. Safari po kilku dniach nieużywania strony).
 

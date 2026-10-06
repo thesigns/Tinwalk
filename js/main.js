@@ -71,7 +71,7 @@ import { LocationTracker } from './gps.js';
 import { Haptics, canVibrate } from './haptics.js';
 import { MapView } from './map.js';
 import { SoundEffects } from './sound.js';
-import { STATE_VERSION, exportState, loadState, parseSave, requestPersistentStorage, saveState } from './state.js';
+import { STATE_VERSION, createInitialState, exportState, loadState, parseSave, requestPersistentStorage, saveState } from './state.js';
 import { APP_UPDATED } from './version.js';
 
 const SHELTER_LOCATING_MS = 10_000;
@@ -231,6 +231,7 @@ const ui = {
   menuDialog: $('menu-dialog'),
   importInput: $('import-input'),
   importDialog: $('import-dialog'),
+  resetDialog: $('reset-dialog'),
   rewardCard: $('reward-card'),
   rewardMedalIcon: document.querySelector('#reward-medal .icon'),
   rewardIcon: $('reward-icon'),
@@ -1326,12 +1327,23 @@ async function importSave(file) {
     return;
   }
   if ((await ask(ui.importDialog)) !== 'import') return;
+  replaceState(result.state);
+  showToast('Save imported', 'import');
+}
+
+async function resetSave() {
+  if ((await ask(ui.resetDialog)) !== 'reset') return;
+  replaceState(createInitialState());
+  showToast('Game data reset', 'reset');
+}
+
+function replaceState(newState) {
   // Other code holds a reference to `state`, so its contents are replaced in place.
   for (const key of Object.keys(state)) delete state[key];
-  Object.assign(state, result.state);
+  Object.assign(state, newState);
   inShelter = false;
+  mapView.recenter();
   saveAndUpdate();
-  showToast('Save imported', 'import');
 }
 
 function hasBeenWelcomed() {
@@ -1398,6 +1410,10 @@ $('import-button').addEventListener('click', () => {
   // Open the file picker while still handling the tap, or browsers may block it.
   ui.importInput.click();
   ui.menuDialog.close();
+});
+$('reset-button').addEventListener('click', () => {
+  ui.menuDialog.close();
+  resetSave();
 });
 ui.importInput.addEventListener('change', () => {
   const [file] = ui.importInput.files;
