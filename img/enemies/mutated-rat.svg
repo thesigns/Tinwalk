@@ -1,0 +1,187 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- A mutated rat in the fallout: hunched, bald and blotched, bone spikes along its back,
+       glowing sores, three yellow eyes and a foaming mouth. Behind it dead trees under a
+       sickly sky, a leaking drum with the radiation mark and a bent warning sign. -->
+  <defs>
+    <clipPath id="disc"><circle cx="256" cy="256" r="232"/></clipPath>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b9b47a"/>
+      <stop offset="0.45" stop-color="#d8d29c"/>
+      <stop offset="0.7" stop-color="#ebe5bc"/>
+    </linearGradient>
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8e8a62"/>
+      <stop offset="1" stop-color="#6a6646"/>
+    </linearGradient>
+    <radialGradient id="glow">
+      <stop offset="0" stop-color="#f1f8b4"/>
+      <stop offset="0.35" stop-color="#d7ea6a" stop-opacity="0.8"/>
+      <stop offset="1" stop-color="#d7ea6a" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <path d="M0 0v7" stroke="#33281c" stroke-width="1.6" opacity="0.55"/>
+    </pattern>
+    <pattern id="hatch-sky" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-20)">
+      <path d="M0 0v8" stroke="#6a5842" stroke-width="1.4" opacity="0.45"/>
+    </pattern>
+    <!-- A glowing sore, 1 across, centred on its origin. -->
+    <g id="sore">
+      <circle r="1" fill="url(#glow)" stroke="none"/>
+      <circle r="0.42" fill="#b9d23c" stroke="#5c6a2c" stroke-width="0.08"/>
+      <circle r="0.2" fill="#f1f8b4" stroke="none"/>
+    </g>
+    <!-- The radiation mark, 1 across, centred on its origin. -->
+    <g id="trefoil">
+      <path d="M0-0.12 0.27-0.47A0.5 0.5 0 0 1 0.5 0.03L0.12 0.03zM0-0.12-0.27-0.47A0.5 0.5 0 0 0-0.5 0.03L-0.12 0.03zM0.06 0.11 0.27 0.49A0.5 0.5 0 0 1-0.27 0.49L-0.06 0.11z" transform="scale(0.9)"/>
+      <circle r="0.1"/>
+    </g>
+  </defs>
+
+  <g clip-path="url(#disc)">
+    <rect width="512" height="512" fill="url(#sky)"/>
+    <!-- A pale sun behind the haze. -->
+    <circle cx="372" cy="128" r="34" fill="#f3eec8" stroke="#6a5842" stroke-width="2.5"/>
+    <path d="M330 140h86v8h-86zM324 120h40v6h-40z" fill="#d8d29c"/>
+    <g stroke="#6a5842" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M60 130c8-16 28-22 40-10 10-18 36-20 48-4 14-6 32 2 34 16 10 0 18 8 16 16H60z" fill="#e3ddb0"/>
+      <path d="M60 140h138v8H60z" fill="url(#hatch-sky)" stroke="none"/>
+    </g>
+
+    <!-- Dead trees, bare and grey. -->
+    <g fill="none" stroke="#8a8466" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M96 330V200M96 260l-26-30M96 236l22-34M96 214l-12-24M70 230l-8-18M118 202l10-12" stroke-width="7"/>
+      <path d="M160 330V240M160 280l16-26M160 262l-14-18M176 254l6-14" stroke-width="5"/>
+      <path d="M432 330V186M432 246l28-32M432 222l-24-30M432 200l10-26M460 214l6-18M408 192l-10-14" stroke-width="8"/>
+      <path d="M376 330V250M376 286l-16-20M376 270l14-22" stroke-width="5"/>
+    </g>
+
+    <!-- Scorched ground, cracked. -->
+    <path d="M0 320c90-8 170-10 256-6s180 2 256-4V512H0z" fill="url(#ground)"/>
+    <path d="M0 320c90-8 170-10 256-6s180 2 256-4" fill="none" stroke="#33281c" stroke-width="2.5"/>
+    <g fill="none" stroke="#4f4c34" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M60 420l30 6 10 18 26 4M300 440l26-10 22 8 10-14M200 480l20-12 24 6M420 420l18 10 4 18"/>
+      <path d="M150 400l-14 12M380 470l16 8"/>
+    </g>
+
+    <!-- A leaking drum on its side and its glowing puddle. -->
+    <ellipse cx="282" cy="444" rx="76" ry="16" fill="url(#glow)"/>
+    <path d="M232 436c20-6 60-8 84-2 18 4 20 12 4 16-26 6-72 4-88-6z" fill="#b9d23c" stroke="#5c6a2c" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M254 438c12-2 26-2 36 0M300 444c6 0 10 0 14 2" fill="none" stroke="#f1f8b4" stroke-width="3" stroke-linecap="round"/>
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <ellipse cx="150" cy="420" rx="10" ry="25" fill="#6e4630" stroke-width="3.5"/>
+      <path d="M150 395h80v50h-80z" fill="#8a5a3a" stroke-width="3.5"/>
+      <path d="M176 395h30v50h-30z" fill="#e0bd68" stroke-width="2.5"/>
+      <use href="#trefoil" transform="translate(191 420) scale(22)" fill="#33281c" stroke="none"/>
+      <path d="M166 395v50M216 395v50" stroke-width="3"/>
+      <path d="M158 400c2 10 0 20-4 28M222 402c2 8 0 16-2 22" fill="none" stroke="#5a3a24" stroke-width="3" opacity="0.7"/>
+      <ellipse cx="230" cy="420" rx="10" ry="25" fill="#1f1810" stroke-width="3.5"/>
+      <!-- Ooze spilling out of the open end. -->
+      <path d="M226 436c4 4 8 6 14 2" fill="none" stroke="#b9d23c" stroke-width="6"/>
+    </g>
+
+    <!-- A bent warning sign. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M452 330l-8-96" fill="none" stroke="#5f594f" stroke-width="7"/>
+      <g transform="rotate(-12 444 226)">
+        <path d="M412 200h64v48h-64z" fill="#e0bd68" stroke-width="3"/>
+        <use href="#trefoil" transform="translate(444 224) scale(30)" fill="#33281c" stroke="none"/>
+        <path d="M418 206h.01M470 206h.01M418 242h.01M470 242h.01" stroke-width="4"/>
+        <path d="M460 202c4 10 2 20-4 26" fill="none" stroke="#8a5a3a" stroke-width="3" opacity="0.6"/>
+      </g>
+    </g>
+
+    <!-- The mutated rat. -->
+    <g transform="translate(26 -18) scale(0.95)" stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <ellipse cx="250" cy="374" rx="170" ry="11" fill="#33281c" opacity="0.25" stroke="none"/>
+      <!-- Tail, lumpy and blotched. -->
+      <path d="M112 356C70 356 50 380 64 402c16 22 64 18 100 6 30-10 54-4 70 10" fill="none" stroke-width="17"/>
+      <path d="M112 356C70 356 50 380 64 402c16 22 64 18 100 6 30-10 54-4 70 10" fill="none" stroke="#c09a8c" stroke-width="10"/>
+      <circle cx="66" cy="388" r="11" fill="#c09a8c" stroke-width="3"/>
+      <circle cx="140" cy="414" r="8" fill="#c09a8c" stroke-width="3"/>
+      <path d="M84 364l4 9M64 404l9-2M100 418l1-9M168 404l-2-9M206 402l-1-9" fill="none" stroke="#8e6a5e" stroke-width="2.2"/>
+      <!-- Bone spikes along the back, the biggest over the shoulders. -->
+      <g fill="#ece0c4" stroke-width="3.4">
+        <path d="M120 284l-30-24 38 4z"/>
+        <path d="M128 268l-22-34 40 14z"/>
+        <path d="M164 230l-12-44 36 30z"/>
+        <path d="M212 212l4-48 24 42z"/>
+        <path d="M262 216l20-42 8 48z"/>
+        <path d="M296 234l20-20 2 30z"/>
+      </g>
+      <path d="M156 214l8 6M214 186l6 2M272 194l6 4" fill="none" stroke="#a39d90" stroke-width="2"/>
+      <!-- The mouth, open, behind the jaws. -->
+      <path d="M404 306 354 314 394 330z" fill="#5a1e10" stroke-width="3.6"/>
+      <!-- Hunched body and head in one outline. -->
+      <path d="M100 372C80 300 118 214 210 210c52-2 90 22 108 48 18-8 40-2 58 10 14 10 26 20 34 28 4 6 0 12-8 12l-48 6 40 14c4 8-4 14-14 12-18 0-36 2-48 12-4 10-6 18-8 20z" fill="#b8998b" stroke-width="3.6"/>
+      <!-- Patches of fur left on the bald skin, ragged at the edges. -->
+      <g fill="#675d50" stroke="none">
+        <path d="M112 330c-6-40 20-90 80-104l4 8-8 6 6 6c-4 10-14 14-24 14l6 8c-6 10-18 14-28 10l2 10c-6 12-18 20-38 42z"/>
+        <path d="M232 222c28-2 52 8 68 22l-8 4 2 8c-10 2-20 0-26 8l-6-8-6 6c-8-10-18-12-24-20l4-6z"/>
+      </g>
+      <!-- Veins and wrinkles on the bare skin. -->
+      <path d="M236 290c10-4 18-2 24 4 6-6 14-6 20-2M200 330c8-6 16-6 22 0M290 320c6-6 14-8 20-4M330 296c4-8 10-12 18-12" fill="none" stroke="#8a4a4a" stroke-width="2" opacity="0.7"/>
+      <path d="M150 354q10-6 20-4M240 356q12-6 24-2M284 352q8-4 16-2" fill="none" stroke="#8e6a5e" stroke-width="2.2"/>
+      <!-- Haunch, with only its front edge drawn, and the hind foot with long claws. -->
+      <path d="M128 332c22-30 72-28 82 4 4 20-10 32-24 36h-50c-14-8-16-24-8-40z" fill="#a4877a" stroke="none"/>
+      <path d="M132 330c22-28 70-26 80 6 4 18-8 30-22 34" fill="none" stroke-width="3.6"/>
+      <path d="M170 368h44c8 4 4 12-6 12h-40z" fill="#c98b80" stroke-width="3"/>
+      <path d="M212 370l14 2M210 377l14 4M202 381l10 6" fill="none" stroke-width="3"/>
+      <!-- Front leg, claws dug into the ground. -->
+      <path d="M304 336c8 14 12 24 14 34h18c-2-12-8-24-14-34z" fill="#a4877a" stroke-width="3.6"/>
+      <path d="M314 366h30c6 4 2 12-6 12h-26z" fill="#c98b80" stroke-width="3"/>
+      <path d="M342 368l14 1M342 375l14 4M334 379l9 7" fill="none" stroke-width="3"/>
+      <!-- Torn ear with a scar. -->
+      <path d="M302 254c-14-30 2-56 26-52l2 16 10-8c8 12 4 30-8 44z" fill="#b8998b" stroke-width="3.6"/>
+      <path d="M314 244c-6-18 2-30 12-30l2 10 8-4c4 8 0 18-6 24z" fill="#c98b80" stroke="none"/>
+      <path d="M286 266l20 16M290 278l6-8M298 284l6-8" fill="none" stroke="#8a4a4a" stroke-width="2.2"/>
+      <!-- Fangs, a crooked row of them, and foam. -->
+      <g fill="#f3e3b0" stroke-width="2.4">
+        <path d="M392 308l6 18 5-19z"/>
+        <path d="M376 310l4 14 5-15z"/>
+        <path d="M362 312l3 10 4-11z"/>
+        <path d="M384 328l3-14 6 12z"/>
+        <path d="M370 322l3-10 5 8z"/>
+      </g>
+      <path d="M372 334c-4 10 0 22-4 32 8-2 12-12 10-20 4 8 4 16 0 22 8-4 12-14 10-24 6 4 12 2 14-4-10-4-20-8-30-6z" fill="#f6ecd6" stroke-width="2.6"/>
+      <path d="M352 328c-4 6-4 12 0 16" fill="none" stroke="#f6ecd6" stroke-width="5"/>
+      <!-- Three eyes, glowing. -->
+      <circle cx="362" cy="272" r="30" fill="url(#glow)" stroke="none"/>
+      <circle cx="338" cy="262" r="20" fill="url(#glow)" stroke="none"/>
+      <circle cx="350" cy="242" r="16" fill="url(#glow)" stroke="none"/>
+      <g stroke-width="3">
+        <circle cx="362" cy="272" r="15" fill="#f0d860"/>
+        <circle cx="338" cy="262" r="9" fill="#f0d860"/>
+        <circle cx="350" cy="242" r="7" fill="#f0d860"/>
+      </g>
+      <path d="M362 262v20M338 256v12M350 238v8" stroke="#82301c" stroke-width="4.5"/>
+      <path d="M342 248l34 14" fill="none" stroke-width="4"/>
+      <!-- Nose and a few crooked whiskers. -->
+      <g fill="none" stroke-width="2">
+        <path d="M398 300c20-10 30-6 44-14 10-6 18-6 26-4M400 306c22 0 34 6 54 2"/>
+      </g>
+      <ellipse cx="408" cy="298" rx="9" ry="8" fill="#c98b80" stroke-width="3"/>
+      <!-- Sores, glowing through the skin. -->
+      <use href="#sore" transform="translate(150 300) scale(30)"/>
+      <use href="#sore" transform="translate(236 262) scale(24)"/>
+      <use href="#sore" transform="translate(270 330) scale(20)"/>
+      <use href="#sore" transform="translate(186 248) scale(16)"/>
+      <use href="#sore" transform="translate(316 300) scale(14)"/>
+      <use href="#sore" transform="translate(110 392) scale(14)"/>
+    </g>
+
+    <!-- Dead grass and a small skull in the foreground. -->
+    <g fill="none" stroke="#4f4c34" stroke-width="2.6" stroke-linecap="round">
+      <path d="M150 470c2-12 6-20 12-26M160 472c0-12-2-20-6-28M340 470c4-12 10-20 16-24M350 472c0-10-2-18-6-24M410 440c2-10 6-16 10-20"/>
+    </g>
+    <g stroke="#33281c" stroke-linejoin="round" stroke-width="2.6" transform="translate(356 446)">
+      <path d="M-22 4c0-16 10-24 22-24s22 8 20 22l-6 4v8h-26v-8z" fill="#ece0c4"/>
+      <path d="M-12-2a5 5 0 1 0 0.01 0M8-2a5 5 0 1 0 0.01 0" fill="#1f1810"/>
+      <path d="M-14 14v-6M-6 14v-6M2 14v-6" fill="none" stroke-width="2"/>
+    </g>
+  </g>
+
+  <!-- The medallion's frame. -->
+  <circle cx="256" cy="256" r="232" fill="none" stroke="#33281c" stroke-width="5"/>
+  <circle cx="256" cy="256" r="244" fill="none" stroke="#33281c" stroke-width="9"/>
+  <circle cx="256" cy="256" r="238" fill="none" stroke="#ece0c0" stroke-width="3"/>
+</svg>

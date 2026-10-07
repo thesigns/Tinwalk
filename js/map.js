@@ -29,7 +29,8 @@ const LABEL_FONT = '800 17px "Big Shoulders Stencil", Impact, sans-serif';
 const HUT_ICON = new Path2D('M3 11.5 12 4l9 7.5M5.5 10v10.5h13V10M10 20.5V15h4v5.5');
 const LANDMARK_RADIUS_PX = 15;
 const LANDMARK_ICON_PX = 20;
-const LANDMARK_BADGE_PX = 46;
+// Landmark and enemy badges.
+const BADGE_PX = 46;
 // The red pencil ring around the rescue mission's landmark.
 const TARGET_RADIUS_PX = 31;
 // Where the arrow to an off-screen target runs along, clear of the status
@@ -214,8 +215,8 @@ export class MapView {
     const complete = this.drawTerrain(center);
     if (!complete) this.requestFrame();
     this.drawSearchedAreas(center, scene.searchedAreas);
-    this.drawLandmarks(center, scene.landmarks);
-    this.drawMarkers(center, scene.enemies, ENEMY_STYLE);
+    this.drawBadges(center, scene.landmarks, 'landmark-icons', LANDMARK_STYLE);
+    this.drawBadges(center, scene.enemies, 'enemy-icons', ENEMY_STYLE);
     if (scene.target) this.drawTarget(center, scene.target);
     if (scene.shelter) this.drawShelter(center, scene.shelter);
     this.drawEffects();
@@ -289,7 +290,7 @@ export class MapView {
       const { ctx } = this;
       const { x, y } = this.toScreen(this.center, point);
       // Never smaller than a landmark badge, so rings around one start at its edge.
-      const radius = Math.max(radiusMeters / this.metersPerPixel, LANDMARK_BADGE_PX / 2);
+      const radius = Math.max(radiusMeters / this.metersPerPixel, BADGE_PX / 2);
       for (const delay of [0, 0.25]) {
         const ring = Math.max(0, (progress - delay) / (1 - delay));
         if (ring <= 0 || ring >= 1) continue;
@@ -466,7 +467,7 @@ export class MapView {
     const { center } = this;
     if (!center) return null;
     let nearest = null;
-    let nearestDistance = LANDMARK_BADGE_PX / 2 + TAP_MARGIN_PX;
+    let nearestDistance = BADGE_PX / 2 + TAP_MARGIN_PX;
     for (const landmark of this.scene.landmarks) {
       const point = this.toScreen(center, landmark);
       const distance = Math.hypot(point.x - x, point.y - y);
@@ -478,28 +479,28 @@ export class MapView {
     return nearest;
   }
 
-  // Landmarks are badges drawn from img/landmark-icons/<type>.svg, the same
-  // size at every zoom; until a badge has loaded, the plain symbol stands in.
-  drawLandmarks(center, landmarks) {
+  // Landmarks and enemies are badges drawn from img/<folder>/<type>.svg, the
+  // same size at every zoom; until a badge has loaded, the plain symbol stands in.
+  drawBadges(center, markers, folder, style) {
     const { ctx, width, height } = this;
-    const radius = LANDMARK_BADGE_PX / 2;
+    const radius = BADGE_PX / 2;
     const symbols = [];
-    for (const landmark of landmarks) {
-      const badge = landmarkBadge(landmark.type, () => this.requestFrame());
+    for (const marker of markers) {
+      const badge = loadBadge(folder, marker.type, () => this.requestFrame());
       if (!badge) {
-        symbols.push(landmark);
+        symbols.push(marker);
         continue;
       }
-      const { x, y } = this.toScreen(center, landmark);
+      const { x, y } = this.toScreen(center, marker);
       if (x < -radius || y < -radius || x > width + radius || y > height + radius) continue;
       ctx.save();
       ctx.shadowColor = COLORS.shadow;
       ctx.shadowBlur = 4;
       ctx.shadowOffsetY = 1.5;
-      ctx.drawImage(badge, x - radius, y - radius, LANDMARK_BADGE_PX, LANDMARK_BADGE_PX);
+      ctx.drawImage(badge, x - radius, y - radius, BADGE_PX, BADGE_PX);
       ctx.restore();
     }
-    this.drawMarkers(center, symbols, LANDMARK_STYLE);
+    this.drawMarkers(center, symbols, style);
   }
 
   // Landmarks and enemies: small symbols on discs, the same size at every zoom.
@@ -721,24 +722,25 @@ export class MapView {
   }
 }
 
-// Landmark badges are rasterized once, sharp enough for high-density screens,
-// so panning doesn't redraw the SVGs every frame.
-const BADGE_RASTER_PX = LANDMARK_BADGE_PX * 3;
-const badges = new Map(); // type -> canvas, or null while loading or if there is none
+// Badges are rasterized once, sharp enough for high-density screens, so
+// panning doesn't redraw the SVGs every frame.
+const BADGE_RASTER_PX = BADGE_PX * 3;
+const badges = new Map(); // 'folder/type' -> canvas, or null while loading or if there is none
 
-function landmarkBadge(type, onLoad) {
-  if (badges.has(type)) return badges.get(type);
-  badges.set(type, null);
+function loadBadge(folder, type, onLoad) {
+  const key = `${folder}/${type}`;
+  if (badges.has(key)) return badges.get(key);
+  badges.set(key, null);
   const image = new Image();
   image.onload = () => {
     const canvas = document.createElement('canvas');
     canvas.width = BADGE_RASTER_PX;
     canvas.height = BADGE_RASTER_PX;
     canvas.getContext('2d').drawImage(image, 0, 0, BADGE_RASTER_PX, BADGE_RASTER_PX);
-    badges.set(type, canvas);
+    badges.set(key, canvas);
     onLoad();
   };
-  image.src = `img/landmark-icons/${type}.svg`;
+  image.src = `img/${key}.svg`;
   return null;
 }
 

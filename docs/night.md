@@ -16,7 +16,7 @@ Pora dnia w grze to prawdziwa pora dnia w miejscu, w którym jest użytkownik. P
 | Dzień | bez zmian            | +1        |
 | Noc   | −1 (ale co najmniej 1) | +1      |
 
-- Kara i premia dotyczą liczby zasobów wylosowanej z tabeli odległości (zob. [loot.md](loot.md)). Wygrana walka podwaja wynik już po karze albo premii.
+- Kara i premia dotyczą liczby zasobów wylosowanej z tabeli odległości (zob. [loot.md](loot.md)). Skarb za wygraną walkę nie zależy od pory dnia ani latarki (zob. [combat.md](combat.md#wygrana)).
 - Do 1 km od schronu przeszukanie zawsze daje 1 sztukę, więc tam noc niczego nie zabiera.
 - Z latarką noc nie różni się od dnia. Gra nigdy nie nagradza wychodzenia po ciemku, tylko przestaje za nie karać.
 - O tym, czy jest noc, decyduje miejsce i chwila przeszukania.

@@ -31,9 +31,11 @@ export function replayAnimation(element, className) {
 }
 
 // Flies a copy of an icon in an arc from one element to another.
+// `from` is an element or a DOMRect: a dialog that has just closed no longer
+// has a box, so the caller may remember where its icon was.
 export function flyIcon(name, from, to) {
   if (prefersReducedMotion()) return Promise.resolve();
-  const start = from.getBoundingClientRect();
+  const start = from instanceof Element ? from.getBoundingClientRect() : from;
   const end = to.getBoundingClientRect();
   const flyer = iconElement(name);
   flyer.classList.add('flyer');

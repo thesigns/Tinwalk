@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <!-- Map badge: a mutated rat, hunched, with bone spikes along its back, bald skin with
+       glowing sores, three yellow eyes and a foaming mouth. Enemies sit on red paint. -->
+  <defs>
+    <clipPath id="inside"><circle cx="48" cy="48" r="42"/></clipPath>
+    <!-- A glowing sore, 1 across, centred on its origin. -->
+    <g id="sore">
+      <circle r="1" fill="#d7ea6a" opacity="0.35"/>
+      <circle r="0.62" fill="#b9d23c"/>
+      <circle r="0.3" fill="#f1f8b4"/>
+    </g>
+  </defs>
+
+  <circle cx="48" cy="48" r="45" fill="#b4432b"/>
+  <g clip-path="url(#inside)">
+    <path d="M0 72H96V96H0z" fill="#82301c"/>
+    <path d="M0 72H96" stroke="#33281c" stroke-width="2.4"/>
+  </g>
+
+  <!-- Drawn at the illustration's scale and shrunk to fit: strokes of 13 come out at 2.6. -->
+  <g transform="translate(0.8 -2.4) scale(0.2)" stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Tail, lumpy, curled round behind. -->
+    <path d="M112 356C82 354 70 372 80 390c12 16 44 14 66 4" fill="none" stroke-width="30"/>
+    <path d="M112 356C82 354 70 372 80 390c12 16 44 14 66 4" fill="none" stroke="#c09a8c" stroke-width="14"/>
+    <circle cx="80" cy="384" r="12" fill="#c09a8c" stroke-width="9"/>
+    <!-- Bone spikes along the back. -->
+    <g fill="#ece0c4" stroke-width="11">
+      <path d="M128 268l-22-34 40 14z"/>
+      <path d="M164 230l-12-44 36 30z"/>
+      <path d="M212 212l4-48 24 42z"/>
+      <path d="M262 216l20-42 8 48z"/>
+    </g>
+    <!-- The mouth, open, behind the jaws. -->
+    <path d="M404 306 354 314 394 330z" fill="#5a1e10" stroke-width="11"/>
+    <!-- Hunched body and head in one outline. -->
+    <path d="M100 372C80 300 118 214 210 210c52-2 90 22 108 48 18-8 40-2 58 10 14 10 26 20 34 28 4 6 0 12-8 12l-48 6 40 14c4 8-4 14-14 12-18 0-36 2-48 12-4 10-6 18-8 20z" fill="#b8998b" stroke-width="13"/>
+    <!-- Patches of fur left on the bald skin. -->
+    <g fill="#675d50" stroke="none">
+      <path d="M112 330c-6-40 20-90 80-104 10 20-6 30-20 34 10 16-4 34-22 32 4 18-16 30-38 38z"/>
+      <path d="M232 222c28-2 52 8 68 22-14 10-32 4-36 18-12-14-30-10-38-24z"/>
+    </g>
+    <!-- Haunch, with only its front edge drawn, and the hind foot. -->
+    <path d="M128 332c22-30 72-28 82 4 4 20-10 32-24 36h-50c-14-8-16-24-8-40z" fill="#a4877a" stroke="none"/>
+    <path d="M132 330c22-28 70-26 80 6 4 18-8 30-22 34" fill="none" stroke-width="13"/>
+    <path d="M170 368h44c8 4 4 12-6 12h-40z" fill="#c98b80" stroke-width="11"/>
+    <!-- Front leg and clawed paw. -->
+    <path d="M304 336c8 14 12 24 14 34h18c-2-12-8-24-14-34z" fill="#a4877a" stroke-width="13"/>
+    <path d="M314 366h30c6 4 2 12-6 12h-26z" fill="#c98b80" stroke-width="11"/>
+    <!-- Torn ear. -->
+    <path d="M302 254c-14-30 2-56 26-52l2 16 10-8c8 12 4 30-8 44z" fill="#b8998b" stroke-width="13"/>
+    <!-- Fangs and foam. -->
+    <g fill="#f3e3b0" stroke-width="7">
+      <path d="M386 309l6 16 6-17z"/>
+      <path d="M366 312l4 12 5-13z"/>
+      <path d="M380 326l4-12 6 11z"/>
+    </g>
+    <path d="M370 334c-4 10 0 20-4 28 8-2 12-10 10-18 6 4 12 2 14-4z" fill="#f6ecd6" stroke-width="7"/>
+    <!-- Three eyes, glowing. -->
+    <g stroke-width="7">
+      <circle cx="362" cy="272" r="16" fill="#f0d860"/>
+      <circle cx="338" cy="262" r="10" fill="#f0d860"/>
+      <circle cx="350" cy="244" r="8" fill="#f0d860"/>
+    </g>
+    <path d="M362 262v20M338 256v12M350 239v10" stroke="#82301c" stroke-width="7"/>
+    <ellipse cx="408" cy="298" rx="10" ry="9" fill="#c98b80" stroke-width="9"/>
+  </g>
+  <!-- Sores, glowing through the outline. -->
+  <use href="#sore" transform="translate(32 59) scale(4.2)"/>
+  <use href="#sore" transform="translate(49 52) scale(3.4)"/>
+  <use href="#sore" transform="translate(58 63) scale(2.8)"/>
+  <use href="#sore" transform="translate(38 47) scale(2.4)"/>
+
+  <circle cx="48" cy="48" r="45" fill="none" stroke="#33281c" stroke-width="4"/>
+</svg>

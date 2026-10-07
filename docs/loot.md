@@ -8,7 +8,7 @@ W grze są cztery zasoby: **Junk**, **Food**, **Cells** (baterie) i **Isotopes**
 
 Cells są rzadkie poza ruinami. Nic w grze ich jeszcze nie wytwarza, więc jedynym źródłem jest przeszukiwanie.
 
-Przeszukanie może też dać podręcznik ([crafting.md](crafting.md#podręczniki-manuals)), odkryć landmark ([landmarks.md](landmarks.md)) albo zakończyć się spotkaniem z wrogiem ([combat.md](combat.md)). Wygrana walka podwaja liczbę zasobów.
+Przeszukanie może też dać podręcznik ([crafting.md](crafting.md#podręczniki-manuals)), odkryć landmark ([landmarks.md](landmarks.md)) albo zakończyć się spotkaniem z wrogiem ([combat.md](combat.md)). Wygrana walka dokłada do zasobów skarb wroga ([combat.md](combat.md#wygrana)).
 
 ## Odległość od schronu
 

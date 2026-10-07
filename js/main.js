@@ -7,12 +7,11 @@ import {
   LANDMARKS,
   MANUALS,
   MANUAL_SIZE,
+  PLAYER_STRENGTH,
   RADIO,
   RESOURCES,
   SEARCH_RADIUS,
-  STRIKE_CARDS,
   SHELTER_RADIUS,
-  VICTORY_LOOT_MULTIPLIER,
   WOUNDED_CAPACITY_BONUS,
   activeSearchedAreas,
   backpackCapacity,
@@ -31,6 +30,7 @@ import {
   createShelter,
   dropFromBackpack,
   emptyResources,
+  enemyAttack,
   expireMission,
   fight,
   finishSearch,
@@ -52,10 +52,12 @@ import {
   missionEndsAt,
   nextDaylightChange,
   packItem,
+  playerStrength,
   pruneSearchedAreas,
   radiationAtPosition,
   removeLandmark,
   runAway,
+  runLoss,
   search,
   searchBlocker,
   settleMeals,
@@ -68,6 +70,7 @@ import {
   unload,
   woundHealsAt,
 } from './game.js';
+import { diceRange } from './dice.js';
 import { flyIcon, iconElement, prefersReducedMotion, replayAnimation, wait } from './fx.js';
 import { averagePosition, bearingDegrees, distanceMeters } from './geo.js';
 import { LocationTracker } from './gps.js';
@@ -81,8 +84,9 @@ const SHELTER_LOCATING_MS = 10_000;
 const SEARCH_ANIMATION_MS = 1_400;
 const REWARD_CARD_MS = 1_300;
 const RIPPLE_MS = 900;
-// How far the player can walk from a landmark they just found before its card closes.
-const DISCOVERY_CARD_RANGE = 50;
+// How far the player can walk from where a card opened (a landmark they just
+// found, a search's loot) before it closes by itself.
+const WALK_AWAY_RANGE = 50;
 // How long the radio crackles before the player hears whether anyone called.
 const LISTEN_MS = 3_400;
 const TOAST_DURATION_MS = 4_000;
@@ -111,25 +115,8 @@ const SEARCH_BLOCKER_HINTS = {
   shelter: 'Too close to your shelter',
   searched: 'This area has already been searched',
 };
-const ENCOUNTER_TEXT = {
-  rat: 'A rat jumps out of the rubble at you, teeth bared.',
-  'mutated-rat': 'Something rat-shaped and wrong crawls out at you, hissing.',
-};
-// What the enemy's threat card looks like, by the highest value each line covers.
-const THREAT_TEXT = {
-  rat: [
-    [2, 'Scrawny and limping'],
-    [4, 'Hungry and bold'],
-    [6, 'Big and cornered'],
-  ],
-  'mutated-rat': [
-    [5, 'Twitching, half blind'],
-    [8, 'Covered in glowing sores'],
-    [10, 'Huge, foaming at the mouth'],
-  ],
-};
-// How long the strike card takes to turn before the outcome shows.
-const CARD_FLIP_MS = 700;
+// How long a roll takes to turn up before the fight goes on.
+const ROLL_MS = 700;
 const COMPASS_POINTS = [
   { short: 'N', long: 'north' },
   { short: 'NE', long: 'north-east' },
@@ -179,14 +166,13 @@ const ui = {
   missionDetail: $('mission-detail'),
   encounterDialog: $('encounter-dialog'),
   encounterTitle: $('encounter-title'),
-  encounterIcon: $('encounter-icon'),
+  encounterArt: $('encounter-art'),
   encounterText: $('encounter-text'),
-  threatCard: $('threat-card'),
-  threatNote: $('threat-note'),
-  strikeCard: $('strike-card'),
-  strikeNote: $('strike-note'),
+  enemyLabel: $('enemy-label'),
+  enemyRoll: $('enemy-roll'),
+  playerRoll: $('player-roll'),
   encounterChoices: $('encounter-choices'),
-  encounterResult: $('encounter-result'),
+  encounterMessage: $('encounter-message'),
   encounterDone: $('encounter-done'),
   encounterOk: $('encounter-ok'),
   manualDialog: $('manual-dialog'),
@@ -252,6 +238,14 @@ const ui = {
   rewardAmount: $('reward-amount'),
   rewardName: $('reward-name'),
   rewardNote: $('reward-note'),
+  lootDialog: $('loot-dialog'),
+  lootIcon: $('loot-icon'),
+  lootAmount: $('loot-amount'),
+  lootName: $('loot-name'),
+  lootNote: $('loot-note'),
+  lootStash: $('loot-stash'),
+  lootStashTitle: $('loot-stash-title'),
+  lootStashItems: $('loot-stash-items'),
   soundToggle: $('sound-toggle'),
   vibrationToggle: $('vibration-toggle'),
 };
@@ -283,8 +277,9 @@ let ringTimer = null;
 // What is marked to be dropped in the open backpack panel: resource units by
 // id, backpack items and manual ids.
 let dropping = { resources: emptyResources(), items: [], manuals: [] };
-// The landmark whose discovery card is open, or null.
-let discoveredLandmark = null;
+// A card that closes by itself once the player walks away from where it
+// opened: { dialog, point }, or null.
+let walkAwayCard = null;
 // Survivor name tags in the shelter panel, kept between renders (see renderSurvivorBadges).
 const survivorBadges = new WeakMap();
 
@@ -325,8 +320,8 @@ function crackle() {
 function update() {
   inShelter = isInShelter(state.shelter, tracker.position, inShelter);
   const { position } = tracker;
-  if (discoveredLandmark && position && distanceMeters(position, discoveredLandmark) > DISCOVERY_CARD_RANGE) {
-    ui.landmarkDialog.close('close');
+  if (walkAwayCard && position && distanceMeters(position, walkAwayCard.point) > WALK_AWAY_RANGE) {
+    walkAwayCard.dialog.close('close');
   }
   renderStatus();
   renderActions();
@@ -614,47 +609,104 @@ async function searchAction() {
   holdBackpack = true;
   const result = search(state, position, now());
   saveAndUpdate();
+  // A landmark stands whatever happens in a fight, so it shows first.
+  if (result.landmark) await showLandmark(result.landmark);
   let { loot = null, rescued = null } = result;
-  let victory = null;
+  let stash = null;
   if (result.encounter) {
+    const { enemy } = result.encounter;
     holdBackpack = false;
     update();
-    victory = await encounter(result.encounter);
-    if (!victory) return;
+    if (!(await encounter(result.encounter))) return;
     holdBackpack = true;
-    ({ loot, rescued } = finishSearch(state, position, now(), VICTORY_LOOT_MULTIPLIER));
+    let treasure;
+    ({ loot, rescued, treasure } = finishSearch(state, position, now(), enemy));
+    stash = { enemy, took: treasure };
     saveAndUpdate();
   }
 
-  const { resource, found, carried, manual, landmark, dark, flashlight, geiger } = loot;
-  let message = `You've found ${amountOf(resource, found)}`;
-  if (carried === 0) message += ', but your backpack is full';
-  else if (carried < found) message += `, but could only carry ${carried}`;
-  if (geiger) {
-    message += `. Your ${ITEMS['geiger-counter'].label} showed everything else here was too hot to keep`;
-    message += geiger.wornOut ? ', then went dead.' : '.';
-  } else if (flashlight) message += `. Your ${ITEMS.flashlight.label} lit up dark corners${flashlight.wornOut ? ' and went dead' : ''}.`;
-  else if (dark) message += '. It was too dark to search well.';
-  if (victory) message = `${victory} ${message}`;
-  feedback(carried > 0 ? 'found' : 'full');
-  await showReward({
-    icon: resource.id,
-    amount: carried > 0 ? `+${carried}` : '0',
-    name: resource.label,
-    note: message,
-    empty: carried === 0,
-    flyToBackpack: carried > 0,
-  });
+  const carried = await showLoot(loot, stash, position);
   holdBackpack = false;
   update();
-  if (carried > 0) {
+  if (carried) {
     replayAnimation(ui.backpackHud, 'bump');
     feedback('land');
   }
 
-  if (landmark) await showLandmark(landmark);
   if (rescued) await offerSurvivor(rescued);
-  if (manual) await offerManual(manual);
+  if (loot.manual) await offerManual(loot.manual);
+}
+
+// Shows what a search turned up, and the beaten enemy's stash after a fight,
+// until the player taps OK or walks on. Then the finds fly into the backpack.
+// Returns whether anything went into it.
+async function showLoot(loot, stash, position) {
+  const { resource, carried } = loot;
+  ui.lootIcon.setAttribute('href', `#i-${resource.id}`);
+  ui.lootIcon.parentElement.dataset.icon = carried > 0 ? resource.id : '';
+  ui.lootAmount.textContent = carried > 0 ? `+${carried}` : '0';
+  ui.lootName.textContent = carried === 1 ? resource.one : resource.label;
+  ui.lootDialog.classList.toggle('empty', carried === 0);
+  ui.lootNote.textContent = lootNote(loot, stash);
+  ui.lootNote.hidden = !ui.lootNote.textContent;
+  ui.lootStash.hidden = !stash;
+  if (stash) {
+    const { label, treasure } = ENEMIES[stash.enemy.type];
+    ui.lootStashTitle.textContent = `The ${label}'s stash`;
+    ui.lootStashItems.replaceChildren(
+      ...RESOURCES.filter(({ id }) => treasure[id]).map((item) => stashChip(item, stash.took[item.id])),
+    );
+  }
+  feedback(carried > 0 ? 'found' : 'full');
+
+  walkAwayCard = { dialog: ui.lootDialog, point: tracker.position ?? position };
+  const closed = ask(ui.lootDialog);
+  // Where each find sits once the card has settled, for it to fly from after it closes.
+  await Promise.race([Promise.all(ui.lootDialog.getAnimations().map((animation) => animation.finished)), closed]);
+  const finds = [...ui.lootDialog.querySelectorAll('[data-icon]')]
+    .filter((element) => element.dataset.icon)
+    .map((element) => ({ icon: element.dataset.icon, rect: element.getBoundingClientRect() }))
+    .filter(({ rect }) => rect.width > 0);
+  await closed;
+  walkAwayCard = null;
+  await Promise.all(finds.map(({ icon, rect }) => flyIcon(icon, rect, ui.backpackIcon)));
+  return carried > 0 || (stash !== null && totalResources(stash.took) > 0);
+}
+
+// What else the player should know about a search: what didn't fit, and what
+// the dark, a flashlight or a Geiger counter did.
+function lootNote({ resource, found, carried, dark, flashlight, geiger }, stash) {
+  const notes = [];
+  if (carried === 0) notes.push(`You found ${amountOf(resource, found)}, but your backpack is full.`);
+  else if (carried < found) notes.push(`You found ${amountOf(resource, found)}, but could only carry ${carried}.`);
+  if (geiger) {
+    const dead = geiger.wornOut ? ', then went dead' : '';
+    notes.push(`Your ${ITEMS['geiger-counter'].label} showed everything else here was too hot to keep${dead}.`);
+  } else if (flashlight) {
+    notes.push(`Your ${ITEMS.flashlight.label} lit up dark corners${flashlight.wornOut ? ' and went dead' : ''}.`);
+  } else if (dark) {
+    notes.push('It was too dark to search well.');
+  }
+  if (stash) {
+    const took = totalResources(stash.took);
+    const had = totalResources({ ...emptyResources(), ...ENEMIES[stash.enemy.type].treasure });
+    if (took === 0) notes.push('You had no room for its stash.');
+    else if (took < had) notes.push('You had no room for all of its stash.');
+  }
+  return notes.join(' ');
+}
+
+// One resource of an enemy's stash: its icon and how much the player took.
+function stashChip(resource, took) {
+  const chip = document.createElement('span');
+  chip.className = 'loot-chip';
+  chip.classList.toggle('none', took === 0);
+  const medal = document.createElement('span');
+  medal.className = 'chip-medal';
+  medal.dataset.icon = took > 0 ? resource.id : '';
+  medal.append(iconElement(resource.id));
+  chip.append(medal, `+${took} ${took === 1 ? resource.one : resource.label}`);
+  return chip;
 }
 
 // A newly discovered landmark is stamped onto the map and its card opens.
@@ -664,99 +716,136 @@ async function showLandmark(landmark) {
   await openLandmark(landmark, true);
 }
 
-// Shows the enemy's threat card and lets the player pick a weapon from the
-// backpack, fight bare-handed or run, then turns their strike card. Returns a
-// note for the loot card after a won fight, or null if the search ends here.
+// Shows the enemy's strength and takes the player through the fight: run or
+// reach for a weapon, see the enemy's attack, then run or strike back.
+// Returns whether the player won; otherwise the search ends here.
 async function encounter(encounter) {
-  const { enemy, threat, returning } = encounter;
-  const { label } = ENEMIES[enemy.type];
-  ui.encounterTitle.textContent = `${label}!`;
-  ui.encounterIcon.setAttribute('href', `#i-${enemy.type}`);
-  ui.encounterText.textContent = returning ? `The ${label} you met here is still around.` : ENCOUNTER_TEXT[enemy.type];
-  ui.threatCard.textContent = threat;
-  ui.threatNote.textContent = THREAT_TEXT[enemy.type].find(([max]) => threat <= max)[1];
-  ui.strikeCard.textContent = '';
-  ui.strikeCard.classList.add('face-down');
-  ui.strikeNote.textContent = `1–${STRIKE_CARDS} + your weapon`;
-  ui.encounterResult.hidden = true;
+  const { enemy } = encounter;
+  const { label, strength, flavor } = ENEMIES[enemy.type];
+  // Without a weapon there is nothing to reach for, and the player's strength is known.
+  const weapons = backpackWeapons(state);
+  ui.encounterArt.src = `img/enemies/${enemy.type}.svg`;
+  ui.encounterTitle.textContent = label;
+  ui.encounterText.textContent = flavor;
+  ui.enemyLabel.textContent = label;
+  showStrength(ui.enemyRoll, strength);
+  showStrength(ui.playerRoll, weapons.length ? null : PLAYER_STRENGTH);
+  ui.encounterMessage.textContent = 'Fight or run?';
   ui.encounterDone.hidden = true;
-  ui.encounterChoices.hidden = false;
-  const choice = new Promise((resolve) => ui.encounterChoices.replaceChildren(...fightChoices(resolve)));
   ui.encounterDialog.showModal();
   feedback('enemy');
-  const weapon = await choice;
-  ui.encounterChoices.hidden = true;
 
-  if (weapon === 'run') {
-    ui.encounterDialog.close();
-    const lost = runAway(state, encounter);
-    saveAndUpdate();
-    feedback('flee');
-    const total = totalResources(lost);
-    if (total > 0) replayAnimation(ui.backpackHud, 'bump');
-    const dropped = total > 0 ? `You ran, dropping ${describeResources(lost)}` : 'You ran and got away';
-    showToast(`${dropped}. The ${label} stays on your map.`, enemy.type);
-    return null;
+  const fightChoice = weapons.length
+    ? { value: 'arm', label: 'Reach for a weapon', detail: '' }
+    : { value: null, label: 'Fight bare-handed', detail: PLAYER_STRENGTH };
+  let weapon = await choose([fightChoice, runChoice(false)]);
+  if (weapon === 'run') return flee(enemy, false);
+  if (weapon === 'arm') {
+    ui.encounterMessage.textContent = 'What do you fight with?';
+    weapon = await choose([...weapons.map(weaponChoice), { value: null, label: 'Bare hands', detail: PLAYER_STRENGTH }]);
   }
 
   const weaponLabel = weapon && ITEMS[weapon.id].label;
-  const { outcome, card, strike, wornOut, lost, wounded } = fight(state, encounter, weapon, now());
+  showStrength(ui.playerRoll, playerStrength(weapon));
+  const attack = enemyAttack(enemy);
+  await showRoll(ui.enemyRoll, attack);
+  ui.encounterMessage.textContent = `The ${label} attacks! Strike back or run?`;
+  const attackChoice = { value: 'attack', label: 'Attack', detail: weapon ? `with the ${weaponLabel}` : 'bare-handed' };
+  if ((await choose([attackChoice, runChoice(true)])) === 'run') return flee(enemy, true);
+
+  const { won, strike, wornOut, lost } = fight(state, encounter, attack, weapon);
   saveAndUpdate();
-  ui.strikeCard.classList.remove('face-down');
-  ui.strikeCard.textContent = strike;
-  ui.strikeNote.textContent = weapon ? `${card} + ${ITEMS[weapon.id].bonus} for the ${weaponLabel}` : `${card}, bare-handed`;
-  replayAnimation(ui.strikeCard, 'flip');
-  feedback('flip');
-  await wait(CARD_FLIP_MS);
+  await showRoll(ui.playerRoll, strike);
 
   const wornNote = wornOut ? ` Your ${weaponLabel} is worn out.` : '';
   const total = totalResources(lost);
   let note;
-  if (outcome === 'won') {
-    note = `You fought off the ${label}: double loot!`;
+  if (won) {
+    note = `You beat the ${label}.`;
     feedback('hit');
-  } else if (outcome === 'stalemate') {
-    note = `A stalemate: the ${label} holds its ground and stays on your map. You find nothing here.`;
-    feedback('stalemate');
   } else {
-    note = `The ${label} got the better of you and stays on your map.`;
+    note = strike === attack
+      ? `A tie goes to the ${label}, and it stays on your map.`
+      : `The ${label} got the better of you and stays on your map.`;
     if (total > 0) note += ` You lost ${describeResources(lost)}.`;
-    if (wounded) note += ` ${state.companion.name} was wounded.`;
     feedback('defeat');
   }
-  ui.encounterResult.textContent = note + wornNote;
-  ui.encounterResult.hidden = false;
+  ui.encounterMessage.textContent = note + wornNote;
   ui.encounterDone.hidden = false;
   ui.encounterOk.focus();
   await new Promise((resolve) => ui.encounterDialog.addEventListener('close', resolve, { once: true }));
   if (total > 0) replayAnimation(ui.backpackHud, 'bump');
-  if (wounded) replayAnimation(ui.companion, 'bump');
-  return outcome === 'won' ? note + wornNote : null;
+  return won;
 }
 
-// A button for each weapon in the backpack, bare hands and running away; a
-// tap resolves with the weapon, null for bare hands, or 'run'.
-function fightChoices(resolve) {
-  const choices = [
-    ...backpackWeapons(state).map((item) => {
-      const { label, bonus, uses } = ITEMS[item.id];
-      return { value: item, label, detail: `+${bonus} · ${item.uses}/${uses} uses`, style: 'btn-paint' };
-    }),
-    { value: null, label: 'Bare hands', detail: '+0', style: 'btn-paint' },
-    { value: 'run', label: 'Run', detail: 'drop some supplies', style: 'btn-ink' },
-  ];
-  return choices.map(({ value, label, detail, style }) => {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = `btn ${style}`;
-    const name = document.createElement('span');
-    name.textContent = label;
-    const small = document.createElement('span');
-    small.className = 'choice-detail';
-    small.textContent = detail;
-    button.append(name, small);
-    button.addEventListener('click', () => resolve(value), { once: true });
-    return button;
+// A roll yet to come: the strength it will be rolled with and its range, or
+// a question mark while the player hasn't picked a weapon.
+function showStrength(element, strength) {
+  element.classList.remove('rolled');
+  if (!strength) {
+    element.replaceChildren('?');
+    return;
+  }
+  const [min, max] = diceRange(strength);
+  const range = document.createElement('small');
+  range.textContent = `(${min}–${max})`;
+  element.replaceChildren(strength, range);
+}
+
+// Shows a roll and waits for it to land.
+async function showRoll(element, value) {
+  element.classList.add('rolled');
+  element.textContent = value;
+  replayAnimation(element, 'flip');
+  feedback('flip');
+  await wait(ROLL_MS);
+}
+
+// Runs from the enemy, closing the fight, and says what was dropped. Returns
+// false: the search ends here.
+function flee(enemy, attacked) {
+  ui.encounterDialog.close();
+  const lost = runAway(state, attacked);
+  saveAndUpdate();
+  feedback('flee');
+  const total = totalResources(lost);
+  if (total > 0) replayAnimation(ui.backpackHud, 'bump');
+  const dropped = total > 0 ? `You ran, dropping ${describeResources(lost)}` : 'You ran and got away';
+  showToast(`${dropped}. The ${ENEMIES[enemy.type].label} stays on your map.`, enemy.type);
+  return false;
+}
+
+function runChoice(attacked) {
+  const count = runLoss(state, attacked);
+  const detail = count === 0 ? 'nothing to drop' : `drop ${count} ${count === 1 ? 'supply' : 'supplies'}`;
+  return { value: 'run', label: 'Run', detail, style: 'btn-ink' };
+}
+
+function weaponChoice(item) {
+  const { label, uses } = ITEMS[item.id];
+  return { value: item, label, detail: `${playerStrength(item)} · ${item.uses}/${uses} uses` };
+}
+
+// Shows a button for each choice and resolves with the value of the one tapped.
+function choose(choices) {
+  return new Promise((resolve) => {
+    const buttons = choices.map(({ value, label, detail, style = 'btn-paint' }) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = `btn ${style}`;
+      const name = document.createElement('span');
+      name.textContent = label;
+      const small = document.createElement('span');
+      small.className = 'choice-detail';
+      small.textContent = detail;
+      button.append(name, small);
+      button.addEventListener('click', () => {
+        ui.encounterChoices.replaceChildren();
+        resolve(value);
+      });
+      return button;
+    });
+    ui.encounterChoices.replaceChildren(...buttons);
   });
 }
 
@@ -1367,9 +1456,9 @@ async function openLandmark(landmark, discovered = false) {
   ui.landmarkFlavor.textContent = flavor;
   ui.landmarkMission.hidden = !pinned;
   ui.landmarkRemove.hidden = pinned;
-  discoveredLandmark = discovered ? landmark : null;
+  walkAwayCard = discovered ? { dialog: ui.landmarkDialog, point: landmark } : null;
   const choice = await ask(ui.landmarkDialog);
-  discoveredLandmark = null;
+  walkAwayCard = null;
   if (choice !== 'remove') return;
   ui.removeLandmarkName.textContent = label;
   if ((await ask(ui.removeLandmarkDialog)) !== 'remove') return;

@@ -28,7 +28,7 @@ Przedmioty i wyposażenie schronu wytwarza się w schronie z zasobów z magazynu
 
 ### Zabieranie
 
-- Po znalezieniu (po komunikacie o zasobach, ewentualnym landmarku i ewentualnym ratunku ocalałego) aplikacja pokazuje okno z podręcznikiem i przyciskami **Take** oraz **Leave**.
+- Po znalezieniu (po ewentualnym landmarku, oknie ze znaleziskiem i ewentualnym ratunku ocalałego) aplikacja pokazuje okno z podręcznikiem i przyciskami **Take** oraz **Leave**.
 - Podręcznik zajmuje 3 jednostki miejsca w plecaku. Gdy miejsca brakuje, **Take** jest nieaktywne, a okno pozwala otworzyć plecak i coś wyrzucić.
 - Zostawiony albo wyrzucony podręcznik przepada, ale może wypaść ponownie.
 - Podręcznik zaczyna działać dopiero po rozładunku w schronie. Zostaje w schronie na zawsze i nie można go zabrać z powrotem do plecaka.

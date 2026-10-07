@@ -76,7 +76,8 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
 | Cells | zasilanie radia, a docelowo innych urządzeń elektrycznych |
 | Isotopes | docelowo produkcja Reactor Fuel; tylko ze stref radiacji (zob. [radiation.md](radiation.md)) |
 
-- Komunikat po przeszukaniu, np. „You've found 3 Junk”.
+- Po przeszukaniu otwiera się okno ze znaleziskiem: medal z ikoną zasobu, pod nim duży napis, np. „+3 Junk”, i ewentualne uwagi (co się nie zmieściło, co zrobiła ciemność, latarka albo licznik Geigera). Po wygranej walce okno ma też sekcję ze skarbem wroga (zob. [combat.md](combat.md#interfejs)).
+- Okno nie znika samo: zamyka je przycisk **OK** albo odejście ponad 50 m od miejsca, w którym się pojawiło. Dopiero wtedy ikony znalezisk wlatują do plecaka na pasku stanu.
 - Przeszukanie może dać podręcznik, który odblokowuje wytwarzanie przedmiotów (zob. [crafting.md](crafting.md)).
 - Po ciemku przeszukanie daje mniej, chyba że użytkownik ma latarkę (zob. [night.md](night.md)).
 - Część pustkowia jest skażona radiacją. Strefy są niewidoczne i wykrywa je licznik Geigera (zob. [radiation.md](radiation.md)).
@@ -87,7 +88,7 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
 ### Plecak
 
 - Plecak mieści łącznie 50 jednostek wszystkich zasobów i przedmiotów (np. 25 Junk i 25 Food). Każdy zasób zajmuje 1 jednostkę. Ile miejsca zajmuje przedmiot albo podręcznik, opisuje [crafting.md](crafting.md).
-- Gdy znalezisko nie mieści się w całości, użytkownik zabiera tyle, ile się zmieści, a reszta przepada. Komunikat, np. „You've found 3 Junk, but could only carry 1”.
+- Gdy znalezisko nie mieści się w całości, użytkownik zabiera tyle, ile się zmieści, a reszta przepada. Okno pokazuje, ile zabrał (np. „+1 Junk”), z uwagą „You found 3 Junk, but could only carry 1.”
 - Z pełnym plecakiem nadal można przeszukiwać (np. w nadziei na landmark albo żeby uratować ocalałego).
 - Dotknięcie plecaka na pasku stanu otwiera jego zawartość: ile jednostek każdego zasobu niesie użytkownik, jakie przedmioty i ile miejsca zostało.
 - Z plecaka można wyrzucać zasoby, np. żeby zrobić miejsce na inne. Użytkownik zaznacza przyciskami −/+, ile jednostek którego zasobu wyrzucić (przytrzymanie przycisku zmienia liczbę dalej), i zatwierdza przyciskiem **Drop**. Zamknięcie okna bez zatwierdzenia niczego nie wyrzuca.
@@ -102,7 +103,7 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
 - Ocalały idący z użytkownikiem zwiększa pojemność plecaka o 30 jednostek (łącznie 80), a ranny tylko o 10 (zob. [combat.md](combat.md#rany)).
 - Ocalały ma losowe imię.
 - Ocaleni w schronie jedzą i bez jedzenia odchodzą (zob. [survivors.md](survivors.md)). Poza tym w prototypie nic nie robią.
-- Ocalały może zostać ranny w walce. Ranę leczy się apteczką albo goi się sama (zob. [combat.md](combat.md#rany)).
+- Uratowany ocalały jest ranny. Ranę leczy się apteczką albo goi się sama (zob. [combat.md](combat.md#rany)).
 
 ### Rozładunek (Unload)
 

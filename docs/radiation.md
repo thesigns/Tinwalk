@@ -35,9 +35,9 @@ Licznik działa, gdy jest w plecaku. Nie trzeba go włączać.
 - Przeszukanie daje **1 Isotopes zamiast zwykłych zasobów**. Reszta łupu jest zbyt skażona, żeby ją zabrać.
 - Przeszukanie zużywa jedno użycie licznika. Z kilku liczników używany jest ten z najmniejszą liczbą użyć. Zużyty licznik znika.
 - Noc i latarka nie mają wpływu na Isotopes (zob. [night.md](night.md)), a latarka się wtedy nie zużywa.
-- Wygrana walka podwaja łup, więc daje 2 Isotopes.
+- Wygrana walka dokłada skarb zmutowanego szczura: 1 Junk i 1 Isotope. Isotope ze skarbu przypada także bez licznika (zob. [combat.md](combat.md#wrogowie)).
 - Ucieczka i przegrana walka nie dają łupu, więc nie zużywają licznika.
-- Podręcznik i landmark losują się jak zwykle.
+- Podręcznik losuje się jak zwykle, a landmark powstaje jak zwykle, także przy ucieczce albo przegranej (zob. [landmarks.md](landmarks.md#odkrywanie)).
 
 ## Isotopes
 

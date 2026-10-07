@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <!-- Map badge: a rat crouched on the ground, one tooth showing. Enemies sit on red paint,
+       so they stand apart from the landmarks inked on paper. -->
+  <defs>
+    <clipPath id="inside"><circle cx="48" cy="48" r="42"/></clipPath>
+  </defs>
+
+  <circle cx="48" cy="48" r="45" fill="#b4432b"/>
+  <g clip-path="url(#inside)">
+    <path d="M0 72H96V96H0z" fill="#82301c"/>
+    <path d="M0 72H96" stroke="#33281c" stroke-width="2.4"/>
+  </g>
+
+  <!-- The rat, drawn at the illustration's scale and shrunk to fit: strokes of 13 come out at 2.6. -->
+  <g transform="translate(0.8 -2.4) scale(0.2)" stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Tail, curled round behind. -->
+    <path d="M112 356C82 354 70 372 80 390c12 16 44 14 66 4" fill="none" stroke-width="30"/>
+    <path d="M112 356C82 354 70 372 80 390c12 16 44 14 66 4" fill="none" stroke="#d4938a" stroke-width="14"/>
+    <!-- Body and head in one outline. -->
+    <path d="M100 372C84 320 110 252 200 236c50-8 90 2 114 20 20-10 44-4 62 12 14 10 26 20 34 28 4 6 0 12-8 12-12 6-26 14-40 18-14 4-26 10-32 20-4 10-6 18-8 26z" fill="#857868" stroke-width="13"/>
+    <!-- Darker fur along the back. -->
+    <path d="M106 334c-6-40 24-82 94-92 50-6 90 2 112 20-34-8-74-6-112 6-40 12-70 34-94 66z" fill="#61574a" stroke="none"/>
+    <!-- Haunch, with only its front edge drawn, and the hind foot. -->
+    <path d="M128 332c22-30 72-28 82 4 4 20-10 32-24 36h-50c-14-8-16-24-8-40z" fill="#6f6355" stroke="none"/>
+    <path d="M132 330c22-28 70-26 80 6 4 18-8 30-22 34" fill="none" stroke-width="13"/>
+    <path d="M170 368h44c8 4 4 12-6 12h-40z" fill="#d4938a" stroke-width="11"/>
+    <!-- Front leg and paw. -->
+    <path d="M304 334c8 14 12 24 14 36h18c-2-12-8-24-14-34z" fill="#6f6355" stroke-width="13"/>
+    <path d="M314 366h30c6 4 2 12-6 12h-26z" fill="#d4938a" stroke-width="11"/>
+    <!-- Ear. -->
+    <path d="M302 252c-12-32 8-56 32-48 18 6 18 32 2 48z" fill="#857868" stroke-width="13"/>
+    <path d="M314 244c-6-20 4-32 18-28 10 4 10 18 2 28z" fill="#d4938a" stroke="none"/>
+    <!-- Eye with a glint, nose, a tooth and whiskers. -->
+    <circle cx="360" cy="270" r="14" fill="#1f1810" stroke="none"/>
+    <circle cx="364" cy="265" r="5" fill="#f6ecd6" stroke="none"/>
+    <path d="M396 300l52-14M394 306l54 4" fill="none" stroke-width="6"/>
+    <ellipse cx="408" cy="298" rx="10" ry="9" fill="#d4938a" stroke-width="9"/>
+    <path d="M386 312h13l-2 18h-9z" fill="#f3e3b0" stroke-width="9"/>
+  </g>
+
+  <circle cx="48" cy="48" r="45" fill="none" stroke="#33281c" stroke-width="4"/>
+</svg>

@@ -32,7 +32,7 @@ What you find depends on the terrain: ruins are full of Junk and Cells, forests 
 ## The wasteland
 
 - **Landmarks.** Every fourth search may discover a landmark, such as a windmill, a bunker or a police station, which stays on your map for good. Each kind has its own illustration: tap a landmark to see it, when you last visited it, and to remove it if you like.
-- **Enemies.** A search can end in a fight: the enemy draws a threat card, and you either run or draw a strike card, adding your weapon's bonus. Win and the loot is doubled. Lose or run and you drop some of your supplies, the enemy stays on your map, and a survivor walking with you may get wounded.
+- **Enemies.** A search can end in a fight of dice against dice. The enemy shows its strength, say 2d3, and you run or reach for a weapon. Then it rolls its attack, and you run or strike back, rolling your own 2d6 plus your weapon's dice. Win and you also get the enemy's stash. Lose or run and you drop some of your supplies, the longer you stay the more, and the enemy stays on your map.
 - **Night.** Day and night follow the real sun where you are. In the dark, searches find less, unless you carry a flashlight.
 - **Radiation.** Invisible fallout zones cover part of the map. Food found there is contaminated and makes survivors sick. A Geiger counter reveals the zones by crackling, and lets you collect Isotopes there instead.
 

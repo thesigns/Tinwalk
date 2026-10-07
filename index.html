@@ -232,28 +232,40 @@
 
   <dialog id="encounter-dialog" class="paper">
     <form method="dialog">
+      <img id="encounter-art" class="landmark-art encounter-art" alt="" width="512" height="512">
       <h2 id="encounter-title"></h2>
-      <div class="survivor-card">
-        <div class="portrait enemy"><svg class="icon"><use id="encounter-icon" href=""/></svg></div>
-        <p id="encounter-text"></p>
-      </div>
-      <!-- The enemy's threat card against the player's strike card. -->
+      <p id="encounter-text" class="landmark-flavor"></p>
+      <!-- The enemy's strength against the player's, then their rolls. -->
       <div class="duel">
         <div class="duel-side">
-          <span class="duel-label">Threat</span>
-          <div id="threat-card" class="play-card threat"></div>
-          <span id="threat-note" class="duel-note"></span>
+          <span id="enemy-label" class="duel-label"></span>
+          <div id="enemy-roll" class="duel-value enemy"></div>
         </div>
         <div class="duel-side">
-          <span class="duel-label">Your strike</span>
-          <div id="strike-card" class="play-card"></div>
-          <span id="strike-note" class="duel-note"></span>
+          <span class="duel-label">You</span>
+          <div id="player-roll" class="duel-value"></div>
         </div>
       </div>
+      <p id="encounter-message"></p>
       <div id="encounter-choices" class="encounter-choices"></div>
-      <p id="encounter-result" hidden></p>
       <div id="encounter-done" class="dialog-buttons" hidden>
         <button id="encounter-ok" class="btn btn-paint" value="close">OK</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="loot-dialog" class="paper">
+    <form method="dialog">
+      <div class="loot-medal"><svg class="icon"><use id="loot-icon" href=""/></svg></div>
+      <h2 class="loot-title"><span id="loot-amount"></span> <span id="loot-name"></span></h2>
+      <p id="loot-note"></p>
+      <!-- A beaten enemy's stash, on top of what the search turned up. -->
+      <div id="loot-stash" hidden>
+        <h3 id="loot-stash-title"></h3>
+        <div id="loot-stash-items" class="loot-stash-items"></div>
+      </div>
+      <div class="dialog-buttons">
+        <button class="btn btn-paint" value="close" autofocus>OK</button>
       </div>
     </form>
   </dialog>

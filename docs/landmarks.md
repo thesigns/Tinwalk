@@ -9,9 +9,9 @@ Przy przeszukiwaniu można czasem odkryć landmark, np. opuszczoną kopalnię al
 - Landmark może się pojawić przy co czwartym przeszukanym obszarze: gdy po przeszukaniu liczba aktywnych przeszukanych obszarów (razem z tym właśnie przeszukanym) dzieli się przez 4. Liczą się tylko obszary, które jeszcze nie wygasły (zob. [bootstrap.md](bootstrap.md#przeszukiwanie-search-area)), więc spacer po ponad 6 godzinach przerwy zaczyna liczenie od nowa.
 - Przy takim przeszukaniu landmark powstaje zawsze, chyba że:
   - w promieniu 600 m od miejsca przeszukania stoi już inny landmark albo schron,
-  - użytkownik porusza się szybciej niż 12 km/h,
-  - przeszukanie zakończyło się ucieczką albo przegraną walką (zob. [combat.md](combat.md)).
+  - użytkownik porusza się szybciej niż 12 km/h.
 - Wtedy szansa przepada i następna przychodzi dopiero przy kolejnej wielokrotności 4.
+- Wynik walki przy tym przeszukaniu nie ma znaczenia: landmark powstaje także po ucieczce albo przegranej, a jego karta pokazuje się przed oknem walki (zob. [combat.md](combat.md#interfejs)).
 - Landmark stoi dokładnie w miejscu, w którym użytkownik przeszukał obszar (tam, gdzie przeszukanie zostawia swój punkt). Dzięki temu wiadomo, że da się tam bezpiecznie dojść pieszo, więc można wysyłać tam użytkownika na misje.
 - Z tego samego powodu landmark nie powstaje przy szybszym ruchu. Inaczej przeszukanie z okna autobusu albo pociągu postawiłoby landmark na jezdni albo na torach. To zasada bezpieczeństwa, a nie ochrona przed oszukiwaniem.
 - Prędkość pochodzi z pomiaru GPS. Gdy przeglądarka jej nie podaje, aplikacja liczy ją z pomiarów z ostatnich ok. 30 s. Gdy nie da się jej ustalić (np. jest tylko jeden pomiar), aplikacja przyjmuje, że użytkownik idzie.
@@ -38,7 +38,7 @@ Każdy rodzaj ma własną ikonę w interfejsie, własną odznakę na mapie i wł
 ### Na mapie
 
 - Landmark jest na mapie okrągłą odznaką swojego rodzaju (uproszczony, czytelny rysunek na papierowym krążku, z paskiem gruntu w kolorze biomu), bez nazwy, żeby nie zaśmiecać mapy. Odznaka ma stały rozmiar przy każdym zbliżeniu.
-- Po odkryciu, za komunikatem o zasobach, odznaka zostaje wbita w mapę krótką animacją i otwiera się ekran landmarku (zob. niżej) z napisem „You've found a landmark!” zamiast daty ostatniej wizyty. Ten ekran zamyka się sam, gdy użytkownik odejdzie ponad 50 m od landmarku.
+- Po odkryciu, jeszcze przed oknem walki i oknem ze znaleziskiem, odznaka zostaje wbita w mapę krótką animacją i otwiera się ekran landmarku (zob. niżej) z napisem „You've found a landmark!” zamiast daty ostatniej wizyty. Ten ekran zamyka się sam, gdy użytkownik odejdzie ponad 50 m od landmarku.
 - Landmark pamięta, kiedy był ostatnio odwiedzony: przy odkryciu i przy każdym przeszukaniu, którego obszar go obejmuje (ten sam zasięg, który kończy misję ratunkową).
 - Gdy przeszukanie z miejsca, w którym stoi użytkownik, objęłoby landmark, nad przyciskiem przeszukania widać podpowiedź, np. „Near the Police Station”. Ważniejsze podpowiedzi (słaby sygnał GPS, obszar już przeszukany) mają pierwszeństwo.
 - Sam landmark nic nie daje. Odkrycie jest nagrodą samą w sobie, a landmark jest celem misji ratunkowych.
@@ -109,9 +109,9 @@ Szansa zależy od czasu, który minął od końca poprzedniej misji ratunkowej (
 
 - Misja się udaje, gdy po przeszukaniu cel leży w przeszukanym obszarze. Wystarczy więc przeszukać obszar w promieniu ok. 200 m od landmarku. Zlane obszary mogą sięgnąć nawet dalej.
 - Takie przeszukanie nigdy nie spotyka nowego wroga: ranny nie przetrwałby w otoczeniu wrogów.
-- Wróg pozostawiony na mapie w promieniu 200 m od celu przytrzymuje ocalałego: misja nie uda się, dopóki ten wróg nie zostanie pokonany (zob. [combat.md](combat.md#wrogowie-na-mapie)). Przeszukanie przy celu zaczyna się wtedy walką z nim. Wygrana kończy ratunek w tym samym przeszukaniu, a ucieczka, remis albo przegrana nie. Przeszukany obszar wygasa po 6 godzinach, więc na kolejną próbę zostaje zwykle dość czasu z 24 godzin misji.
+- Wróg pozostawiony na mapie w promieniu 200 m od celu przytrzymuje ocalałego: misja nie uda się, dopóki ten wróg nie zostanie pokonany (zob. [combat.md](combat.md#wrogowie-na-mapie)). Przeszukanie przy celu zaczyna się wtedy walką z nim. Wygrana kończy ratunek w tym samym przeszukaniu, a ucieczka albo przegrana nie. Przeszukany obszar wygasa po 6 godzinach, więc na kolejną próbę zostaje zwykle dość czasu z 24 godzin misji.
 - Poza tym przeszukanie daje to co zwykle: zasoby i może dać podręcznik.
-- Po komunikacie o zasobach użytkownik wybiera: **Take with you** albo **Leave**. Pozostawiony ocalały przepada. Misja kończy się w obu przypadkach.
+- Po zamknięciu okna ze znaleziskiem użytkownik wybiera: **Take with you** albo **Leave**. Pozostawiony ocalały przepada. Misja kończy się w obu przypadkach.
 - Uratowany ocalały jest ranny od chwili ratunku (zob. [combat.md](combat.md#rany)). Rana goi się po 72 godzinach albo od apteczki. Do tego czasu ocalały zwiększa pojemność plecaka tylko o 10 jednostek, a w schronie je 2 Food.
 
 ### Porażka
