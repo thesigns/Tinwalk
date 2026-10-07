@@ -371,7 +371,7 @@ input {
 .rivets::after {
   content: "";
   position: absolute;
-  top: calc(50% + env(safe-area-inset-top) / 2);
+  top: 50%;
   width: 9px;
   height: 9px;
   border-radius: 50%;
@@ -521,14 +521,6 @@ button {
   stroke-width: 2.6;
 }
 
-.btn-labeled {
-  flex-direction: column;
-  gap: 1px;
-  min-height: 58px;
-  padding: 0 14px;
-  font-size: 14px;
-}
-
 /* Shown while the shelter position is being averaged. */
 #action-button.locating::after {
   content: "";
@@ -576,9 +568,84 @@ button {
   pointer-events: none;
 }
 
-#status-bar,
+#game-header,
 #debug-panel {
   pointer-events: auto;
+}
+
+/* Tabs: a strip of darker tin above the status bar. The menu button leaves
+   the game for the start screen, so it is only an icon. */
+#tabs {
+  display: flex;
+  padding: env(safe-area-inset-top) 4px 0;
+  background:
+    var(--grain),
+    linear-gradient(180deg, #3a3833, var(--tin-dark));
+  border-bottom: 1px solid var(--tin-edge);
+}
+
+.tab {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 46px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--tin-muted);
+  font-family: var(--font-stencil);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.tab .icon {
+  width: 20px;
+  height: 20px;
+}
+
+.tab-menu {
+  flex: 0 0 48px;
+}
+
+.tab-menu .icon {
+  width: 24px;
+  height: 24px;
+}
+
+.tab:active {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.tab:focus-visible {
+  outline: 3px solid var(--brass);
+  outline-offset: -3px;
+}
+
+.tab[aria-selected="true"] {
+  color: var(--tin-text);
+}
+
+.tab[aria-selected="true"]::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 0;
+  height: 3px;
+  border-radius: 2px 2px 0 0;
+  background: var(--brass);
+}
+
+/* In the shelter, where its actions work. */
+.tab.here .icon {
+  color: var(--green-light);
 }
 
 #status-bar {
@@ -586,7 +653,7 @@ button {
   flex-wrap: wrap;
   align-items: center;
   gap: 6px 16px;
-  padding: calc(env(safe-area-inset-top) + 10px) 26px 10px;
+  padding: 10px 26px;
   border-bottom: 2px solid var(--tin-edge);
   box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.12), 0 4px 12px rgba(0, 0, 0, 0.4);
   font-family: var(--font-stencil);
@@ -758,6 +825,29 @@ button {
   gap: 12px;
 }
 
+/* Pages: the You and Shelter tabs, on paper over the map, below the bars. */
+
+.page {
+  position: fixed;
+  inset: 0;
+  padding: calc(var(--header-height, 110px) + 20px) 16px calc(env(safe-area-inset-bottom) + 90px);
+  overflow-y: auto;
+  box-shadow: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(51, 40, 28, 0.4) transparent;
+}
+
+.page-content {
+  width: min(420px, 100%);
+  margin: 0 auto;
+}
+
+/* The map's own controls and notes only belong to the Wastes tab. */
+body[data-tab="you"] :is(#map-legend, #mission-note, #side-controls, #actions, #action-hint),
+body[data-tab="shelter"] :is(#map-legend, #mission-note, #side-controls, #actions, #action-hint) {
+  display: none !important;
+}
+
 /* Start screen: the logo, a word on safety and the way into the game. It
    covers the map completely. */
 
@@ -923,7 +1013,8 @@ dialog::backdrop {
   background: rgba(24, 20, 15, 0.65);
 }
 
-dialog h2 {
+dialog h2,
+.page h2 {
   margin: 0 0 8px;
   font-family: var(--font-stencil);
   font-size: 32px;
@@ -932,7 +1023,8 @@ dialog h2 {
   text-transform: uppercase;
 }
 
-dialog h3 {
+dialog h3,
+.page h3 {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -947,7 +1039,8 @@ dialog h3 {
   text-transform: uppercase;
 }
 
-dialog p {
+dialog p,
+.page p {
   margin: 0 0 8px;
 }
 
@@ -1447,13 +1540,13 @@ dialog input:focus {
   font-size: 14px;
 }
 
-/* A warning dot on the Shelter button while survivors there go hungry. */
-#shelter-button[data-hunger="hungry"]::after,
-#shelter-button[data-hunger="starving"]::after {
+/* A warning dot on the Shelter tab while survivors there go hungry. */
+#shelter-tab[data-hunger="hungry"]::after,
+#shelter-tab[data-hunger="starving"]::after {
   content: "";
   position: absolute;
-  top: -5px;
-  right: -5px;
+  top: 7px;
+  right: 6px;
   width: 14px;
   height: 14px;
   border-radius: 50%;
@@ -1461,7 +1554,7 @@ dialog input:focus {
   box-shadow: 0 0 0 2px var(--tin-edge);
 }
 
-#shelter-button[data-hunger="starving"]::after {
+#shelter-tab[data-hunger="starving"]::after {
   background: var(--starving);
   animation: alert-pulse 1.2s ease-in-out infinite;
 }

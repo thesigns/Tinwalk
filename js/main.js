@@ -147,7 +147,6 @@ const ui = {
   actionButton: $('action-button'),
   actionIcon: $('action-icon'),
   actionLabel: $('action-label'),
-  shelterButton: $('shelter-button'),
   deniedScreen: $('denied-screen'),
   nameDialog: $('name-dialog'),
   shelterName: $('shelter-name'),
@@ -192,8 +191,20 @@ const ui = {
   backpackClose: $('backpack-close'),
   backpackDrop: $('backpack-drop'),
   backpackRow: $('backpack-row'),
-  shelterPanel: $('shelter-panel'),
-  shelterPanelName: $('shelter-panel-name'),
+  tabs: [...document.querySelectorAll('#tabs [data-tab]')],
+  shelterTab: $('shelter-tab'),
+  pages: { you: $('you-page'), shelter: $('shelter-page') },
+  gameHeader: $('game-header'),
+  youLoad: $('you-load'),
+  youBackpack: $('you-backpack'),
+  youBackpackEmpty: $('you-backpack-empty'),
+  youCompanion: $('you-companion'),
+  youCompanionText: $('you-companion-text'),
+  youTreat: $('you-treat'),
+  youDrop: $('you-drop'),
+  shelterNone: $('shelter-none'),
+  shelterContent: $('shelter-content'),
+  shelterPageName: $('shelter-page-name'),
   shelterStorage: $('shelter-storage'),
   shelterItems: $('shelter-items'),
   shelterManuals: $('shelter-manuals'),
@@ -260,6 +271,8 @@ const sound = new SoundEffects();
 const haptics = new Haptics();
 
 let started = false; // location tracking starts only after the welcome screen
+// The open tab: 'you', 'shelter' or 'wastes' (the map).
+let tab = 'wastes';
 let inShelter = false;
 let locatingShelter = false;
 let searching = false;
@@ -282,7 +295,7 @@ let dropping = { resources: emptyResources(), items: [], manuals: [] };
 // A card that closes by itself once the player walks away from where it
 // opened: { dialog, point }, or null.
 let walkAwayCard = null;
-// Survivor name tags in the shelter panel, kept between renders (see renderSurvivorBadges).
+// Survivor name tags on the shelter page, kept between renders (see renderSurvivorBadges).
 const survivorBadges = new WeakMap();
 
 // A game event the player should hear and feel, e.g. 'found'.
@@ -331,8 +344,9 @@ function update() {
   // In debug mode the game can be played without GPS.
   ui.deniedScreen.hidden = isDebug || tracker.signal !== 'denied';
   debugPanel?.update();
+  if (tab === 'you') renderYouPage();
   // Importing or resetting a save from the start screen's settings changes this.
-  const play = state.shelter ? 'Continue Game' : 'New Game';
+  const play = state.shelter || started ? 'Continue Game' : 'New Game';
   if (ui.playButton.textContent !== play) ui.playButton.textContent = play;
 }
 
@@ -347,7 +361,7 @@ function tick() {
   if (left.length > 0) showDepartures(left);
   if (sick.length > 0) showSickness(sick);
   if (failed) showLostSignal(failed);
-  if (ui.shelterPanel.open) renderShelterPanel();
+  if (tab === 'shelter') renderShelterPage();
   update();
 }
 
@@ -497,11 +511,12 @@ function renderActions() {
   ui.actionButton.dataset.action = action.id;
   ui.actionHint.textContent = action.hint ?? '';
   ui.actionHint.hidden = !action.hint;
-  ui.shelterButton.hidden = !state.shelter;
   // Warns about hungry survivors while the player is out on a walk.
   const hunger = worstHunger();
-  ui.shelterButton.dataset.hunger = hunger;
-  ui.shelterButton.setAttribute('aria-label', hunger === 'satiated' ? 'Shelter' : `Shelter: survivors are ${hunger}`);
+  ui.shelterTab.dataset.hunger = hunger;
+  ui.shelterTab.setAttribute('aria-label', hunger === 'satiated' ? 'Shelter' : `Shelter: survivors are ${hunger}`);
+  // Shelter actions only work in the shelter, so the tab shows when they do.
+  ui.shelterTab.classList.toggle('here', inShelter);
 }
 
 // The hungriest stage among the shelter's survivors ('satiated' if there are none).
@@ -1076,7 +1091,7 @@ function treatSurvivor(survivor) {
   saveAndUpdate();
   feedback('heal');
   showToast(sick ? `${survivor.name} has been treated` : `${survivor.name}'s wound has been dressed`, 'first-aid-kit');
-  renderShelterPanel();
+  renderShelterPage();
 }
 
 // Steps once when pressed, then keeps stepping while held, until `step` returns false.
@@ -1102,17 +1117,58 @@ function holdToRepeat(button, step) {
   button.addEventListener('contextmenu', (event) => event.preventDefault());
 }
 
-function openShelterPanel() {
-  renderShelterPanel();
-  ui.shelterPanel.showModal();
+// Switches between the You and Shelter pages and the map.
+function showTab(name) {
+  tab = name;
+  document.body.dataset.tab = name;
+  for (const button of ui.tabs) button.setAttribute('aria-selected', String(button.dataset.tab === name));
+  for (const [id, page] of Object.entries(ui.pages)) {
+    page.hidden = id !== name;
+    if (id === name) page.scrollTop = 0;
+  }
+  if (name === 'shelter') renderShelterPage();
+  if (name === 'you') renderYouPage();
+}
+
+// What the player carries and who walks with them. Dropping things happens
+// in the backpack panel, which finds also open to make room.
+function renderYouPage() {
+  const time = now();
+  ui.youLoad.textContent = `${backpackLoad(state)}/${backpackCapacity(state, time)}`;
+  const rows = [
+    ...RESOURCES.filter(({ id }) => state.backpack[id] > 0).map(({ id, label }) => [id, label, `${state.backpack[id]}`]),
+    ...state.backpackItems.map((item) => {
+      const { label, uses, size } = ITEMS[item.id];
+      return [item.id, label, `${item.uses}/${uses} uses · ${size} space`];
+    }),
+    ...state.backpackManuals.map((id) => ['manual', MANUALS[id].label, `${MANUAL_SIZE} space`]),
+  ];
+  renderOnChange(ui.youBackpack, rows, () =>
+    rows.map(([icon, label, detail]) => itemRow({ icon, label, detail, action: null, stamp: '' })),
+  );
+  ui.youBackpackEmpty.hidden = rows.length > 0;
+  ui.youDrop.hidden = rows.length === 0;
+
+  const { companion } = state;
+  ui.youCompanion.hidden = !companion;
+  if (!companion) return;
+  const wounded = isWounded(companion, time);
+  const space = `+${companionCapacityBonus(state, time)} backpack space`;
+  ui.youCompanionText.textContent = wounded
+    ? `${companion.name} is wounded: ${space}. Heals in ${formatDuration(woundHealsAt(companion) - time)}.`
+    : `${companion.name}: ${space}.`;
+  ui.youTreat.hidden = !wounded;
+  ui.youTreat.disabled = !canTreat(state, companion, time);
 }
 
 // Re-rendered every tick while open, so the hunger bars keep moving.
-function renderShelterPanel() {
+function renderShelterPage() {
   const { shelter } = state;
+  ui.shelterNone.hidden = Boolean(shelter);
+  ui.shelterContent.hidden = !shelter;
   if (!shelter) return;
   const time = now();
-  ui.shelterPanelName.textContent = shelter.name;
+  ui.shelterPageName.textContent = shelter.name;
   ui.shelterStorage.replaceChildren(
     ...RESOURCES.map(({ id, label }) => {
       const tile = document.createElement('li');
@@ -1244,19 +1300,19 @@ function buildRadioAction() {
   saveAndUpdate();
   feedback('craft');
   showToast(`You built a ${RADIO.label}`, 'radio');
-  renderShelterPanel();
+  renderShelterPage();
 }
 
 async function listenAction() {
   if (listening || !state.shelter?.radio || listenBlocker(state, inShelter, now()) !== null) return;
   listening = true;
   feedback('listen');
-  renderShelterPanel();
+  renderShelterPage();
   await wait(LISTEN_MS);
   listening = false;
   const mission = listen(state, now());
   saveAndUpdate();
-  renderShelterPanel();
+  renderShelterPage();
   if (!mission) {
     feedback('static');
     return;
@@ -1271,7 +1327,7 @@ async function listenAction() {
     `Search the area at the ${label} within ${formatDuration(missionEndsAt(mission) - now())} to bring ${survivor} home.`;
   await ask(ui.radioDialog);
   // Show the player where to go.
-  ui.shelterPanel.close();
+  showTab('wastes');
   mapView.playRipple(landmark, 0, RIPPLE_MS);
 }
 
@@ -1283,7 +1339,7 @@ function showLostSignal({ survivor, landmark }) {
   feedback('lost');
 }
 
-// The shelter panel re-renders every tick, and replacing a button between
+// The shelter page re-renders every tick, and replacing a button between
 // press and release would swallow the tap, so lists with buttons are only
 // rebuilt when what they show changes.
 function renderOnChange(list, shown, build) {
@@ -1293,18 +1349,22 @@ function renderOnChange(list, shown, build) {
   list.replaceChildren(...build());
 }
 
-function itemRow({ icon, label, detail, action, enabled, onClick }) {
+function itemRow({ icon, label, detail, action, enabled, onClick, stamp = 'Built' }) {
   const row = ui.itemRow.content.firstElementChild.cloneNode(true);
   row.querySelector('.resource-icon use').setAttribute('href', `#i-${icon}`);
   row.querySelector('.resource-name').textContent = label;
   row.querySelector('.item-detail').textContent = detail;
   const button = row.querySelector('.item-action');
   if (!action) {
-    // Already built: a stamp instead of a button.
-    const stamp = document.createElement('span');
-    stamp.className = 'item-stamp';
-    stamp.textContent = 'Built';
-    button.replaceWith(stamp);
+    // Already built: a stamp instead of a button. Rows that only list things have neither.
+    if (!stamp) {
+      button.remove();
+      return row;
+    }
+    const mark = document.createElement('span');
+    mark.className = 'item-stamp';
+    mark.textContent = stamp;
+    button.replaceWith(mark);
     return row;
   }
   button.textContent = action;
@@ -1319,7 +1379,7 @@ function craftAction(id) {
   saveAndUpdate();
   feedback('craft');
   showToast(`You crafted a ${ITEMS[id].label}`, id);
-  renderShelterPanel();
+  renderShelterPage();
 }
 
 function packAction(item) {
@@ -1328,7 +1388,7 @@ function packAction(item) {
   feedback('land');
   replayAnimation(ui.backpackHud, 'bump');
   showToast(`You packed your ${ITEMS[item.id].label}`, item.id);
-  renderShelterPanel();
+  renderShelterPage();
 }
 
 // Updates the name tags in place, for the same reason as renderOnChange().
@@ -1511,7 +1571,13 @@ ui.actionButton.addEventListener('click', () => {
 });
 ui.backpackHud.addEventListener('click', openBackpackPanel);
 ui.backpackTreat.addEventListener('click', treatCompanion);
-ui.shelterButton.addEventListener('click', openShelterPanel);
+for (const button of ui.tabs) button.addEventListener('click', () => showTab(button.dataset.tab));
+ui.youDrop.addEventListener('click', openBackpackPanel);
+ui.youTreat.addEventListener('click', treatCompanion);
+// The bars stay on top of the pages, which start below them.
+new ResizeObserver(() => {
+  document.documentElement.style.setProperty('--header-height', `${ui.gameHeader.offsetHeight}px`);
+}).observe(ui.gameHeader);
 ui.radioListen.addEventListener('click', listenAction);
 ui.departureDialog.addEventListener('close', () => (departed = []));
 ui.sicknessDialog.addEventListener('close', () => (sickened = []));
@@ -1528,6 +1594,8 @@ document.fonts?.ready.then(update);
 // new player, or the game.
 ui.playButton.addEventListener('click', () => {
   ui.startScreen.hidden = true;
+  if (started) return;
+  showTab('wastes');
   if (state.shelter || hasBeenWelcomed()) startTracking();
   else ui.welcomeScreen.hidden = false;
 });
@@ -1542,7 +1610,13 @@ $('start-button').addEventListener('click', () => {
   startTracking();
 });
 
-$('menu-button').addEventListener('click', () => ui.menuDialog.showModal());
+// Back to the start screen. Location tracking goes on, so there is no wait
+// for a fix when the player comes back.
+$('menu-button').addEventListener('click', () => {
+  ui.startScreen.hidden = false;
+  update();
+  ui.playButton.focus();
+});
 $('menu-close').addEventListener('click', () => ui.menuDialog.close());
 $('export-button').addEventListener('click', () => {
   ui.menuDialog.close();

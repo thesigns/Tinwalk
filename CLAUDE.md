@@ -34,7 +34,7 @@ All code is in `js/`, loaded from `index.html` via `js/main.js`.
 
 | Module | Responsibility |
 |---|---|
-| `main.js` | Wires everything together: UI rendering, actions (create shelter, search, fight, unload, craft, listen to the radio), dialogs, menu, reward animations |
+| `main.js` | Wires everything together: UI rendering, tabs (You, Shelter, Wastes) and their pages, actions (create shelter, search, fight, unload, craft, listen to the radio), dialogs, the start screen, reward animations |
 | `game.js` | Game rules and constants (radii, loot tiers and weights, capacity, survivor meals, manuals, items, the radio, landmarks, rescue missions, enemies and the dice fight, wounds). Functions mutate the state; the caller saves |
 | `state.js` | State shape, `STATE_VERSION`, load/save to `localStorage`, export/import with validation |
 | `gps.js` | `LocationTracker`: Geolocation API, accuracy/staleness filtering, signal state, manual position for debug |
@@ -64,7 +64,7 @@ All code is in `js/`, loaded from `index.html` via `js/main.js`.
 - **Colors:** the palette is defined as CSS custom properties in `css/style.css`; `COLORS` in `map.js` mirrors it for canvas drawing. Keep them in sync.
 - **Landmark and enemy art:** each landmark type has a map badge in `img/landmark-icons/<type>.svg` (96×96, flat and simple, read at 46 px; the map rasterizes it once and falls back to the sprite icon without a file) and a detailed illustration in `img/landmarks/<type>.svg` (512×512 medallion, shown on the landmark card when a badge is tapped). Enemies work the same way with `img/enemy-icons/` (badges on red paint instead of paper) and `img/enemies/` (shown in the fight dialog). All sets share the palette in `css/style.css`.
 - **Icons:** icons are `<symbol id="i-…">` entries in the SVG sprite in `index.html`; create them in JS with `iconElement(name)`. Resource, item, enemy and landmark ids (`junk`, `knife`, `rat`, `windmill`) double as icon names. The map draws landmark and enemy icons on the canvas from the same sprite via `Path2D`, so their symbols must use `<path>` elements only.
-- **Shelter panel re-renders every tick:** replacing a button between press and release swallows the tap, so lists with buttons go through `renderOnChange()` and survivor badges are updated in place.
+- **Shelter page re-renders every tick:** replacing a button between press and release swallows the tap, so lists with buttons go through `renderOnChange()` and survivor badges are updated in place.
 - **Fonts:** Big Shoulders Stencil (headings, buttons, numbers) and Courier Prime (text) are self-hosted in `fonts/` with their OFL licenses. Canvas labels use them too, so the map re-renders once `document.fonts.ready` resolves. Small print on the start screen uses the system sans (`--font-sans`).
 - **Feedback:** `feedback(name)` in `main.js` plays both a sound and a vibration; event names are shared between `SOUNDS` in `sound.js` and `PATTERNS` in `haptics.js`. Browsers only allow audio after a user gesture, so `sound.unlock()` runs on every click.
 - **Animations:** respect `prefers-reduced-motion` (CSS media query, and `prefersReducedMotion()` in `fx.js`).

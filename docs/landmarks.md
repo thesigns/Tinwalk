@@ -63,7 +63,7 @@ Radio działa na baterie (Cells, zob. [loot.md](loot.md)). Zbudowanie radia nie 
 
 ### Nasłuch
 
-- Gdy radio jest zbudowane, panel schronu ma sekcję **Radio** z przyciskiem **Listen**.
+- Gdy radio jest zbudowane, zakładka **Shelter** ma sekcję **Radio** z przyciskiem **Listen**.
 - Przycisk jest aktywny, gdy jednocześnie:
   - użytkownik jest w schronie,
   - z użytkownikiem nie idzie żaden ocalały,

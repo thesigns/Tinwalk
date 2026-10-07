@@ -102,8 +102,8 @@ Siłę zapisuje się jak rzut kośćmi w grach fabularnych: `xdy+z`, czyli x rzu
 
 - Apteczka (First aid kit) leczy ranę od razu. Jedno użycie leczy jedną ranę, a u chorego ocalałego naraz także chorobę (zob. [radiation.md](radiation.md#choroba-sick)).
 - Leczy się ręcznie, przyciskiem **Treat**:
-  - ocalałego idącego z użytkownikiem apteczką z plecaka, w panelu plecaka,
-  - ocalałego w schronie apteczką z magazynu, na jego plakietce w panelu schronu. Tu nie trzeba być w schronie.
+  - ocalałego idącego z użytkownikiem apteczką z plecaka, na zakładce **You** albo w panelu plecaka,
+  - ocalałego w schronie apteczką z magazynu, na jego plakietce na zakładce **Shelter**. Tu nie trzeba być w schronie.
 - Przycisk jest nieaktywny, gdy pod ręką nie ma apteczki.
 
 ## Interfejs

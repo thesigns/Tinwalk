@@ -141,24 +141,28 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
 - Pinezka jest zielona, gdy użytkownik może przeszukać obszar, a czerwona, gdy nie może (np. jest w przeszukanym obszarze, za blisko schronu albo w schronie). Przy słabym sygnale pinezka jest szara.
 - Domyślny widok obejmuje około 1–2 km wokół użytkownika i jest wycentrowany na użytkowniku.
 - Mapę można przybliżać i oddalać (gest szczypania, na komputerze kółko myszy) w zakresie od ok. 500 m do ok. 5 km szerokości widoku.
-- Mapę można przesuwać palcem (na komputerze przeciąganiem myszą), żeby obejrzeć dłuższą trasę albo cel misji. Przesunięta mapa zostaje w miejscu, a przycisk z celownikiem przy menu wraca do śledzenia użytkownika.
+- Mapę można przesuwać palcem (na komputerze przeciąganiem myszą), żeby obejrzeć dłuższą trasę albo cel misji. Przesunięta mapa zostaje w miejscu, a przycisk z celownikiem z prawej strony mapy wraca do śledzenia użytkownika.
 - Biom w miejscu przeszukania wpływa na to, jaki zasób się znajdzie (zob. [loot.md](loot.md)).
 - Oprócz biomów jest niewidoczna warstwa stref radiacji (zob. [radiation.md](radiation.md)). Mapa jej nie pokazuje.
 
 ### Interfejs
 
-- Główny ekran to mapa.
-- Pasek stanu pokazuje: zawartość plecaka (np. „Backpack 12/50”), czy idzie z nami ocalały, oraz jakość sygnału GPS. Dotknięcie plecaka otwiera panel plecaka.
-- Przyciski zależą od kontekstu: **Create a Shelter**, **Search area**, **Unload**.
+- Na górze ekranu gry są zakładki:
+  - przycisk menu (ikona z trzema kreskami): wraca do ekranu startowego, a gra (także śledzenie pozycji) toczy się dalej,
+  - **You**: postać użytkownika. Na razie zawartość plecaka z obciążeniem, przycisk **Drop things** (otwiera panel plecaka) oraz ocalały, który idzie z użytkownikiem, z przyciskiem **Treat**, gdy jest ranny. W przyszłości więcej informacji o postaci.
+  - **Shelter**: schron (opis niżej). Ikona zakładki jest zielona, gdy użytkownik jest w schronie, bo tylko wtedy działają akcje schronu.
+  - **Wastes**: mapa. Po wejściu do gry otwiera się ta zakładka.
+- Pod zakładkami jest zawsze pasek stanu: zawartość plecaka (np. „Backpack 12/50”), czy idzie z nami ocalały, oraz jakość sygnału GPS. Dotknięcie plecaka otwiera panel plecaka, w którym można wyrzucić rzeczy.
+- Na zakładce **Wastes** przyciski zależą od kontekstu: **Create a Shelter**, **Search area**, **Unload**.
 - Obok kompasu i podziałki mapy jedno słowo mówi, gdzie stoi użytkownik: **Shelter**, **Plains**, **Forest** albo **Ruins**. W ruinach pod spodem jest mniejszym drukiem nazwa osady. Najniżej jest pora dnia i czas do jej zmiany, np. „Day · dark in 3 h” (zob. [night.md](night.md)). Dzięki temu na granicy biomów nie trzeba zgadywać z mapy, jaki łup da przeszukanie. Bez pozycji słowa nie ma, a przy słabym sygnale jest przygaszone, tak jak pinezka.
-- Panel schronu pokazuje nazwę schronu, stan magazynu, przedmioty i podręczniki, warsztat (zob. [crafting.md](crafting.md)), radio (zob. [landmarks.md](landmarks.md#radio)) oraz ocalałych z ich etapem głodu i ranami (zob. [survivors.md](survivors.md)).
+- Zakładka **Shelter** pokazuje nazwę schronu, stan magazynu, przedmioty i podręczniki, warsztat (zob. [crafting.md](crafting.md)), radio (zob. [landmarks.md](landmarks.md#radio)) oraz ocalałych z ich etapem głodu i ranami (zob. [survivors.md](survivors.md)). Bez schronu mówi tylko, że trzeba go założyć na zakładce **Wastes**. Po odebraniu wezwania przez radio aplikacja przechodzi na mapę, żeby pokazać, gdzie iść.
 
 #### Ekran startowy
 
 - Przy każdym uruchomieniu aplikacji, zanim pojawi się cokolwiek innego, aplikacja pokazuje ekran startowy. Zasłania on całą mapę.
 - Na górze jest logo Tinwalk (`img/logos/tinwalk-logo-stacked.svg`), pod nim małym drukiem przypomnienie o bezpieczeństwie: „When you walk outdoors, stay aware of your surroundings. Don't enter restricted, private or dangerous areas, and keep an eye on traffic.”.
 - Pod spodem są przyciski:
-  - **Continue Game**, jeśli gracz ma założony schron, albo **New Game**, jeśli go nie ma,
+  - **Continue Game**, jeśli gracz ma założony schron albo gra już trwa (powrót z menu), a w przeciwnym razie **New Game**,
   - **Settings**: otwiera ustawienia (dźwięk, wibracje, eksport, import i reset zapisu),
   - **Help**: na razie nieaktywny.
 - Na dole małym drukiem jest data ostatniej aktualizacji i wersja zapisu, np. „Last updated 7 Oct 2026 · Save version 11”.

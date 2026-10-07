@@ -71,47 +71,104 @@
   <div id="map-paper"></div>
 
   <div id="side-controls">
-    <button id="menu-button" class="btn btn-tin btn-square" type="button" aria-label="Menu"><svg class="icon"><use href="#i-menu"/></svg></button>
     <button id="recenter" class="btn btn-tin btn-square" type="button" aria-label="Center the map on me"><svg class="icon"><use href="#i-locate"/></svg></button>
   </div>
 
-  <div id="top">
-    <header id="status-bar" class="tin rivets">
-      <button id="backpack-hud" class="hud-item" type="button">
-        <svg id="backpack-icon" class="icon"><use href="#i-backpack"/></svg>
-        <span class="gauge"><span id="backpack-gauge" class="gauge-fill"></span></span>
-        <span id="backpack-status" class="hud-value"></span>
-      </button>
-      <div id="companion-status" class="hud-item companion" hidden>
+  <!-- The tabs other than Wastes: full pages over the map. -->
+  <section id="you-page" class="page paper" hidden>
+    <div class="page-content">
+      <div class="panel-title">
         <svg class="icon"><use href="#i-survivor"/></svg>
-        <span id="companion-name"></span>
+        <h2>You</h2>
       </div>
-      <div id="gps-hud" class="hud-item gps">
-        <span class="signal-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-        <span id="gps-status" class="hud-value"></span>
+      <h3>Backpack <span id="you-load" class="count"></span></h3>
+      <ul id="you-backpack" class="item-list"></ul>
+      <p id="you-backpack-empty" class="muted">Your backpack is empty.</p>
+      <button id="you-drop" class="btn btn-ink btn-small" type="button"><svg class="icon"><use href="#i-backpack"/></svg><span>Drop things</span></button>
+      <div id="you-companion" hidden>
+        <h3>With you</h3>
+        <div class="radio-row">
+          <p id="you-companion-text"></p>
+          <button id="you-treat" class="btn btn-ink btn-small" type="button"><svg class="icon"><use href="#i-first-aid-kit"/></svg><span>Treat</span></button>
+        </div>
       </div>
-    </header>
+    </div>
+  </section>
 
-    <details id="debug-panel" hidden>
-      <summary>Debug</summary>
-      <dl>
-        <dt>Source</dt><dd data-field="source"></dd>
-        <dt>Signal</dt><dd data-field="signal"></dd>
-        <dt>Position</dt><dd data-field="position"></dd>
-        <dt>Last reading</dt><dd data-field="last-reading"></dd>
-        <dt>Readings</dt><dd data-field="stats"></dd>
-        <dt>Game</dt><dd data-field="game"></dd>
-        <dt>Time</dt><dd data-field="time"></dd>
-      </dl>
-      <p class="hint">Tap the map to set your position.</p>
-      <div class="debug-buttons">
-        <button id="use-gps" type="button" hidden>Use GPS</button>
-        <button data-speed="1" type="button">1×</button>
-        <button data-speed="60" type="button">60×</button>
-        <button data-speed="3600" type="button">3600×</button>
-        <button id="reset-time" type="button">Reset time</button>
+  <section id="shelter-page" class="page paper" hidden>
+    <div class="page-content">
+      <p id="shelter-none" class="muted">You have no shelter yet. Set one up at home: go to the Wastes and create it there.</p>
+      <div id="shelter-content">
+        <div class="panel-title">
+          <svg class="icon"><use href="#i-shelter"/></svg>
+          <h2 id="shelter-page-name"></h2>
+        </div>
+        <h3>Storage</h3>
+        <ul id="shelter-storage" class="resource-grid"></ul>
+        <ul id="shelter-items" class="item-list"></ul>
+        <h3>Workshop</h3>
+        <ul id="shelter-manuals" class="manual-list"></ul>
+        <ul id="shelter-recipes" class="item-list"></ul>
+        <p id="workshop-hint" class="muted"></p>
+        <div id="radio-section" hidden>
+          <h3>Radio</h3>
+          <div class="radio-row">
+            <p id="radio-text"></p>
+            <button id="radio-listen" class="btn btn-ink btn-small" type="button"><svg class="icon"><use href="#i-radio"/></svg><span>Listen</span></button>
+          </div>
+        </div>
+        <h3>Survivors <span id="shelter-survivor-count" class="count"></span></h3>
+        <ul id="shelter-survivor-names" class="survivor-badges"></ul>
+        <p id="shelter-no-survivors" class="muted">No one has joined you yet.</p>
       </div>
-    </details>
+    </div>
+  </section>
+
+  <div id="top">
+    <div id="game-header">
+      <nav id="tabs" class="tin" role="tablist" aria-label="Game">
+        <button id="menu-button" class="tab tab-menu" type="button" aria-label="Menu"><svg class="icon"><use href="#i-menu"/></svg></button>
+        <button class="tab" type="button" role="tab" data-tab="you" aria-selected="false"><svg class="icon"><use href="#i-survivor"/></svg><span>You</span></button>
+        <button id="shelter-tab" class="tab" type="button" role="tab" data-tab="shelter" aria-selected="false"><svg class="icon"><use href="#i-shelter"/></svg><span>Shelter</span></button>
+        <button class="tab" type="button" role="tab" data-tab="wastes" aria-selected="true"><svg class="icon"><use href="#i-pin"/></svg><span>Wastes</span></button>
+      </nav>
+      <header id="status-bar" class="tin rivets">
+        <button id="backpack-hud" class="hud-item" type="button">
+          <svg id="backpack-icon" class="icon"><use href="#i-backpack"/></svg>
+          <span class="gauge"><span id="backpack-gauge" class="gauge-fill"></span></span>
+          <span id="backpack-status" class="hud-value"></span>
+        </button>
+        <div id="companion-status" class="hud-item companion" hidden>
+          <svg class="icon"><use href="#i-survivor"/></svg>
+          <span id="companion-name"></span>
+        </div>
+        <div id="gps-hud" class="hud-item gps">
+          <span class="signal-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+          <span id="gps-status" class="hud-value"></span>
+        </div>
+      </header>
+
+      <details id="debug-panel" hidden>
+        <summary>Debug</summary>
+        <dl>
+          <dt>Source</dt><dd data-field="source"></dd>
+          <dt>Signal</dt><dd data-field="signal"></dd>
+          <dt>Position</dt><dd data-field="position"></dd>
+          <dt>Last reading</dt><dd data-field="last-reading"></dd>
+          <dt>Readings</dt><dd data-field="stats"></dd>
+          <dt>Game</dt><dd data-field="game"></dd>
+          <dt>Time</dt><dd data-field="time"></dd>
+        </dl>
+        <p class="hint">Tap the map to set your position.</p>
+        <div class="debug-buttons">
+          <button id="use-gps" type="button" hidden>Use GPS</button>
+          <button data-speed="1" type="button">1×</button>
+          <button data-speed="60" type="button">60×</button>
+          <button data-speed="3600" type="button">3600×</button>
+          <button id="reset-time" type="button">Reset time</button>
+        </div>
+      </details>
+    </div>
 
     <div id="map-legend">
       <svg id="compass" viewBox="0 0 40 50" aria-hidden="true">
@@ -153,10 +210,6 @@
     </div>
     <p id="action-hint" hidden></p>
     <div id="actions">
-      <button id="shelter-button" class="btn btn-tin btn-labeled" type="button" hidden>
-        <svg class="icon"><use href="#i-shelter"/></svg>
-        <span>Shelter</span>
-      </button>
       <button id="action-button" class="btn btn-paint btn-main" type="button">
         <svg class="icon"><use id="action-icon" href="#i-search"/></svg>
         <span id="action-label"></span>
@@ -287,35 +340,6 @@
         <button class="btn btn-ink" value="leave">Leave</button>
         <button id="manual-backpack" class="btn btn-ink btn-square" value="backpack" aria-label="Open backpack"><svg class="icon"><use href="#i-backpack"/></svg></button>
         <button id="manual-take" class="btn btn-paint" value="take" autofocus>Take</button>
-      </div>
-    </form>
-  </dialog>
-
-  <dialog id="shelter-panel" class="paper">
-    <form method="dialog">
-      <div class="panel-title">
-        <svg class="icon"><use href="#i-shelter"/></svg>
-        <h2 id="shelter-panel-name"></h2>
-      </div>
-      <h3>Storage</h3>
-      <ul id="shelter-storage" class="resource-grid"></ul>
-      <ul id="shelter-items" class="item-list"></ul>
-      <h3>Workshop</h3>
-      <ul id="shelter-manuals" class="manual-list"></ul>
-      <ul id="shelter-recipes" class="item-list"></ul>
-      <p id="workshop-hint" class="muted"></p>
-      <div id="radio-section" hidden>
-        <h3>Radio</h3>
-        <div class="radio-row">
-          <p id="radio-text"></p>
-          <button id="radio-listen" class="btn btn-ink btn-small" type="button"><svg class="icon"><use href="#i-radio"/></svg><span>Listen</span></button>
-        </div>
-      </div>
-      <h3>Survivors <span id="shelter-survivor-count" class="count"></span></h3>
-      <ul id="shelter-survivor-names" class="survivor-badges"></ul>
-      <p id="shelter-no-survivors" class="muted">No one has joined you yet.</p>
-      <div class="dialog-buttons">
-        <button class="btn btn-paint" value="close">Close</button>
       </div>
     </form>
   </dialog>

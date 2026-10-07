@@ -77,7 +77,7 @@ Przedmioty i wyposażenie schronu wytwarza się w schronie z zasobów z magazynu
 
 ## Interfejs
 
-- Panel schronu ma sekcję **Workshop**: listę przepisów z posiadanych podręczników, z kosztem (np. „10 Junk + 1 Cell”) i przyciskiem **Craft**. Przycisk jest nieaktywny, gdy brakuje zasobów albo użytkownik nie jest w schronie. Przy zbudowanym radiu zamiast przycisku jest napis „Built”.
+- Zakładka **Shelter** ma sekcję **Workshop**: listę przepisów z posiadanych podręczników, z kosztem (np. „10 Junk + 1 Cell”) i przyciskiem **Craft**. Przycisk jest nieaktywny, gdy brakuje zasobów albo użytkownik nie jest w schronie. Przy zbudowanym radiu zamiast przycisku jest napis „Built”.
 - Bez żadnego podręcznika sekcja pokazuje krótką informację, że przepisy pochodzą z podręczników znajdowanych na pustkowiu.
-- Panel schronu pokazuje posiadane podręczniki oraz przedmioty w magazynie z liczbą użyć. Przy przedmiocie jest przycisk **Pack**, który przenosi go do plecaka (aktywny tylko w schronie i gdy jest miejsce).
-- Panel plecaka pokazuje przedmioty z liczbą użyć i zajmowanym miejscem.
+- Zakładka **Shelter** pokazuje posiadane podręczniki oraz przedmioty w magazynie z liczbą użyć. Przy przedmiocie jest przycisk **Pack**, który przenosi go do plecaka (aktywny tylko w schronie i gdy jest miejsce).
+- Zakładka **You** i panel plecaka pokazują przedmioty z liczbą użyć i zajmowanym miejscem.

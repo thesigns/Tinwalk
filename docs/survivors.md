@@ -45,10 +45,10 @@ Każdy etap trwa 24 godziny:
 
 ## Interfejs
 
-- W panelu schronu każdy ocalały ma plakietkę z imieniem, etapem głodu i paskiem postępu, który pokazuje, ile zostało do końca bieżącego etapu, oraz czas słownie:
+- Na zakładce **Shelter** każdy ocalały ma plakietkę z imieniem, etapem głodu i paskiem postępu, który pokazuje, ile zostało do końca bieżącego etapu, oraz czas słownie:
   - najedzony: „eats in 14 h” (albo „hungry in 14 h”, gdy w magazynie nie ma jedzenia),
   - głodny: „starving in 20 h”,
   - głodujący: „leaves in 5 h”.
 - Kolor paska i etapu zależy od etapu: zielony, pomarańczowy, czerwony.
 - Ranny albo chory ocalały ma na plakietce także oznaczenie rany albo choroby i przycisk **Treat** (zob. [combat.md](combat.md#rany) i [radiation.md](radiation.md#interfejs)).
-- Gdy któryś ocalały jest głodny, przycisk **Shelter** ma pomarańczową kropkę, a gdy któryś głoduje, czerwoną, pulsującą. Dzięki temu widać to także podczas spaceru.
+- Gdy któryś ocalały jest głodny, zakładka **Shelter** ma pomarańczową kropkę, a gdy któryś głoduje, czerwoną, pulsującą. Dzięki temu widać to także podczas spaceru.
