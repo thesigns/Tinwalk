@@ -27,6 +27,7 @@
     <symbol id="i-import" viewBox="0 0 24 24"><path d="M12 15V4"/><path d="m7 9 5-5 5 5"/><path d="M5 20h14"/></symbol>
     <symbol id="i-reset" viewBox="0 0 24 24"><path d="M5.6 8.5A7.5 7.5 0 1 1 4.5 12"/><path d="M4.5 4v4.5H9"/></symbol>
     <symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a7.5 7.5 0 0 1 0 11"/></symbol>
+    <symbol id="i-debug" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M7 10l3 2-3 2M12 15h5"/></symbol>
     <symbol id="i-vibrate" viewBox="0 0 24 24"><rect x="8" y="4" width="8" height="16" rx="1.5"/><path d="M4.5 9v6M19.5 9v6M2 10.5v3M22 10.5v3"/></symbol>
     <symbol id="i-junk" viewBox="0 0 24 24"><path d="M12 3.5 19.4 7.75v8.5L12 20.5l-7.4-4.25v-8.5z"/><circle cx="12" cy="12" r="3.2"/></symbol>
     <symbol id="i-food" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="6" ry="2.2"/><path d="M6 6v12c0 1.2 2.7 2.2 6 2.2s6-1 6-2.2V6"/><path d="M6 10.5c0 1.2 2.7 2.2 6 2.2s6-1 6-2.2"/></symbol>
@@ -170,13 +171,17 @@
     <p id="reward-note"></p>
   </div>
 
-  <!-- Shown at every start, before anything else. -->
-  <section id="safety-screen" class="overlay" hidden>
-    <div class="card paper">
-      <h1 class="wordmark">Tinwalk</h1>
-      <p id="app-meta" class="app-meta"></p>
-      <p class="safety-text">When you walk outdoors, stay aware of your surroundings. Don't enter restricted, private or dangerous areas, and keep an eye on traffic. Stay safe!</p>
-      <button id="safety-button" class="btn btn-paint btn-main" type="button">I understand</button>
+  <!-- Shown at every start, before anything else; it hides the map. -->
+  <section id="start-screen" class="start-screen paper" hidden>
+    <div class="start-content">
+      <h1 class="start-logo"><img src="img/logos/tinwalk-logo-stacked.svg" alt="Tinwalk"></h1>
+      <p class="start-small">When you walk outdoors, stay aware of your surroundings. Don't enter restricted, private or dangerous areas, and keep an eye on traffic.</p>
+      <div class="start-buttons">
+        <button id="play-button" class="btn btn-paint btn-main" type="button">New Game</button>
+        <button id="settings-button" class="btn btn-ink btn-main" type="button">Settings</button>
+        <button id="help-button" class="btn btn-ink btn-main" type="button" disabled>Help</button>
+      </div>
+      <p id="app-meta" class="start-small"></p>
     </div>
   </section>
 
@@ -410,13 +415,16 @@
   </template>
 
   <dialog id="menu-dialog" class="paper">
-    <h2>Menu</h2>
+    <h2>Settings</h2>
     <div class="menu-toggles">
       <button id="sound-toggle" class="toggle" type="button" role="switch" aria-checked="true">
         <svg class="icon"><use href="#i-sound"/></svg><span>Sound</span><span class="switch"></span>
       </button>
       <button id="vibration-toggle" class="toggle" type="button" role="switch" aria-checked="true">
         <svg class="icon"><use href="#i-vibrate"/></svg><span>Vibration</span><span class="switch"></span>
+      </button>
+      <button id="debug-bar-toggle" class="toggle" type="button" role="switch" aria-checked="true" hidden>
+        <svg class="icon"><use href="#i-debug"/></svg><span>Debug bar</span><span class="switch"></span>
       </button>
     </div>
     <h3>Your save</h3>

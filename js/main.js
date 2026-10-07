@@ -218,7 +218,8 @@ const ui = {
   locationDaylight: $('location-daylight'),
   scaleLine: $('scale-line'),
   welcomeScreen: $('welcome-screen'),
-  safetyScreen: $('safety-screen'),
+  startScreen: $('start-screen'),
+  playButton: $('play-button'),
   menuDialog: $('menu-dialog'),
   importInput: $('import-input'),
   importDialog: $('import-dialog'),
@@ -248,6 +249,7 @@ const ui = {
   lootStashItems: $('loot-stash-items'),
   soundToggle: $('sound-toggle'),
   vibrationToggle: $('vibration-toggle'),
+  debugBarToggle: $('debug-bar-toggle'),
 };
 
 const state = loadState();
@@ -329,6 +331,9 @@ function update() {
   // In debug mode the game can be played without GPS.
   ui.deniedScreen.hidden = isDebug || tracker.signal !== 'denied';
   debugPanel?.update();
+  // Importing or resetting a save from the start screen's settings changes this.
+  const play = state.shelter ? 'Continue Game' : 'New Game';
+  if (ui.playButton.textContent !== play) ui.playButton.textContent = play;
 }
 
 // Searched areas expire, survivors get hungry and rescue missions run out
@@ -1519,13 +1524,14 @@ mapView.onScaleChange = (meters, pixels) => {
 // Map labels are drawn with the web fonts, so redraw once they have loaded.
 document.fonts?.ready.then(update);
 
-// The safety notice comes first at every start; then the welcome screen on
-// the first one, or the game.
-$('safety-button').addEventListener('click', () => {
-  ui.safetyScreen.hidden = true;
-  if (hasBeenWelcomed()) startTracking();
+// The start screen comes first at every start; then the welcome screen for a
+// new player, or the game.
+ui.playButton.addEventListener('click', () => {
+  ui.startScreen.hidden = true;
+  if (state.shelter || hasBeenWelcomed()) startTracking();
   else ui.welcomeScreen.hidden = false;
 });
+$('settings-button').addEventListener('click', () => ui.menuDialog.showModal());
 
 $('start-button').addEventListener('click', () => {
   try {
@@ -1557,7 +1563,7 @@ ui.importInput.addEventListener('change', () => {
   if (file) importSave(file);
 });
 
-// Sound and vibration switches in the menu.
+// Sound, vibration and debug bar switches in the menu.
 function setUpToggle(button, target, preview) {
   const render = () => button.setAttribute('aria-checked', String(target.enabled));
   render();
@@ -1570,6 +1576,10 @@ function setUpToggle(button, target, preview) {
 setUpToggle(ui.soundToggle, sound, () => sound.play('found'));
 setUpToggle(ui.vibrationToggle, haptics, () => haptics.play('found'));
 ui.vibrationToggle.hidden = !canVibrate;
+if (debugPanel) {
+  setUpToggle(ui.debugBarToggle, debugPanel, () => {});
+  ui.debugBarToggle.hidden = false;
+}
 
 // Browsers only let audio start after the player taps something.
 document.addEventListener(
@@ -1607,6 +1617,6 @@ setInterval(tick, TICK_MS);
 requestPersistentStorage();
 tick();
 const updated = new Date(`${APP_UPDATED}T12:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-$('app-meta').textContent = `Save version ${STATE_VERSION} · Updated ${updated}`;
-ui.safetyScreen.hidden = false;
-$('safety-button').focus();
+$('app-meta').textContent = `Last updated ${updated} · Save version ${STATE_VERSION}`;
+ui.startScreen.hidden = false;
+ui.playButton.focus();

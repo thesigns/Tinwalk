@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Tinwalk app icon: the shelter on a sheet of dark tin. Full bleed, so the
+       system can round the corners; the shelter stays in a maskable icon's safe zone. -->
+  <defs>
+    <linearGradient id="sheet" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5a564d"/>
+      <stop offset="0.55" stop-color="#48453e"/>
+      <stop offset="1" stop-color="#2b2924"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#sheet)"/>
+  <g transform="translate(256 331) scale(0.7962)">
+    <path d="M188.4 -3A188.4 188.4 0 0 0 156.1 -105.4L152 -106.1L113.7 -78.3L113 -74.1A135.1 135.1 0 0 1 135.1 -3L138.1 0L185.4 0ZM148.5 -115.9A188.4 188.4 0 0 0 64.4 -177.1L60.6 -175.2L46 -130.2L47.9 -126.3A135.1 135.1 0 0 1 105.4 -84.6L109.6 -84L147.9 -111.8ZM52 -181.1A188.4 188.4 0 0 0 -52 -181.1L-54 -177.4L-39.3 -132.4L-35.5 -130.3A135.1 135.1 0 0 1 35.5 -130.3L39.3 -132.4L54 -177.4ZM-64.4 -177.1A188.4 188.4 0 0 0 -148.5 -115.9L-147.9 -111.8L-109.6 -84L-105.4 -84.6A135.1 135.1 0 0 1 -47.9 -126.3L-46 -130.2L-60.6 -175.2ZM-156.1 -105.4A188.4 188.4 0 0 0 -188.4 -3L-185.4 0L-138.1 0L-135.1 -3A135.1 135.1 0 0 1 -113 -74.1L-113.7 -78.3L-152 -106.1ZM-71.4 0L71.4 0L74.3 -3A74.4 74.4 0 0 0 -74.3 -3Z" fill="#efe6d0"/>
+  </g>
+</svg>

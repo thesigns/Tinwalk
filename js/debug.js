@@ -2,6 +2,7 @@
 // position by tapping the map, and can speed up game time.
 
 import { enableDebugClock, resetTime, setTimeSpeed, timeOffset, timeSpeed } from './clock.js';
+import { isSettingOn, saveSetting } from './settings.js';
 
 export const isDebug = new URLSearchParams(location.search).has('debug');
 
@@ -9,6 +10,8 @@ if (isDebug) enableDebugClock();
 
 // Map center used until the first position is known (Warsaw).
 export const DEBUG_START = { lat: 52.2297, lon: 21.0122 };
+
+const BAR_SETTING = 'tinwalk.debugBar';
 
 export class DebugPanel {
   // describeGame() returns a one-line summary of the game state around the player.
@@ -34,9 +37,18 @@ export class DebugPanel {
       onTimeChange();
     });
 
-    root.hidden = false;
+    // Hiding the panel only declutters the screen: debug mode keeps working.
+    this.enabled = isSettingOn(BAR_SETTING);
+    root.hidden = !this.enabled;
     // Reading ages and game time change even when nothing else happens.
     setInterval(() => this.update(), 1000);
+  }
+
+  // Same interface as sound and haptics, so the menu switch can drive it.
+  setEnabled(enabled) {
+    this.enabled = enabled;
+    saveSetting(BAR_SETTING, enabled);
+    this.root.hidden = !enabled;
   }
 
   update() {

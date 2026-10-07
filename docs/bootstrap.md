@@ -155,9 +155,14 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
 
 #### Ekran startowy
 
-- Przy każdym uruchomieniu aplikacji, zanim pojawi się cokolwiek innego, aplikacja pokazuje ekran z logo (napisem **Tinwalk**), wersją zapisu i datą ostatniej aktualizacji, np. „Save version 8 · Updated 5 Oct 2026”.
-- Pod spodem jest przypomnienie o bezpieczeństwie: „When you walk outdoors, stay aware of your surroundings. Don't enter restricted, private or dangerous areas, and keep an eye on traffic. Stay safe!” i przycisk **I understand**.
-- Dopiero po kliknięciu przycisku aplikacja zaczyna śledzić pozycję, a przy pierwszym uruchomieniu pokazuje ekran powitalny.
+- Przy każdym uruchomieniu aplikacji, zanim pojawi się cokolwiek innego, aplikacja pokazuje ekran startowy. Zasłania on całą mapę.
+- Na górze jest logo Tinwalk (`img/logos/tinwalk-logo-stacked.svg`), pod nim małym drukiem przypomnienie o bezpieczeństwie: „When you walk outdoors, stay aware of your surroundings. Don't enter restricted, private or dangerous areas, and keep an eye on traffic.”.
+- Pod spodem są przyciski:
+  - **Continue Game**, jeśli gracz ma założony schron, albo **New Game**, jeśli go nie ma,
+  - **Settings**: otwiera ustawienia (dźwięk, wibracje, eksport, import i reset zapisu),
+  - **Help**: na razie nieaktywny.
+- Na dole małym drukiem jest data ostatniej aktualizacji i wersja zapisu, np. „Last updated 7 Oct 2026 · Save version 11”.
+- Dopiero po kliknięciu **New Game** albo **Continue Game** aplikacja zaczyna śledzić pozycję, a nowemu graczowi najpierw pokazuje ekran powitalny.
 - Datę aktualizacji trzeba zmieniać ręcznie (stała `APP_UPDATED` w `js/version.js`), bo aplikacja nie ma kroku budowania.
 
 #### Pierwsze uruchomienie
@@ -169,7 +174,7 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
 
 - Stan aplikacji jest zapisywany w `localStorage` jako JSON po każdej zmianie.
 - Aplikacja pozwala wyeksportować stan do pliku JSON i zaimportować go z powrotem (ochrona przed utratą danych).
-- W menu jest „Reset data”: po potwierdzeniu w okienku (ostrzeżenie, że usuwa cały postęp gry) gra zaczyna się od nowa. Ustawienia dźwięku i wibracji zostają.
+- W ustawieniach jest „Reset data”: po potwierdzeniu w okienku (ostrzeżenie, że usuwa cały postęp gry) gra zaczyna się od nowa. Ustawienia dźwięku i wibracji zostają.
 - Zapisany stan ma pole `version`, żeby w przyszłości dało się migrować starsze zapisy. Import odrzuca plik o nieznanej wersji lub nieprawidłowej strukturze i pokazuje komunikat.
 - Przy starcie aplikacja wywołuje `navigator.storage.persist()`, żeby zmniejszyć ryzyko, że przeglądarka sama usunie dane (np. Safari po kilku dniach nieużywania strony).
 

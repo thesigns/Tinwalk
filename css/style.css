@@ -51,6 +51,8 @@
 :root {
   --font-stencil: "Big Shoulders Stencil", Impact, "Arial Narrow", sans-serif;
   --font-type: "Courier Prime", "Courier New", monospace;
+  /* Small print where a typewriter face reads too heavy: the system's own sans. */
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
   --paper: #ece0c0;
   --paper-shade: #d6c49a;
@@ -486,9 +488,13 @@ button {
   box-shadow: inset 0 0 0 2.5px var(--ink);
 }
 
-.btn-ink:active {
+.btn-ink:active:not(:disabled) {
   transform: translateY(2px);
   background: var(--ink-faint);
+}
+
+.btn-ink:disabled {
+  opacity: 0.35;
 }
 
 .btn-square {
@@ -752,7 +758,53 @@ button {
   gap: 12px;
 }
 
-/* Full-screen overlays: safety notice, welcome and missing location */
+/* Start screen: the logo, a word on safety and the way into the game. It
+   covers the map completely. */
+
+.start-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  padding: calc(env(safe-area-inset-top) + 32px) 16px calc(env(safe-area-inset-bottom) + 24px);
+  overflow-y: auto;
+  box-shadow: none;
+}
+
+.start-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(320px, 100%);
+  margin: auto;
+  text-align: center;
+}
+
+.start-logo {
+  margin: 0 0 22px;
+}
+
+.start-logo img {
+  display: block;
+  width: min(250px, 72vw);
+  height: auto;
+}
+
+.start-small {
+  margin: 0;
+  color: var(--ink-soft);
+  font: 13px/1.45 var(--font-sans);
+}
+
+.start-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: min(250px, 100%);
+  margin: 30px 0 32px;
+}
+
+/* Full-screen overlays: welcome and missing location */
 
 .overlay {
   position: fixed;
@@ -794,20 +846,6 @@ button {
   font-size: 68px;
   font-weight: 900;
   letter-spacing: 0.02em;
-}
-
-/* "Save version 8 · Updated 5 Oct 2026", under the wordmark on the start screen. */
-.app-meta {
-  margin: 0 0 18px;
-  color: var(--ink-soft);
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.safety-text {
-  margin: 0 0 22px;
-  font-size: 17px;
-  font-weight: 700;
 }
 
 /* A stroke of red paint under the title. */
