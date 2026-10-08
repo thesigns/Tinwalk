@@ -223,7 +223,7 @@ export const ENEMIES = {
     label: 'Rat',
     strength: '2d3',
     treasure: { junk: 1, food: 1 },
-    flavor: "Fat on what the town left behind and afraid of nothing. Alone it's weak, but its teeth are sharp.",
+    flavor: "Fat on what the world left behind and afraid of nothing. Alone it's weak, but its teeth are sharp.",
   },
   'mutated-rat': {
     label: 'Mutated Rat',
