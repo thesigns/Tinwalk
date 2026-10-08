@@ -175,44 +175,6 @@ input {
   pointer-events: none;
 }
 
-#compass {
-  width: 40px;
-  height: 50px;
-  overflow: visible;
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.25));
-}
-
-#compass text {
-  fill: var(--ink);
-  font: 800 12px var(--font-stencil);
-  text-anchor: middle;
-}
-
-#compass circle {
-  fill: rgba(236, 224, 192, 0.75);
-  stroke: var(--ink);
-  stroke-width: 1.5;
-}
-
-#compass .needle-north {
-  fill: var(--paint);
-  stroke: var(--ink);
-  stroke-width: 1;
-  stroke-linejoin: round;
-}
-
-#compass .needle-south {
-  fill: var(--paper);
-  stroke: var(--ink);
-  stroke-width: 1;
-  stroke-linejoin: round;
-}
-
-#compass .hub {
-  fill: var(--ink);
-  stroke: none;
-}
-
 #scale-bar {
   display: flex;
   flex-direction: column;
@@ -240,11 +202,6 @@ input {
 
 #location-label {
   font-size: 24px;
-}
-
-/* The settlement's name, under "Ruins". */
-#location-place {
-  font-size: 14px;
 }
 
 /* "Day · dark in 3 h": searching in the dark finds less. */

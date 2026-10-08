@@ -20,7 +20,7 @@ Licznik działa, gdy jest w plecaku. Nie trzeba go włączać.
 
 ### Wykrywanie
 
-- Gdy użytkownik z licznikiem w plecaku jest w strefie, obok kompasu widać ikonkę radiacji. Bez licznika nic nie zdradza strefy.
+- Gdy użytkownik z licznikiem w plecaku jest w strefie, obok podziałki mapy widać ikonkę radiacji. Bez licznika nic nie zdradza strefy.
 - Licznik trzeszczy (dźwięk i wibracja przez ok. 1,2 s):
   - przy wejściu do strefy,
   - przy przeszukaniu w strefie,

@@ -103,7 +103,7 @@ Szansa zależy od czasu, który minął od końca poprzedniej misji ratunkowej (
 
 - Na misję jest 24 godziny od wezwania (czasu gry).
 - Cel misji jest na mapie zakreślony czerwonym ołówkiem. Gdy cel jest poza ekranem, czerwona strzałka przy krawędzi mapy wskazuje kierunek.
-- Pod kompasem leży notka z misją: kto czeka, przy jakim landmarku, jak daleko i w którą stronę od użytkownika oraz ile czasu zostało, np. „Ada · Abandoned Mine / 1.2 km NE · 18 h left”.
+- Pod podziałką mapy leży notka z misją: kto czeka, przy jakim landmarku, jak daleko i w którą stronę od użytkownika oraz ile czasu zostało, np. „Ada · Abandoned Mine / 1.2 km NE · 18 h left”.
 
 ### Ratunek
 

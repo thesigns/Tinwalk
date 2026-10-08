@@ -61,7 +61,6 @@ import {
   search,
   searchBlocker,
   settleMeals,
-  settlementAtPosition,
   sicknessHealsAt,
   takeManual,
   takeSurvivor,
@@ -236,7 +235,6 @@ const ui = {
   scaleLabel: $('scale-label'),
   location: $('location'),
   locationLabel: $('location-label'),
-  locationPlace: $('location-place'),
   locationDaylight: $('location-daylight'),
   scaleLine: $('scale-line'),
   welcomeScreen: $('welcome-screen'),
@@ -421,10 +419,7 @@ function renderStatus() {
   const { position } = tracker;
   ui.location.hidden = !position;
   if (position) {
-    const settlement = inShelter ? null : settlementAtPosition(position);
     ui.locationLabel.textContent = inShelter ? 'Shelter' : biomeAtPosition(position).label;
-    ui.locationPlace.hidden = !settlement;
-    ui.locationPlace.textContent = settlement?.name ?? '';
     ui.locationDaylight.textContent = describeDaylight(position, time);
     ui.location.classList.toggle('uncertain', !tracker.hasGoodSignal);
   }

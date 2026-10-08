@@ -20,7 +20,6 @@
 // covering about a fifth of the world, regardless of the biome underneath.
 
 import { EARTH_RADIUS, MERCATOR_RADIUS, fromMercator, toMercator } from './geo.js';
-import { SETTLEMENT_NAME_ENDS, SETTLEMENT_NAME_STARTS } from './names.js';
 import { createSimplex, hash } from './noise.js';
 import { area, bisect, containsAll, inset, intersect, middleOf } from './polygon.js';
 
@@ -194,7 +193,7 @@ export function radiationAt(mx, my) {
 
 // Settlements
 //
-// A settlement is a center, a radius and a name. Its ruins are laid out in
+// A settlement is a center and a radius. Its ruins are laid out in
 // districts: the cells of a Voronoi diagram over one site per DISTRICT_CELL,
 // each district with a street grid at an angle of its own and avenues along
 // its edges, so blocks cut by a district's edge come out irregular. A block
@@ -205,17 +204,14 @@ export function radiationAt(mx, my) {
 const settlementCache = new Map();
 const MAX_CACHED_SETTLEMENTS = 4096;
 
-// The settlement in a grid cell, or null: { name, x, y, radius }, in world units.
+// The settlement in a grid cell, or null: { x, y, radius }, in world units.
 function settlementIn(cx, cy) {
   const key = cellKey(cx, cy);
   if (settlementCache.has(key)) return settlementCache.get(key);
   let settlement = null;
   if (hash(cx, cy, salted(701)) < SETTLEMENT_CHANCE) {
     const size = hash(cx, cy, salted(704));
-    const start = SETTLEMENT_NAME_STARTS[Math.floor(hash(cx, cy, salted(707)) * SETTLEMENT_NAME_STARTS.length)];
-    const end = SETTLEMENT_NAME_ENDS[Math.floor(hash(cx, cy, salted(708)) * SETTLEMENT_NAME_ENDS.length)];
     settlement = {
-      name: start + end,
       x: (cx + 0.15 + 0.7 * hash(cx, cy, salted(702))) * SETTLEMENT_CELL,
       y: (cy + 0.15 + 0.7 * hash(cx, cy, salted(703))) * SETTLEMENT_CELL,
       radius: SETTLEMENT_MIN_RADIUS + (SETTLEMENT_MAX_RADIUS - SETTLEMENT_MIN_RADIUS) * size,
@@ -322,7 +318,7 @@ function gridRectangle(district, u0, v0, u1, v1) {
 }
 
 // The district's ruined blocks by cellKey() of their grid indices, computed once:
-// { ground, block, settlement, shade, box }, in world
+// { ground, block, shade, box }, in world
 // units. ground is the block with its share of the streets, cut to the
 // district; block is what stands between the streets, or null where an
 // avenue left too little of it.
@@ -368,8 +364,7 @@ function blocksOf(district) {
       const rectangle = gridRectangle(district, u0, v0, u0 + BLOCK_LENGTH, v0 + BLOCK_WIDTH);
       const ground = containsAll(cell, rectangle) ? rectangle : intersect(rectangle, cell);
       if (ground.length < 3) continue;
-      const settlement = settlementCovering(...middleOf(ground), candidates);
-      if (!settlement) continue;
+      if (!settlementCovering(...middleOf(ground), candidates)) continue;
       const full = gridRectangle(district, u0 + STREET, v0 + STREET, u0 + BLOCK_LENGTH - STREET, v0 + BLOCK_WIDTH - STREET);
       const block = inner.length < 3 ? [] : containsAll(inner, full) ? full : intersect(full, inner);
       const xs = ground.map(([x]) => x);
@@ -377,7 +372,6 @@ function blocksOf(district) {
       blocks.set(cellKey(gi, gj), {
         ground,
         block: block.length >= 3 && Math.abs(area(block)) > MIN_BLOCK_SHARE * Math.abs(area(full)) ? block : null,
-        settlement,
         // From 0 to 1, so the map can tell blocks apart by their shade.
         shade: hash(district.i * 1024 + gi, district.j * 1024 + gj, salted(920)),
         box: [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)],
@@ -392,16 +386,6 @@ function ruinedBlockAt(x, y) {
   const district = districtAt(x, y);
   const [u, v] = toGrid(district, x, y);
   return blocksOf(district).get(cellKey(Math.floor(u / BLOCK_LENGTH), Math.floor(v / BLOCK_WIDTH)));
-}
-
-// The settlement whose ruins are at a Mercator point, or null.
-export function settlementAt(mx, my) {
-  const { x, y } = toWorld(mx, my);
-  return settlementAtWorld(x, y);
-}
-
-function settlementAtWorld(x, y) {
-  return ruinedBlockAt(x, y)?.settlement ?? null;
 }
 
 // Ruined blocks that may show inside a Mercator rectangle, in world units.

@@ -6,7 +6,7 @@ import { addDice, diceAverage, rollDice } from './dice.js';
 import { distanceMeters, toMercator } from './geo.js';
 import { SURVIVOR_NAMES } from './names.js';
 import { nextCrossing, sunElevation } from './sun.js';
-import { biomeAt, radiationAt, settlementAt } from './terrain.js';
+import { biomeAt, radiationAt } from './terrain.js';
 
 // one: the label for a single unit, as in "1 Cell".
 export const RESOURCES = [
@@ -460,12 +460,6 @@ function enemyNear(state, position) {
 export function biomeAtPosition(position) {
   const { x, y } = toMercator(position);
   return biomeAt(x, y);
-}
-
-// The settlement whose ruins are at a { lat, lon } position, or null.
-export function settlementAtPosition(position) {
-  const { x, y } = toMercator(position);
-  return settlementAt(x, y);
 }
 
 // Returns { resource, found, carried, manual, dark, flashlight, geiger },

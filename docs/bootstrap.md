@@ -126,7 +126,6 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
 - Ruiny obejmują całe kwartały razem z ulicami, więc na ulicy w osadzie też jest się w ruinach.
 - Osady są rysowane jako wektorowe kształty, a nie próbkowane jak reszta terenu, żeby kwartały i ulice były ostre przy każdym przybliżeniu.
 - Ruiny nie mają ikon. Kwartał jest jedną plamą przy każdym przybliżeniu, bez rozbijania na budynki. Kwartały mają kilka odcieni szarości, rozłożonych losowo, żeby miasto nie wyglądało jak równe kafelki.
-- Każda osada ma stałą, wylosowaną nazwę złożoną z dwóch członów, np. „Rustford” albo „Pinemouth”. Nazwy nie ma na mapie, żeby jej nie zaśmiecać; widać ją tylko pod słowem **Ruins** obok kompasu (zob. Interfejs).
 - Grunt jest jednolity, bez cieniowania szumem.
 - Teren należy do świata gry (zob. [Nowa gra i World ID](#nowa-gra-i-world-id)). Jest generowany deterministycznie (szum simplex) z ziarna wyliczonego z World ID i z położenia względem środka świata, czyli miejsca, w którym zaczęła się gra.
 - Położenie jest mierzone w metrach na wschód i na północ od środka świata, wzdłuż powierzchni Ziemi, a nie we współrzędnych mapy. Stopień długości geograficznej jest krótszy niż stopień szerokości, a jednostka mapy (Web Mercator) ma inną długość w Warszawie i w Lizbonie, więc tylko metry dają ten sam teren na każdej szerokości geograficznej. Na dystansie spaceru (kilka km) wynik jest identyczny.
@@ -142,7 +141,7 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
   - niepokonani wrogowie jako ikony na czerwonych kółkach (zob. [combat.md](combat.md#wrogowie-na-mapie)),
   - pozycja użytkownika jako pinezka (z okręgiem dokładności GPS),
 - Pinezka jest zielona, gdy użytkownik może przeszukać obszar, a czerwona, gdy nie może (np. jest w przeszukanym obszarze, za blisko schronu albo w schronie). Przy słabym sygnale pinezka jest szara.
-- Przy pinezce jest stożek pokazujący, w którą stronę zwrócony jest telefon (z jego kompasu), jak w nawigacjach. Jest ciepłobiały i zanika z odległością, jak snop światła latarki. Mapa zostaje zwrócona północą do góry. Kierunek jest wygładzany, bo kompas drży, i liczony tak, żeby nie skakał przy pochylaniu telefonu: płasko liczy się kierunek górnej krawędzi, a pionowo kierunek, w który patrzy tył telefonu. Bez kompasu (komputer), bez zgody albo bez odczytu od 3 s stożka nie ma.
+- Przy pinezce jest stożek pokazujący, w którą stronę zwrócony jest telefon (z jego kompasu), jak w nawigacjach. Jest ciepłobiały i zanika z odległością, jak snop światła latarki. Mapa zostaje zwrócona północą do góry, więc nie ma na niej kompasu, który zawsze wskazywałby to samo. Kierunek jest wygładzany, bo kompas drży, i liczony tak, żeby nie skakał przy pochylaniu telefonu: płasko liczy się kierunek górnej krawędzi, a pionowo kierunek, w który patrzy tył telefonu. Bez kompasu (komputer), bez zgody albo bez odczytu od 3 s stożka nie ma.
   - Android (Chrome) podaje kierunek bez pytania o zgodę. iPhone pyta o zgodę na dostęp do ruchu i orientacji przy dotknięciu **New Game** albo **Continue Game**, bo przeglądarka pozwala zapytać tylko w odpowiedzi na dotknięcie.
   - W trybie debug stożek wskazuje kierunek ostatniego przesunięcia pozycji dotknięciem mapy, jakby użytkownik tam szedł. Wtedy kompas go nie nadpisuje.
 - Domyślny widok obejmuje około 1–2 km wokół użytkownika i jest wycentrowany na użytkowniku.
@@ -160,7 +159,7 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
   - **Wastes**: mapa. Po wejściu do gry otwiera się ta zakładka.
 - Pod zakładkami jest zawsze pasek stanu: zawartość plecaka (np. „Backpack 12/50”), czy idzie z nami ocalały, oraz jakość sygnału GPS. Dotknięcie plecaka otwiera panel plecaka, w którym można wyrzucić rzeczy.
 - Na zakładce **Wastes** przyciski zależą od kontekstu: **Create a Shelter**, **Search area**, **Unload**.
-- Obok kompasu i podziałki mapy jedno słowo mówi, gdzie stoi użytkownik: **Shelter**, **Plains**, **Forest** albo **Ruins**. W ruinach pod spodem jest mniejszym drukiem nazwa osady. Najniżej jest pora dnia i czas do jej zmiany, np. „Day · dark in 3 h” (zob. [night.md](night.md)). Dzięki temu na granicy biomów nie trzeba zgadywać z mapy, jaki łup da przeszukanie. Bez pozycji słowa nie ma, a przy słabym sygnale jest przygaszone, tak jak pinezka.
+- Obok podziałki mapy jedno słowo mówi, gdzie stoi użytkownik: **Shelter**, **Plains**, **Forest** albo **Ruins**. Najniżej jest pora dnia i czas do jej zmiany, np. „Day · dark in 3 h” (zob. [night.md](night.md)). Dzięki temu na granicy biomów nie trzeba zgadywać z mapy, jaki łup da przeszukanie. Bez pozycji słowa nie ma, a przy słabym sygnale jest przygaszone, tak jak pinezka.
 - Zakładka **Shelter** pokazuje nazwę schronu, stan magazynu, przedmioty i podręczniki, warsztat (zob. [crafting.md](crafting.md)), radio (zob. [landmarks.md](landmarks.md#radio)) oraz ocalałych z ich etapem głodu i ranami (zob. [survivors.md](survivors.md)). Bez schronu mówi tylko, że trzeba go założyć na zakładce **Wastes**. Po odebraniu wezwania przez radio aplikacja przechodzi na mapę, żeby pokazać, gdzie iść.
 
 #### Ekran startowy
@@ -182,7 +181,7 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
 - Pod polem jest wyjaśnienie: „Everyone who starts with the same World ID gets the same land around their starting point.”.
 - Między wskazówką a polem **World ID** są wyśrodkowane przyciski **Back** (wraca do ekranu startowego) i **Begin Game**. Enter w polu też rozpoczyna grę.
 - **Begin Game** zaczyna nową grę z pustym stanem i wybranym World ID. Środkiem świata zostaje pierwsza dobra pozycja GPS po rozpoczęciu gry. Do tego czasu mapa jest pustym papierem. W trybie debug bez pozycji środkiem świata jest punkt startowy mapy debug (Warszawa).
-- Dwie osoby z tym samym World ID dostają ten sam teren (biomy, osady z nazwami, strefy radiacji) w tych samych odległościach i kierunkach od swoich punktów startu, gdziekolwiek są. Łup, wrogowie, landmarki i wezwania przez radio są losowane przy przeszukiwaniu, więc są różne.
+- Dwie osoby z tym samym World ID dostają ten sam teren (biomy, osady, strefy radiacji) w tych samych odległościach i kierunkach od swoich punktów startu, gdziekolwiek są. Łup, wrogowie, landmarki i wezwania przez radio są losowane przy przeszukiwaniu, więc są różne.
 - Zapisy sprzed światów dostają losowe World ID ze środkiem świata w miejscu schronu, więc teren pod nimi się zmienia. Zapisy bez schronu nie mają świata i zaczynają od **New Game**.
 - Datę aktualizacji trzeba zmieniać ręcznie (stała `APP_UPDATED` w `js/version.js`), bo aplikacja nie ma kroku budowania.
 
@@ -233,3 +232,4 @@ Tych rzeczy nie implementujemy w prototypie.
   - panele słoneczne.
 - Kolejne urządzenia w schronie zasilane z Cells i przedmioty z baterią w koszcie, np. karabin laserowy, dron zwiadowczy. Przedmiotów nie ładuje się: zużyty znika.
 - Psucie się niektórych rzeczy i naprawy z Junk.
+- Zakładanie osad: punkty na mapie w stylu landmarków, ale budowane przez gracza, a nie odnajdywane, z nazwą wybraną przez gracza. Ruiny miast nie mają nazw.

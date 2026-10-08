@@ -54,7 +54,7 @@ All code is in `js/`, loaded from `index.html` via `js/main.js`.
 | `settings.js` | On/off preferences in `localStorage` |
 | `version.js` | `APP_UPDATED`, the date of the last update shown on the start screen |
 | `debug.js` | Debug panel and the debug clock |
-| `names.js` | Survivor names and settlement name parts |
+| `names.js` | Survivor names |
 
 ## Conventions and gotchas
 
