@@ -122,7 +122,7 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
 - Las jest ciemnooliwkowy, z własnym, gruboziarnistym ziarnem koron drzew. Korony chowają większość rzeźby gór pod lasem i stoją trochę ponad gruntem, więc brzeg lasu łapie światło z jednej strony i rzuca cień z drugiej. Brzeg lasu jest lekko postrzępiony.
 - Ruiny to gęsta, ciemna faktura miasta: ulice, kwartały w kilku odcieniach, a na nich budynki z cieniami i kupy gruzu. W centrum osady budynki są duże i wysokie, ku brzegom przechodzą w małe domki z podwórkami; czasem cały kwartał zajmuje hala. Miasto jest nałożone na rzeźbę tak, że ta przez nie prześwituje, ale las już nie: w mieście lasu nie ma. Teren pod miastem jest wypłaszczony.
 - Na mapie jest jasna siatka kwadratów, jak na starych mapach, liczona w metrach od środka świata: co 100, 250, 500, 1000 albo 2500 m, tyle, żeby kratka miała na ekranie co najmniej ok. 70 px. Podziałka w legendzie zostaje, bo kratka zmienia rozmiar przy przybliżaniu.
-- Napisy legendy i pierścień schronu mają papierową obwódkę, żeby były czytelne i na ciemnym lesie, i na jasnym pyle.
+- Napisy legendy mają papierową obwódkę, żeby były czytelne i na ciemnym lesie, i na jasnym pyle.
 - Nieużytki zajmują ok. 50% świata, bo dają najbardziej zrównoważony łup. Lasy i ruiny zajmują po ok. 25%.
 - Nieużytki to tło: wszystko, co nie jest lasem ani ruinami.
 - Lasy powstają z szumu simplex zniekształconego drugim szumem (domain warping), więc mają nieregularne brzegi, zatoki i polany, a nie obłe plamy.
@@ -139,7 +139,7 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
 - Regiony terenu mają skalę od kilkuset metrów do około kilometra, tak żeby typowy spacer przechodził przez kilka różnych terenów. Na prostym odcinku 3 km teren zmienia się średnio ok. 6 razy.
 - Mapa jest zawsze skierowana na północ.
 - Na mapie widoczne są:
-  - schron jako okrąg z nazwą,
+  - schron jako białe, półprzezroczyste koło (widoczne i na ciemnym lesie, i na jasnym pyle) z pieczątką chatki i nazwą,
   - aktywne przeszukane obszary jako zlane kształty, zakreskowane żółtym ołówkiem tłustym (jak na kalce nałożonej na mapę), z krzyżykiem w miejscu każdego przeszukania; żółty, bo czerwień ginęła na szarym terenie. Tak samo żółty jest okrąg kreślony podczas przeszukiwania,
   - odkryte landmarki jako małe ikony, a cel misji ratunkowej zakreślony czerwonym ołówkiem (zob. [landmarks.md](landmarks.md)),
   - niepokonani wrogowie jako ikony na czerwonych kółkach (zob. [combat.md](combat.md#wrogowie-na-mapie)),

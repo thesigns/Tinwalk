@@ -56,7 +56,6 @@ const COLORS = {
   // Under tiles that aren't drawn yet: the terrain's dust.
   ground: '#b3ada6',
   grid: 'rgba(225, 232, 240, 0.22)',
-  halo: 'rgba(236, 224, 192, 0.55)',
   ink: '#33281c',
   paint: '#b4432b',
   paintLight: '#d9654a',
@@ -75,7 +74,9 @@ const COLORS = {
   heading: 'rgba(255, 250, 228, 0.85)',
   headingMiddle: 'rgba(255, 250, 228, 0.5)',
   headingFade: 'rgba(255, 250, 228, 0)',
-  shelterFill: 'rgba(51, 40, 28, 0.1)',
+  // The shelter's ground: a pale veil that shows on dark forest and dust alike.
+  shelterFill: 'rgba(252, 248, 236, 0.3)',
+  shelterEdge: 'rgba(252, 248, 236, 0.65)',
   // Searched areas are marked in yellow grease pencil, as on a map's
   // overlay: it stands out on the grey land, where red got lost.
   searchedFill: 'rgba(240, 200, 60, 0.1)',
@@ -713,7 +714,7 @@ export class MapView {
     ctx.restore();
   }
 
-  // The shelter: a double ink ring, a stamped hut and its name on a strip of tape.
+  // The shelter: its ground under a pale veil, a stamped hut and its name on a strip of tape.
   drawShelter(center, shelter) {
     const { ctx } = this;
     const { x, y } = this.toScreen(center, shelter);
@@ -723,21 +724,9 @@ export class MapView {
     ctx.arc(x, y, radius, 0, Math.PI * 2);
     ctx.fillStyle = COLORS.shelterFill;
     ctx.fill();
-    // A pale edge keeps the ink circle visible over dark forest.
-    ctx.strokeStyle = COLORS.halo;
-    ctx.lineWidth = 5.5;
+    ctx.strokeStyle = COLORS.shelterEdge;
+    ctx.lineWidth = 1.5;
     ctx.stroke();
-    ctx.strokeStyle = COLORS.ink;
-    ctx.lineWidth = 2.5;
-    ctx.stroke();
-    if (radius > 12) {
-      ctx.beginPath();
-      ctx.arc(x, y, radius - 4, 0, Math.PI * 2);
-      ctx.setLineDash([3, 4]);
-      ctx.lineWidth = 1.2;
-      ctx.stroke();
-      ctx.setLineDash([]);
-    }
 
     // Stamp
     ctx.beginPath();
