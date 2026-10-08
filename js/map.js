@@ -32,6 +32,9 @@ const LANDMARK_RADIUS_PX = 15;
 const LANDMARK_ICON_PX = 20;
 // Landmark and enemy badges.
 const BADGE_PX = 46;
+// The cone showing where the phone points: its reach, and half its width.
+const HEADING_LENGTH_PX = 64;
+const HEADING_SPREAD = (28 * Math.PI) / 180;
 // The red pencil ring around the rescue mission's landmark.
 const TARGET_RADIUS_PX = 31;
 // Where the arrow to an off-screen target runs along, clear of the status
@@ -53,6 +56,10 @@ const COLORS = {
   shadow: 'rgba(40, 28, 15, 0.35)',
   accuracy: 'rgba(180, 67, 43, 0.12)',
   accuracyOutline: 'rgba(180, 67, 43, 0.45)',
+  // The heading cone: a flashlight's beam, warm white.
+  heading: 'rgba(255, 250, 228, 0.85)',
+  headingMiddle: 'rgba(255, 250, 228, 0.5)',
+  headingFade: 'rgba(255, 250, 228, 0)',
   shelterFill: 'rgba(51, 40, 28, 0.1)',
   searchedFill: 'rgba(180, 60, 35, 0.07)',
   pencil: 'rgba(170, 45, 25, 0.85)',
@@ -671,7 +678,7 @@ export class MapView {
 
   // The player: a pin stuck into the map, with the GPS accuracy around it.
   // Green where the player can search, red where they can't, grey without a good signal.
-  drawPlayer(center, { position, good, canSearch }) {
+  drawPlayer(center, { position, good, canSearch, heading }) {
     const { ctx } = this;
     const { x, y } = this.toScreen(center, position);
     ctx.globalAlpha = good ? 1 : 0.5;
@@ -687,8 +694,24 @@ export class MapView {
       ctx.stroke();
     }
 
+    // Where the phone points, like a flashlight's beam fading out with distance.
+    if (heading !== null) {
+      const angle = (heading - 90) * (Math.PI / 180);
+      const fade = ctx.createRadialGradient(x, y, 0, x, y, HEADING_LENGTH_PX);
+      fade.addColorStop(0, COLORS.heading);
+      fade.addColorStop(0.55, COLORS.headingMiddle);
+      fade.addColorStop(1, COLORS.headingFade);
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.arc(x, y, HEADING_LENGTH_PX, angle - HEADING_SPREAD, angle + HEADING_SPREAD);
+      ctx.closePath();
+      ctx.fillStyle = fade;
+      ctx.fill();
+    }
+
+    // The pin's shadow, right under its point.
     ctx.beginPath();
-    ctx.ellipse(x + 2, y, 7, 3, 0, 0, Math.PI * 2);
+    ctx.ellipse(x, y, 7, 3, 0, 0, Math.PI * 2);
     ctx.fillStyle = COLORS.shadow;
     ctx.fill();
 

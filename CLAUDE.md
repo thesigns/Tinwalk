@@ -26,7 +26,7 @@ Open `http://localhost:8000/?debug`. Geolocation requires HTTPS, but `localhost`
 
 Chrome caches ES modules aggressively: after editing JS or CSS, hard-reload (Ctrl+Shift+R), or you may test stale code.
 
-Debug mode (`?debug`) shows a GPS diagnostics panel, lets you set the user's position by tapping the map, and can speed up game time (1×, 60×, 3600×) to test the 6-hour expiry of searched areas and nightfall.
+Debug mode (`?debug`) shows a GPS diagnostics panel, lets you set the user's position by tapping the map (the heading cone then points along the move), and can speed up game time (1×, 60×, 3600×) to test the 6-hour expiry of searched areas and nightfall.
 
 ## Architecture
 
@@ -38,6 +38,7 @@ All code is in `js/`, loaded from `index.html` via `js/main.js`.
 | `game.js` | Game rules and constants (radii, loot tiers and weights, capacity, survivor meals, manuals, items, the radio, landmarks, rescue missions, enemies and the dice fight, wounds). Functions mutate the state; the caller saves |
 | `state.js` | State shape, `STATE_VERSION`, load/save to `localStorage`, export/import with validation |
 | `gps.js` | `LocationTracker`: Geolocation API, accuracy/staleness filtering, signal state, manual position for debug |
+| `heading.js` | `HeadingTracker`: which way the phone points, from its compass (tilt-compensated, smoothed; asks for permission on iPhones); in debug mode, along the last tap-move |
 | `geo.js` | Haversine distances, Web Mercator projection, weighted position averaging |
 | `sun.js` | Sun elevation from time and position (simplified NOAA formulas), for telling day from night |
 | `clock.js` | Game time (`now()`), which debug mode can speed up |

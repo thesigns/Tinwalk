@@ -142,6 +142,9 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
   - niepokonani wrogowie jako ikony na czerwonych kółkach (zob. [combat.md](combat.md#wrogowie-na-mapie)),
   - pozycja użytkownika jako pinezka (z okręgiem dokładności GPS),
 - Pinezka jest zielona, gdy użytkownik może przeszukać obszar, a czerwona, gdy nie może (np. jest w przeszukanym obszarze, za blisko schronu albo w schronie). Przy słabym sygnale pinezka jest szara.
+- Przy pinezce jest stożek pokazujący, w którą stronę zwrócony jest telefon (z jego kompasu), jak w nawigacjach. Jest ciepłobiały i zanika z odległością, jak snop światła latarki. Mapa zostaje zwrócona północą do góry. Kierunek jest wygładzany, bo kompas drży, i liczony tak, żeby nie skakał przy pochylaniu telefonu: płasko liczy się kierunek górnej krawędzi, a pionowo kierunek, w który patrzy tył telefonu. Bez kompasu (komputer), bez zgody albo bez odczytu od 3 s stożka nie ma.
+  - Android (Chrome) podaje kierunek bez pytania o zgodę. iPhone pyta o zgodę na dostęp do ruchu i orientacji przy dotknięciu **New Game** albo **Continue Game**, bo przeglądarka pozwala zapytać tylko w odpowiedzi na dotknięcie.
+  - W trybie debug stożek wskazuje kierunek ostatniego przesunięcia pozycji dotknięciem mapy, jakby użytkownik tam szedł. Wtedy kompas go nie nadpisuje.
 - Domyślny widok obejmuje około 1–2 km wokół użytkownika i jest wycentrowany na użytkowniku.
 - Mapę można przybliżać i oddalać (gest szczypania, na komputerze kółko myszy) w zakresie od ok. 500 m do ok. 5 km szerokości widoku.
 - Mapę można przesuwać palcem (na komputerze przeciąganiem myszą), żeby obejrzeć dłuższą trasę albo cel misji. Przesunięta mapa zostaje w miejscu, a przycisk z celownikiem z prawej strony mapy wraca do śledzenia użytkownika.

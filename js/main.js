@@ -72,6 +72,7 @@ import {
 } from './game.js';
 import { diceRange } from './dice.js';
 import { flyIcon, iconElement, prefersReducedMotion, replayAnimation, wait } from './fx.js';
+import { HeadingTracker } from './heading.js';
 import { averagePosition, bearingDegrees, distanceMeters } from './geo.js';
 import { LocationTracker } from './gps.js';
 import { Haptics, canVibrate } from './haptics.js';
@@ -279,6 +280,7 @@ const ui = {
 
 const state = loadState();
 const tracker = new LocationTracker();
+const heading = new HeadingTracker();
 const mapView = new MapView($('map'));
 const debugPanel = isDebug ? new DebugPanel($('debug-panel'), tracker, describeGame, tick) : null;
 const sound = new SoundEffects();
@@ -555,7 +557,7 @@ function renderMap() {
   const canSearch = action.id === 'search' && action.enabled;
   mapView.render({
     center: position ?? state.shelter ?? (isDebug ? DEBUG_START : null),
-    player: position ? { position, good: tracker.hasGoodSignal, canSearch } : null,
+    player: position ? { position, good: tracker.hasGoodSignal, canSearch, heading: heading.heading } : null,
     shelter: state.shelter && { ...state.shelter, radius: SHELTER_RADIUS },
     searchedAreas: activeSearchedAreas(state, now()),
     landmarks: state.landmarks,
@@ -1663,6 +1665,8 @@ document.fonts?.ready.then(update);
 // The start screen comes first at every start; then the welcome screen for a
 // new player, or the game.
 ui.playButton.addEventListener('click', () => {
+  // iPhones ask for the compass only in response to a tap.
+  heading.start();
   if (state.world) enterGame();
   else newGame();
 });
@@ -1749,6 +1753,7 @@ for (const dialog of [ui.survivorDialog, ui.manualDialog, ui.encounterDialog]) {
 }
 
 tracker.addEventListener('change', update);
+heading.addEventListener('change', renderMap);
 
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) tracker.stop();
@@ -1756,7 +1761,14 @@ document.addEventListener('visibilitychange', () => {
 });
 
 mapView.onLandmarkTap = openLandmark;
-if (isDebug) mapView.onTap = (point) => tracker.setManualPosition(point);
+if (isDebug) {
+  mapView.onTap = (point) => {
+    // Without a compass, the cone points along the move, as if walking there.
+    const from = tracker.position;
+    tracker.setManualPosition(point);
+    if (from && distanceMeters(from, point) > 1) heading.setManual(bearingDegrees(from, point));
+  };
+}
 
 setInterval(tick, TICK_MS);
 
