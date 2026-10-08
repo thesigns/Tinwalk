@@ -115,8 +115,14 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
 
 ### Mapa
 
-- Aplikacja nie pokazuje prawdziwej mapy. W tle rysowana jest fikcyjna, proceduralnie generowana mapa terenu w stylu papierowej mapy topograficznej. Są trzy biomy: równiny (pusty grunt, bez znaków), las i ruiny (plan zrujnowanego miasta).
-- Las ma płaski zielony kolor, bez obrysu, i znaki jak na mapie topograficznej: kółko (drzewa liściaste) albo daszek (iglaste), losowo, w regularnym szachownicowym rytmie co ok. 12 px ekranu. Znaki trzymają się kilka pikseli od brzegu lasu, żeby brzeg był czysty. Ich siatka jest liczona od środka świata, więc gracze z tym samym World ID widzą te same znaki.
+- Aplikacja nie pokazuje prawdziwej mapy. W tle rysowana jest fikcyjna, proceduralnie generowana mapa terenu w stylu mapy świata ze starej postapokaliptycznej gry (wzorem jest Fallout 1): cieniowana rzeźba terenu w wypranych, lekko chłodnych szarościach i brązach, z ziarnem jak na starym zdjęciu lotniczym. Są trzy biomy: równiny, las i ruiny.
+- Mapa udaje dużo większą krainę, niż obejmuje spacer: między miastami wznoszą się pasma gór z poszarpanymi, erodowanymi graniami, a między nimi leżą szerokie, pyliste niecki, miejscami poprzecinane żlebami. Rzeźba jest tylko rysunkiem: nie zmienia biomów ani reguł gry. Jest wyliczana z World ID, więc gracze z tym samym światem widzą te same góry.
+- Światło pada z północnego zachodu, jak na większości map cieniowanych, więc wzniesienia wyglądają na wypukłe.
+- Równiny to pył w jaśniejszych i ciemniejszych plamach, z rdzawymi zboczami i jasnymi graniami w górach.
+- Las jest ciemnooliwkowy, z własnym, gruboziarnistym ziarnem koron drzew. Korony chowają większość rzeźby gór pod lasem i stoją trochę ponad gruntem, więc brzeg lasu łapie światło z jednej strony i rzuca cień z drugiej. Brzeg lasu jest lekko postrzępiony.
+- Ruiny to gęsta, ciemna faktura miasta: ulice, kwartały w kilku odcieniach, a na nich budynki z cieniami i kupy gruzu. W centrum osady budynki są duże i wysokie, ku brzegom przechodzą w małe domki z podwórkami; czasem cały kwartał zajmuje hala. Miasto jest nałożone na rzeźbę tak, że ta przez nie prześwituje, ale las już nie: w mieście lasu nie ma. Teren pod miastem jest wypłaszczony.
+- Na mapie jest jasna siatka kwadratów, jak na starych mapach, liczona w metrach od środka świata: co 100, 250, 500, 1000 albo 2500 m, tyle, żeby kratka miała na ekranie co najmniej ok. 70 px. Podziałka w legendzie zostaje, bo kratka zmienia rozmiar przy przybliżaniu.
+- Napisy legendy i pierścień schronu mają papierową obwódkę, żeby były czytelne i na ciemnym lesie, i na jasnym pyle.
 - Równiny zajmują ok. 50% świata, bo dają najbardziej zrównoważony łup. Lasy i ruiny zajmują po ok. 25%.
 - Równiny to tło: wszystko, co nie jest lasem ani ruinami.
 - Lasy powstają z szumu simplex zniekształconego drugim szumem (domain warping), więc mają nieregularne brzegi, zatoki i polany, a nie obłe plamy.
@@ -124,23 +130,21 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
 - Ruiny są ułożone w dzielnice: komórki diagramu Voronoi wokół punktów rozrzuconych po jednym na kwadrat ok. 400 m. Każda dzielnica ma własną siatkę ulic, obróconą pod swoim kątem, z prostokątnymi kwartałami (ok. 90 × 60 m), a między dzielnicami biegną szersze arterie. Kwartały przecięte granicą dzielnicy są nieregularne (trójkąty, trapezy), a skrawki odcięte przez arterię zostają pustym placem.
 - Kwartał należy do ruin, jeśli jego środek leży w osadzie. Gdy osady się stykają, liczy się ta, której brzeg jest bliżej, więc łączą się jak dzielnice jednego miasta. Na postrzępionym brzegu zdarzają się pojedyncze kwartały oderwane od reszty, jak przedmieścia.
 - Ruiny obejmują całe kwartały razem z ulicami, więc na ulicy w osadzie też jest się w ruinach.
-- Osady są rysowane jako wektorowe kształty, a nie próbkowane jak reszta terenu, żeby kwartały i ulice były ostre przy każdym przybliżeniu.
-- Ruiny nie mają ikon. Kwartał jest jedną plamą przy każdym przybliżeniu, bez rozbijania na budynki. Kwartały mają kilka odcieni szarości, rozłożonych losowo, żeby miasto nie wyglądało jak równe kafelki.
-- Grunt jest jednolity, bez cieniowania szumem.
+- Osady są rysowane jako wektorowe kształty, a nie próbkowane jak reszta terenu, żeby kwartały, ulice i budynki były ostre przy każdym przybliżeniu. Przy dalekim zbliżeniu, gdy domy byłyby mniejsze od piksela, rysowane są same kwartały.
 - Teren należy do świata gry (zob. [Nowa gra i World ID](#nowa-gra-i-world-id)). Jest generowany deterministycznie (szum simplex) z ziarna wyliczonego z World ID i z położenia względem środka świata, czyli miejsca, w którym zaczęła się gra.
 - Położenie jest mierzone w metrach na wschód i na północ od środka świata, wzdłuż powierzchni Ziemi, a nie we współrzędnych mapy. Stopień długości geograficznej jest krótszy niż stopień szerokości, a jednostka mapy (Web Mercator) ma inną długość w Warszawie i w Lizbonie, więc tylko metry dają ten sam teren na każdej szerokości geograficznej. Na dystansie spaceru (kilka km) wynik jest identyczny.
 - Rozmiary terenu są dobrane w jednostkach ok. 0,62 m (jednostka Web Mercator na 52°N, w której teren był strojony), więc w Polsce teren ma takie same rozmiary jak przed wprowadzeniem światów.
-- Teren jest renderowany w kafelkach na niewidocznych płótnach (offscreen canvas) i trzymany w pamięci podręcznej, żeby nie rysować całego terenu w każdej klatce.
-- Szum lasu jest próbkowany na rzadkiej siatce, ale granica lasu jest wyznaczana dopiero z wartości interpolowanej dla każdego piksela kafelka. Dzięki temu jest gładka i ostra, a nie schodkowa.
+- Teren jest renderowany w kafelkach i trzymany w pamięci podręcznej, żeby nie rysować całego terenu w każdej klatce. Kafelki rysują w tle dwa workery (OffscreenCanvas), więc przesuwanie mapy nie przycina. Przeglądarki bez OffscreenCanvas (Safari przed 16.4) rysują kafelki na stronie, po kawałku w każdej klatce.
+- Rzeźba jest próbkowana co 2 piksele kafelka, a jej wolno zmienne części (gdzie są góry, lasy i miasta) na jeszcze rzadszej siatce; każdy piksel dostaje potem własne ziarno. Szczegóły drobniejsze niż piksel nie są liczone, więc koszt kafelka jest podobny przy każdym zbliżeniu.
 - Regiony terenu mają skalę od kilkuset metrów do około kilometra, tak żeby typowy spacer przechodził przez kilka różnych terenów. Na prostym odcinku 3 km teren zmienia się średnio ok. 6 razy.
 - Mapa jest zawsze skierowana na północ.
 - Na mapie widoczne są:
   - schron jako okrąg z nazwą,
-  - aktywne przeszukane obszary jako zlane kształty, zakreskowane czerwonym ołówkiem, z krzyżykiem w miejscu każdego przeszukania,
+  - aktywne przeszukane obszary jako zlane kształty, zakreskowane żółtym ołówkiem tłustym (jak na kalce nałożonej na mapę), z krzyżykiem w miejscu każdego przeszukania; żółty, bo czerwień ginęła na szarym terenie. Tak samo żółty jest okrąg kreślony podczas przeszukiwania,
   - odkryte landmarki jako małe ikony, a cel misji ratunkowej zakreślony czerwonym ołówkiem (zob. [landmarks.md](landmarks.md)),
   - niepokonani wrogowie jako ikony na czerwonych kółkach (zob. [combat.md](combat.md#wrogowie-na-mapie)),
   - pozycja użytkownika jako pinezka (z okręgiem dokładności GPS),
-- Pinezka jest zielona, gdy użytkownik może przeszukać obszar, a czerwona, gdy nie może (np. jest w przeszukanym obszarze, za blisko schronu albo w schronie). Przy słabym sygnale pinezka jest szara.
+- Pinezka jest jaskrawozielona (limonkowa, żeby wyróżniała się na szarym terenie i ciemnym lesie), gdy użytkownik może przeszukać obszar, a czerwona, gdy nie może (np. jest w przeszukanym obszarze, za blisko schronu albo w schronie). Przy słabym sygnale pinezka jest szara.
 - Przy pinezce jest stożek pokazujący, w którą stronę zwrócony jest telefon (z jego kompasu), jak w nawigacjach. Jest ciepłobiały i zanika z odległością, jak snop światła latarki. Mapa zostaje zwrócona północą do góry, więc nie ma na niej kompasu, który zawsze wskazywałby to samo. Kierunek jest wygładzany, bo kompas drży, i liczony tak, żeby nie skakał przy pochylaniu telefonu: płasko liczy się kierunek górnej krawędzi, a pionowo kierunek, w który patrzy tył telefonu. Bez kompasu (komputer), bez zgody albo bez odczytu od 3 s stożka nie ma.
   - Android (Chrome) podaje kierunek bez pytania o zgodę. iPhone pyta o zgodę na dostęp do ruchu i orientacji przy dotknięciu **New Game** albo **Continue Game**, bo przeglądarka pozwala zapytać tylko w odpowiedzi na dotknięcie.
   - W trybie debug stożek wskazuje kierunek ostatniego przesunięcia pozycji dotknięciem mapy, jakby użytkownik tam szedł. Wtedy kompas go nie nadpisuje.

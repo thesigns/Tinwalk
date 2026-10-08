@@ -1586,8 +1586,9 @@ function replaceState(newState) {
 // Lays the terrain out for the saved world, once its center is known.
 function applyWorld() {
   const { world } = state;
-  setWorld(world?.origin ? { seed: worldSeed(world.id), origin: world.origin } : null);
-  mapView.clearTerrain();
+  const settings = world?.origin ? { seed: worldSeed(world.id), origin: world.origin } : null;
+  setWorld(settings);
+  mapView.setWorld(settings);
   ui.worldIdLine.hidden = !world;
   ui.worldIdShown.textContent = world?.id ?? '';
 }

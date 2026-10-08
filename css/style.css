@@ -169,7 +169,10 @@ input {
     var(--grain-light);
 }
 
+/* The legend is printed over the map, with a paper halo that keeps it
+   readable over dark forest and light dust alike. */
 #map-legend {
+  --halo: 0 0 1.5px var(--paper), 0 0 1.5px var(--paper), 0 0 3px var(--paper), 0 0 3px var(--paper), 0 0 6px var(--paper);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -195,7 +198,7 @@ input {
 #scale-label {
   font: 800 14px var(--font-stencil);
   letter-spacing: 0.05em;
-  text-shadow: 0 0 3px var(--paper), 0 0 3px var(--paper);
+  text-shadow: var(--halo);
 }
 
 #location {
@@ -206,7 +209,7 @@ input {
   line-height: 1;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  text-shadow: 0 0 3px var(--paper), 0 0 3px var(--paper), 0 0 6px var(--paper);
+  text-shadow: var(--halo);
 }
 
 #location-label {

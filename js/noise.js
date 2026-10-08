@@ -27,13 +27,14 @@ export function createSimplex(seed) {
   }
   const perm = new Uint8Array(512);
   for (let i = 0; i < 512; i++) perm[i] = table[i & 255];
-
-  function corner(gradientIndex, x, y) {
-    let t = 0.5 - x * x - y * y;
-    if (t < 0) return 0;
-    t *= t;
-    const [gx, gy] = GRADIENTS[gradientIndex & 7];
-    return t * t * (gx * x + gy * y);
+  // Each corner's gradient, looked up once here rather than on every call.
+  // The arithmetic below is the same as with GRADIENTS, so the noise, and
+  // every world built on it, comes out exactly the same.
+  const gradientX = new Float64Array(512);
+  const gradientY = new Float64Array(512);
+  for (let i = 0; i < 512; i++) {
+    gradientX[i] = GRADIENTS[perm[i] & 7][0];
+    gradientY[i] = GRADIENTS[perm[i] & 7][1];
   }
 
   return function noise(x, y) {
@@ -51,12 +52,28 @@ export function createSimplex(seed) {
     const y2 = y0 - 1 + 2 * G2;
     const ii = i & 255;
     const jj = j & 255;
-    return (
-      70 *
-      (corner(perm[ii + perm[jj]], x0, y0) +
-        corner(perm[ii + i1 + perm[jj + j1]], x1, y1) +
-        corner(perm[ii + 1 + perm[jj + 1]], x2, y2))
-    );
+    let n0 = 0;
+    let n1 = 0;
+    let n2 = 0;
+    let t0 = 0.5 - x0 * x0 - y0 * y0;
+    if (t0 >= 0) {
+      const g = ii + perm[jj];
+      t0 *= t0;
+      n0 = t0 * t0 * (gradientX[g] * x0 + gradientY[g] * y0);
+    }
+    let t1 = 0.5 - x1 * x1 - y1 * y1;
+    if (t1 >= 0) {
+      const g = ii + i1 + perm[jj + j1];
+      t1 *= t1;
+      n1 = t1 * t1 * (gradientX[g] * x1 + gradientY[g] * y1);
+    }
+    let t2 = 0.5 - x2 * x2 - y2 * y2;
+    if (t2 >= 0) {
+      const g = ii + 1 + perm[jj + 1];
+      t2 *= t2;
+      n2 = t2 * t2 * (gradientX[g] * x2 + gradientY[g] * y2);
+    }
+    return 70 * (n0 + n1 + n2);
   };
 }
 

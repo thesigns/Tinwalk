@@ -5,7 +5,7 @@
 
 import { SEARCH_INFLUENCE, SEARCH_RADIUS, searchWeight } from './game.js';
 import { fromMercator, mercatorUnitsPerMeter, toMercator } from './geo.js';
-import { hasWorld } from './terrain.js';
+import { fromWorld, hasWorld, toWorld, WORLD_UNIT_METERS } from './terrain.js';
 import { TerrainTiles } from './terrain-tiles.js';
 
 // How many meters the shorter side of the screen covers.
@@ -15,9 +15,14 @@ const MAX_VIEW_WIDTH_METERS = 5000;
 const WHEEL_ZOOM_SPEED = 0.0015;
 const TAP_TOLERANCE_PX = 10;
 const TAP_MARGIN_PX = 6;
-// Time per frame spent rendering missing tiles; the rest is drawn in later frames.
+// Without tile workers: time per frame spent rendering missing tiles; the
+// rest is drawn in later frames.
 const TILE_RENDER_BUDGET_MS = 12;
 const SCALE_BAR_LENGTHS = [50, 100, 200, 500, 1000, 2000, 5000];
+// The map's grid, in meters east and north of the world's center: the
+// smallest of these spacings that leaves cells at least this wide.
+const GRID_SPACINGS = [100, 250, 500, 1000, 2500];
+const MIN_GRID_CELL_PX = 70;
 const MAX_SCALE_BAR_PX = 110;
 const HATCH_SPACING_PX = 7;
 // Grid on which the outline of searched areas is traced.
@@ -44,12 +49,18 @@ const POINTER_INSET = { top: 150, right: 76, bottom: 160, left: 34 };
 // Kept in sync with the palette in style.css.
 const COLORS = {
   paper: '#ece0c0',
+  // Under tiles that aren't drawn yet: the terrain's dust.
+  ground: '#b3ada6',
+  grid: 'rgba(225, 232, 240, 0.22)',
+  halo: 'rgba(236, 224, 192, 0.55)',
   ink: '#33281c',
   paint: '#b4432b',
   paintLight: '#d9654a',
   paintDark: '#82301c',
-  greenLight: '#82b453',
-  greenDark: '#3a5f1d',
+  // The pin where a search is possible: a bright lime, so it stands out on the
+  // map's greys and dark forest at a glance.
+  limeLight: '#cdf545',
+  limeDark: '#5c9612',
   grey: '#a39d90',
   greyDark: '#6b665c',
   tape: 'rgba(236, 226, 190, 0.94)',
@@ -61,9 +72,12 @@ const COLORS = {
   headingMiddle: 'rgba(255, 250, 228, 0.5)',
   headingFade: 'rgba(255, 250, 228, 0)',
   shelterFill: 'rgba(51, 40, 28, 0.1)',
-  searchedFill: 'rgba(180, 60, 35, 0.07)',
+  // Searched areas are marked in yellow grease pencil, as on a map's
+  // overlay: it stands out on the grey land, where red got lost.
+  searchedFill: 'rgba(240, 200, 60, 0.1)',
+  grease: 'rgba(242, 202, 64, 0.95)',
+  greaseFaint: 'rgba(242, 202, 64, 0.4)',
   pencil: 'rgba(170, 45, 25, 0.85)',
-  pencilFaint: 'rgba(170, 45, 25, 0.3)',
   paintText: '#f6ecd6',
 };
 // Landmarks are inked on paper; enemies stand out in red paint.
@@ -77,7 +91,7 @@ export class MapView {
     this.scene = null;
     // Where the user has dragged the map to; null while it follows the scene's center.
     this.pannedCenter = null;
-    this.tiles = new TerrainTiles();
+    this.tiles = new TerrainTiles(() => this.requestFrame());
     this.viewWidthMeters = DEFAULT_VIEW_WIDTH_METERS;
     this.pendingFrame = null;
     this.onTap = null; // (point: { lat, lon }) => void
@@ -120,9 +134,9 @@ export class MapView {
   }
 
   // Moves the map by a drag of (dx, dy) screen pixels.
-  // Drops the rendered terrain, after the world has changed.
-  clearTerrain() {
-    this.tiles.clear();
+  // Lays the terrain out for a new world: { seed, origin }, or null for none.
+  setWorld(settings) {
+    this.tiles.setWorld(settings);
     this.requestFrame();
   }
 
@@ -227,8 +241,10 @@ export class MapView {
     }
 
     // Until the game knows its world, the map is blank paper.
-    const complete = hasWorld() ? this.drawTerrain(center) : true;
-    if (!complete) this.requestFrame();
+    if (hasWorld()) {
+      if (this.drawTerrain(center)) this.requestFrame();
+      this.drawGrid(center);
+    }
     this.drawSearchedAreas(center, scene.searchedAreas);
     this.drawBadges(center, scene.landmarks, 'landmark-icons', LANDMARK_STYLE);
     this.drawBadges(center, scene.enemies, 'enemy-icons', ENEMY_STYLE);
@@ -268,7 +284,7 @@ export class MapView {
     if (this.effects.length > 0) this.requestFrame();
   }
 
-  // A red pencil circling the area being searched.
+  // A grease pencil circling the area being searched.
   playSweep(point, radiusMeters, duration) {
     return this.animate(duration, (progress) => {
       const { ctx } = this;
@@ -287,14 +303,14 @@ export class MapView {
 
       ctx.beginPath();
       ctx.arc(x, y, radius, start, end);
-      ctx.strokeStyle = COLORS.pencil;
+      ctx.strokeStyle = COLORS.grease;
       ctx.lineWidth = 2.5;
       ctx.lineCap = 'round';
       ctx.stroke();
 
       ctx.beginPath();
       ctx.arc(x + Math.cos(end) * radius, y + Math.sin(end) * radius, 4, 0, Math.PI * 2);
-      ctx.fillStyle = COLORS.pencil;
+      ctx.fillStyle = COLORS.grease;
       ctx.fill();
     });
   }
@@ -346,8 +362,9 @@ export class MapView {
     });
   }
 
-  // Draws the terrain tiles covering the screen. Returns false if some tiles
-  // weren't rendered yet because the frame's time budget ran out.
+  // Draws the terrain tiles covering the screen and asks for the missing
+  // ones, nearest to the middle first. Returns true if another frame should
+  // carry on rendering them; tiles from workers ask for a frame themselves.
   drawTerrain(center) {
     const { ctx, width, height } = this;
     const c = toMercator(center);
@@ -357,13 +374,15 @@ export class MapView {
     const left = c.x - (width / 2) * units;
     const top = c.y + (height / 2) * units;
     const deadline = performance.now() + TILE_RENDER_BUDGET_MS;
-    let complete = true;
 
     const minX = Math.floor(left / tileWorld);
     const maxX = Math.floor((left + width * units) / tileWorld);
     const minY = Math.floor((top - height * units) / tileWorld);
     const maxY = Math.floor(top / tileWorld);
     this.tiles.setVisibleCount((maxX - minX + 1) * (maxY - minY + 1));
+    this.tiles.beginFrame();
+    ctx.fillStyle = COLORS.ground;
+    ctx.fillRect(0, 0, width, height);
 
     for (let ty = maxY; ty >= minY; ty--) {
       for (let tx = minX; tx <= maxX; tx++) {
@@ -372,17 +391,45 @@ export class MapView {
         const x1 = Math.round(((tx + 1) * tileWorld - left) / units);
         const y0 = Math.round((top - (ty + 1) * tileWorld) / units);
         const y1 = Math.round((top - ty * tileWorld) / units);
-        let tile = this.tiles.get(level, tx, ty);
-        if (!tile && performance.now() < deadline) tile = this.tiles.render(level, tx, ty);
+        const tile = this.tiles.get(level, tx, ty);
         if (tile) {
           ctx.drawImage(tile, x0, y0, x1 - x0, y1 - y0);
         } else {
-          complete = false;
+          this.tiles.want(level, tx, ty, Math.hypot((x0 + x1 - width) / 2, (y0 + y1 - height) / 2));
           this.drawTileFallback(level, tx, ty, x0, y0, x1 - x0, y1 - y0);
         }
       }
     }
-    return complete;
+    return this.tiles.flush(deadline);
+  }
+
+  // A light grid fixed to the world, like the squares on an old map. Its
+  // lines run along meters east and north of the world's center, which are
+  // straight lines on the map.
+  drawGrid(center) {
+    const { ctx, width, height } = this;
+    const meters = GRID_SPACINGS.find((spacing) => spacing / this.metersPerPixel >= MIN_GRID_CELL_PX) ?? GRID_SPACINGS.at(-1);
+    const step = meters / WORLD_UNIT_METERS;
+    const c = toMercator(center);
+    const units = this.unitsPerPixel(center);
+    const left = c.x - (width / 2) * units;
+    const top = c.y + (height / 2) * units;
+    const from = toWorld(left, top);
+    const to = toWorld(left + width * units, top - height * units);
+    ctx.beginPath();
+    for (let x = Math.ceil(from.x / step) * step; x <= to.x; x += step) {
+      const px = Math.round((fromWorld(x, 0).x - left) / units) + 0.5;
+      ctx.moveTo(px, 0);
+      ctx.lineTo(px, height);
+    }
+    for (let y = Math.ceil(to.y / step) * step; y <= from.y; y += step) {
+      const py = Math.round((top - fromWorld(0, y).y) / units) + 0.5;
+      ctx.moveTo(0, py);
+      ctx.lineTo(width, py);
+    }
+    ctx.strokeStyle = COLORS.grid;
+    ctx.lineWidth = 1;
+    ctx.stroke();
   }
 
   // Until a tile is rendered, stretches what's cached on the neighboring zoom
@@ -406,7 +453,7 @@ export class MapView {
     }
   }
 
-  // Searched areas are crossed out in red pencil: they merge into blobs with a
+  // Searched areas are crossed out in grease pencil: they merge into blobs with a
   // wobbly outline and hatching, and each search point gets an X.
   drawSearchedAreas(center, areas) {
     if (areas.length === 0) return;
@@ -434,7 +481,7 @@ export class MapView {
     ctx.fillStyle = COLORS.searchedFill;
     ctx.fill(outline, 'evenodd');
     ctx.clip(outline, 'evenodd');
-    ctx.strokeStyle = COLORS.pencilFaint;
+    ctx.strokeStyle = COLORS.greaseFaint;
     ctx.lineWidth = 1.2;
     ctx.beginPath();
     const phase = HATCH_SPACING_PX - (((worldX + worldY) % HATCH_SPACING_PX) + HATCH_SPACING_PX) % HATCH_SPACING_PX;
@@ -445,7 +492,7 @@ export class MapView {
     ctx.stroke();
     ctx.restore();
 
-    ctx.strokeStyle = COLORS.pencil;
+    ctx.strokeStyle = COLORS.grease;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     const wavesPerPixel = (2 * Math.PI * metersPerPixel) / WOBBLE_PERIOD_METERS;
@@ -626,6 +673,10 @@ export class MapView {
     ctx.arc(x, y, radius, 0, Math.PI * 2);
     ctx.fillStyle = COLORS.shelterFill;
     ctx.fill();
+    // A pale edge keeps the ink circle visible over dark forest.
+    ctx.strokeStyle = COLORS.halo;
+    ctx.lineWidth = 5.5;
+    ctx.stroke();
     ctx.strokeStyle = COLORS.ink;
     ctx.lineWidth = 2.5;
     ctx.stroke();
@@ -724,7 +775,7 @@ export class MapView {
     const [light, dark] = !good
       ? [COLORS.grey, COLORS.greyDark]
       : canSearch
-        ? [COLORS.greenLight, COLORS.greenDark]
+        ? [COLORS.limeLight, COLORS.limeDark]
         : [COLORS.paintLight, COLORS.paintDark];
     gradient.addColorStop(0, light);
     gradient.addColorStop(1, dark);

@@ -39,10 +39,10 @@ What you find depends on the terrain: ruins are full of Junk and Cells, forests 
 ## Features
 
 - **Real GPS.** Readings less accurate than 50 m are ignored, so actions only unlock with a good signal. The shelter position is averaged over several seconds, since GPS is weakest indoors.
-- **A procedurally generated map.** Instead of a real map, you walk across a fictional wasteland of plains, forests and ruins, drawn like an old paper field map. The terrain is generated from your coordinates, so the same place on Earth always looks the same, and a typical walk crosses several kinds of terrain. Drag the map to look around, pinch or scroll to zoom, and tap the crosshair to center it on yourself again.
+- **A procedurally generated map.** Instead of a real map, you walk across a fictional wasteland of plains, forests and ruins, drawn like the shaded-relief world map of an old post-apocalyptic game: mountain ranges, dusty basins, dark forests and the grey grids of ruined towns. The terrain is generated from your coordinates, so the same place on Earth always looks the same, and a typical walk crosses several kinds of terrain. Drag the map to look around, pinch or scroll to zoom, and tap the crosshair to center it on yourself again.
 - **Private by design.** There is no server: your progress is saved only in your browser, and your location is never sent anywhere. You can export your save to a file, import it back, or reset it in the settings.
 - **Sound and vibration.** Sound effects are synthesized in the browser, with no audio files. Vibration works on Android; iPhone browsers don't support it. Both can be turned off in the settings.
-- **Light on the battery.** The map is rendered into cached tiles, so it isn't redrawn constantly.
+- **Light on the battery.** The map is rendered into cached tiles, in background workers, so it isn't redrawn constantly and panning stays smooth.
 
 ## Running locally
 
