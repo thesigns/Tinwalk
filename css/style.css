@@ -362,32 +362,6 @@ input {
   color: var(--tin-text);
 }
 
-/* Rivets at both ends of a tin plate. */
-.rivets {
-  position: relative;
-}
-
-.rivets::before,
-.rivets::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #ddd6c6, #8a8476 45%, #3b3830 80%);
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.6);
-  transform: translateY(-50%);
-}
-
-.rivets::before {
-  left: 8px;
-}
-
-.rivets::after {
-  right: 8px;
-}
-
 /* Buttons */
 
 button {
@@ -653,7 +627,7 @@ button {
   flex-wrap: wrap;
   align-items: center;
   gap: 6px 16px;
-  padding: 10px 26px;
+  padding: 10px 14px;
   border-bottom: 2px solid var(--tin-edge);
   box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.12), 0 4px 12px rgba(0, 0, 0, 0.4);
   font-family: var(--font-stencil);

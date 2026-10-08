@@ -10,8 +10,8 @@
 //
 // Plains are the open ground everywhere. Forests grow where a warped noise
 // field is high, so they get ragged edges, bays and clearings. Ruins are the
-// remains of settlements: blocks of a street grid around a center, scattered
-// over the world one settlement per cell at most.
+// remains of settlements, scattered over the world one per cell at most, laid
+// out in districts, each with a street grid of its own (see below).
 //
 // Plains cover about half of the world, forests and ruins a quarter each. A
 // straight 3 km walk crosses about 6 borders between them.
@@ -22,6 +22,7 @@
 import { EARTH_RADIUS, MERCATOR_RADIUS, fromMercator, toMercator } from './geo.js';
 import { SETTLEMENT_NAME_ENDS, SETTLEMENT_NAME_STARTS } from './names.js';
 import { createSimplex, hash } from './noise.js';
+import { area, bisect, containsAll, inset, intersect, middleOf } from './polygon.js';
 
 // The terrain was tuned in Mercator units at 52°N, where one is ~0.62 m, so
 // that is the length of a world unit everywhere.
@@ -44,23 +45,25 @@ const FOREST_FREQUENCY = 1 / 3200;
 const FOREST_WARP = 0.4;
 // Forests cover about a third of the land outside settlements.
 const FOREST_THRESHOLD = 0.154;
-// Broad and faint, so it livens up the ground without looking like stains.
-const DETAIL_FREQUENCY = 1 / 600;
-const DETAIL_STRENGTH = 0.03;
 
 // Each cell of this grid may hold one settlement, somewhere in its middle.
 const SETTLEMENT_CELL = 3000;
 const SETTLEMENT_CHANCE = 0.8;
 const SETTLEMENT_MIN_RADIUS = 300;
 const SETTLEMENT_MAX_RADIUS = 1500;
-// City blocks (~90 x 60 m), each with its share of the surrounding streets.
-export const BLOCK_LENGTH = 150;
-export const BLOCK_WIDTH = 100;
 // The edge of a settlement wanders in and out by this fraction of its radius.
 const EDGE_RAGGEDNESS = 0.3;
 const EDGE_FREQUENCY = 1 / 700;
-// Some blocks inside a settlement are empty lots: still ruins, just with no building.
-const EMPTY_LOT_CHANCE = 0.07;
+// Districts (~400 m across) are the Voronoi cells of one site per cell of this grid.
+const DISTRICT_CELL = 650;
+// City blocks (~90 x 60 m), each with its share of the surrounding streets.
+const BLOCK_LENGTH = 150;
+const BLOCK_WIDTH = 100;
+// Half widths: avenues run between districts, streets between blocks.
+const AVENUE = 16;
+const STREET = 10;
+// A block cut down by an avenue to less than this share stays open ground.
+const MIN_BLOCK_SHARE = 0.2;
 
 // Patches of a few hundred meters to a kilometer, like forests. The threshold
 // makes them cover about 20% of the world; intensity reaches 1 in their hottest
@@ -84,6 +87,7 @@ export function worldSeed(id) {
 // null until the game knows it.
 export function setWorld(settings) {
   settlementCache.clear();
+  districtCache.clear();
   worldSet = Boolean(settings);
   if (!settings) return;
   const { seed, origin } = settings;
@@ -122,19 +126,23 @@ export function fromWorld(x, y) {
   return toMercator({ lat: world.lat + y / world.perLat, lon: world.lon + x / world.perLon });
 }
 
+// A Map key for a pair of grid indices, without building a string.
+function cellKey(i, j) {
+  return i * 1048576 + j;
+}
+
 // Hash salts differ from world to world, so settlements do too.
 function salted(salt) {
   return world.salt ^ salt;
 }
 
-const INK = '#5b4a35';
-const GRASS_INK = 'rgba(91, 74, 53, 0.55)';
-
 export const BIOMES = {
-  plains: { name: 'plains', label: 'Plains', color: [214, 204, 159], iconDensity: 0.1, iconSize: 7, drawIcon: drawGrass },
-  forest: { name: 'forest', label: 'Forest', color: [170, 184, 136], iconDensity: 0.75, iconSize: 13, drawIcon: drawTree },
-  // Ruins have no icons: their buildings are drawn with the settlement plan.
-  ruins: { name: 'ruins', label: 'Ruins', color: [190, 183, 168], iconDensity: 0 },
+  // Plains have no icons: open ground is told apart by having none.
+  plains: { name: 'plains', label: 'Plains', color: [214, 204, 159] },
+  // The map marks forests with topographic signs, see terrain-tiles.js.
+  forest: { name: 'forest', label: 'Forest', color: [170, 184, 136] },
+  // Ruins have no icons: their blocks are drawn with the settlement plan.
+  ruins: { name: 'ruins', label: 'Ruins', color: [190, 183, 168] },
 };
 
 // Octaves of noise, each half the size and 0.45 times as strong, in roughly [-1, 1].
@@ -168,7 +176,7 @@ function forestField(x, y) {
 
 export function biomeAt(mx, my) {
   const { x, y } = toWorld(mx, my);
-  if (settlementAtWorld(x, y)) return BIOMES.ruins;
+  if (ruinedBlockAt(x, y)) return BIOMES.ruins;
   return forestField(x, y) > 0 ? BIOMES.forest : BIOMES.plains;
 }
 
@@ -184,44 +192,33 @@ export function radiationAt(mx, my) {
   return level > 0 ? Math.min(1, level / RADIATION_RANGE) : 0;
 }
 
-// Brightness factor around 1, for a little small-scale variation inside a biome.
-export function groundShadeAt(mx, my) {
-  const { x, y } = toWorld(mx, my);
-  return 1 + DETAIL_STRENGTH * noise(x * DETAIL_FREQUENCY, y * DETAIL_FREQUENCY);
-}
-
 // Settlements
+//
+// A settlement is a center, a radius and a name. Its ruins are laid out in
+// districts: the cells of a Voronoi diagram over one site per DISTRICT_CELL,
+// each district with a street grid at an angle of its own and avenues along
+// its edges, so blocks cut by a district's edge come out irregular. A block
+// is ruins when its middle lies inside a settlement, which gives towns ragged
+// edges, and towns that grow into each other share districts. Every block
+// depends only on nearby sites, so tiles can be drawn one at a time.
 
 const settlementCache = new Map();
 const MAX_CACHED_SETTLEMENTS = 4096;
 
-// The settlement in a grid cell, or null:
-// { name, x, y, radius, reach, cos, sin, seed, cx, cy, blocks }, with blocks
-// filled in by blocksOf(). Positions and sizes are in world units.
-// Its street grid is rotated by an angle of its own; block (i, j) spans
-// [i, i + 1] block lengths by [j, j + 1] block widths in the grid's coordinates.
+// The settlement in a grid cell, or null: { name, x, y, radius }, in world units.
 function settlementIn(cx, cy) {
-  const key = `${cx},${cy}`;
+  const key = cellKey(cx, cy);
   if (settlementCache.has(key)) return settlementCache.get(key);
   let settlement = null;
   if (hash(cx, cy, salted(701)) < SETTLEMENT_CHANCE) {
     const size = hash(cx, cy, salted(704));
-    const radius = SETTLEMENT_MIN_RADIUS + (SETTLEMENT_MAX_RADIUS - SETTLEMENT_MIN_RADIUS) * size;
-    const angle = hash(cx, cy, salted(705)) * (Math.PI / 2);
     const start = SETTLEMENT_NAME_STARTS[Math.floor(hash(cx, cy, salted(707)) * SETTLEMENT_NAME_STARTS.length)];
     const end = SETTLEMENT_NAME_ENDS[Math.floor(hash(cx, cy, salted(708)) * SETTLEMENT_NAME_ENDS.length)];
     settlement = {
       name: start + end,
       x: (cx + 0.15 + 0.7 * hash(cx, cy, salted(702))) * SETTLEMENT_CELL,
       y: (cy + 0.15 + 0.7 * hash(cx, cy, salted(703))) * SETTLEMENT_CELL,
-      radius,
-      reach: radius * (1 + EDGE_RAGGEDNESS) + 2 * BLOCK_LENGTH,
-      cos: Math.cos(angle),
-      sin: Math.sin(angle),
-      seed: Math.floor(hash(cx, cy, salted(706)) * 1e6),
-      cx,
-      cy,
-      blocks: null,
+      radius: SETTLEMENT_MIN_RADIUS + (SETTLEMENT_MAX_RADIUS - SETTLEMENT_MIN_RADIUS) * size,
     };
   }
   if (settlementCache.size >= MAX_CACHED_SETTLEMENTS) settlementCache.clear();
@@ -229,86 +226,15 @@ function settlementIn(cx, cy) {
   return settlement;
 }
 
-// World coordinates of a point given in a settlement's street grid.
-function gridToWorld(settlement, u, v) {
-  return {
-    x: settlement.x + u * settlement.cos - v * settlement.sin,
-    y: settlement.y + u * settlement.sin + v * settlement.cos,
-  };
-}
-
-// Mercator coordinates of a point given in a settlement's street grid, for drawing.
-export function fromGrid(settlement, u, v) {
-  const { x, y } = gridToWorld(settlement, u, v);
-  return fromWorld(x, y);
-}
-
-// Settlements whose blocks could meet this one's.
-function neighborsOf(settlement) {
-  const neighbors = [];
-  for (let dy = -2; dy <= 2; dy++) {
-    for (let dx = -2; dx <= 2; dx++) {
-      const other = (dx || dy) && settlementIn(settlement.cx + dx, settlement.cy + dy);
-      if (other && Math.hypot(other.x - settlement.x, other.y - settlement.y) < settlement.reach + other.reach) {
-        neighbors.push(other);
-      }
-    }
-  }
-  return neighbors;
-}
-
-// Where settlements grow into each other, each block goes to the one whose
-// edge is nearer, so they meet like districts of one town, each with its own
-// street grid.
-function isBlock(settlement, neighbors, i, j) {
-  const u = (i + 0.5) * BLOCK_LENGTH;
-  const v = (j + 0.5) * BLOCK_WIDTH;
-  const { x, y } = gridToWorld(settlement, u, v);
-  const distance = Math.hypot(u, v);
-  const edge = settlement.radius * (1 + EDGE_RAGGEDNESS * noise(x * EDGE_FREQUENCY + 7.7, y * EDGE_FREQUENCY - 3.3));
-  if (distance >= edge) return false;
-  return neighbors.every((other) => Math.hypot(x - other.x, y - other.y) - other.radius > distance - settlement.radius);
-}
-
-export function isEmptyLot(settlement, i, j) {
-  return hash(i, j, settlement.seed) < EMPTY_LOT_CHANCE;
-}
-
-// The settlement's blocks, computed once: { list: [[i, j]], has(i, j) }.
-export function blocksOf(settlement) {
-  if (!settlement.blocks) {
-    const keys = new Set();
-    const list = [];
-    const neighbors = neighborsOf(settlement);
-    const columns = Math.ceil(settlement.reach / BLOCK_LENGTH);
-    const rows = Math.ceil(settlement.reach / BLOCK_WIDTH);
-    for (let j = -rows; j < rows; j++) {
-      for (let i = -columns; i < columns; i++) {
-        if (!isBlock(settlement, neighbors, i, j)) continue;
-        keys.add(`${i},${j}`);
-        list.push([i, j]);
-      }
-    }
-    settlement.blocks = { list, has: (i, j) => keys.has(`${i},${j}`) };
-  }
-  return settlement.blocks;
-}
-
-// Settlements that may have blocks inside the given Mercator rectangle.
-export function settlementsIn(minMX, minMY, maxMX, maxMY) {
-  const { x: minX, y: minY } = toWorld(minMX, minMY);
-  const { x: maxX, y: maxY } = toWorld(maxMX, maxMY);
+// Settlements whose ruins could reach within `reach` of a world point.
+function settlementsNear(x, y, reach) {
   const found = [];
-  for (let cy = Math.floor(minY / SETTLEMENT_CELL) - 1; cy <= Math.floor(maxY / SETTLEMENT_CELL) + 1; cy++) {
-    for (let cx = Math.floor(minX / SETTLEMENT_CELL) - 1; cx <= Math.floor(maxX / SETTLEMENT_CELL) + 1; cx++) {
-      const settlement = settlementIn(cx, cy);
-      if (
-        settlement &&
-        settlement.x + settlement.reach > minX &&
-        settlement.x - settlement.reach < maxX &&
-        settlement.y + settlement.reach > minY &&
-        settlement.y - settlement.reach < maxY
-      ) {
+  const cx = Math.floor(x / SETTLEMENT_CELL);
+  const cy = Math.floor(y / SETTLEMENT_CELL);
+  for (let dy = -1; dy <= 1; dy++) {
+    for (let dx = -1; dx <= 1; dx++) {
+      const settlement = settlementIn(cx + dx, cy + dy);
+      if (settlement && Math.hypot(x - settlement.x, y - settlement.y) < settlement.radius * (1 + EDGE_RAGGEDNESS) + reach) {
         found.push(settlement);
       }
     }
@@ -316,78 +242,181 @@ export function settlementsIn(minMX, minMY, maxMX, maxMY) {
   return found;
 }
 
-// The settlement with a block at the point, streets included, or null.
+// Which of the candidate settlements a world point lies in, or null. Where
+// settlements meet, the nearer edge wins.
+function settlementCovering(x, y, candidates) {
+  let best = null;
+  let bestScore = Infinity;
+  for (const settlement of candidates) {
+    const distance = Math.hypot(x - settlement.x, y - settlement.y);
+    if (distance > settlement.radius * (1 + EDGE_RAGGEDNESS)) continue;
+    const edge = settlement.radius * (1 + EDGE_RAGGEDNESS * noise(x * EDGE_FREQUENCY + 7.7, y * EDGE_FREQUENCY - 3.3));
+    if (distance >= edge) continue;
+    const score = distance - settlement.radius;
+    if (score < bestScore) {
+      bestScore = score;
+      best = settlement;
+    }
+  }
+  return best;
+}
+
+// Districts
+
+const districtCache = new Map();
+const MAX_CACHED_DISTRICTS = 2048;
+
+// The district whose site lies in a grid cell: { x, y, i, j, cos, sin, blocks },
+// with blocks filled in by blocksOf().
+function districtIn(i, j) {
+  const key = cellKey(i, j);
+  let district = districtCache.get(key);
+  if (!district) {
+    const angle = hash(i, j, salted(903)) * Math.PI;
+    district = {
+      x: (i + 0.2 + 0.6 * hash(i, j, salted(901))) * DISTRICT_CELL,
+      y: (j + 0.2 + 0.6 * hash(i, j, salted(902))) * DISTRICT_CELL,
+      i,
+      j,
+      cos: Math.cos(angle),
+      sin: Math.sin(angle),
+      blocks: null,
+    };
+    if (districtCache.size >= MAX_CACHED_DISTRICTS) districtCache.clear();
+    districtCache.set(key, district);
+  }
+  return district;
+}
+
+// The district a world point lies in: the one with the nearest site.
+function districtAt(x, y) {
+  const i = Math.floor(x / DISTRICT_CELL);
+  const j = Math.floor(y / DISTRICT_CELL);
+  let best = null;
+  let bestDistance = Infinity;
+  for (let dj = -2; dj <= 2; dj++) {
+    for (let di = -2; di <= 2; di++) {
+      const district = districtIn(i + di, j + dj);
+      const distance = (district.x - x) ** 2 + (district.y - y) ** 2;
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        best = district;
+      }
+    }
+  }
+  return best;
+}
+
+function toGrid(district, x, y) {
+  const dx = x - district.x;
+  const dy = y - district.y;
+  return [dx * district.cos + dy * district.sin, -dx * district.sin + dy * district.cos];
+}
+
+function fromGrid(district, u, v) {
+  return [district.x + u * district.cos - v * district.sin, district.y + u * district.sin + v * district.cos];
+}
+
+function gridRectangle(district, u0, v0, u1, v1) {
+  return [fromGrid(district, u0, v0), fromGrid(district, u1, v0), fromGrid(district, u1, v1), fromGrid(district, u0, v1)];
+}
+
+// The district's ruined blocks by cellKey() of their grid indices, computed once:
+// { ground, block, settlement, shade, box }, in world
+// units. ground is the block with its share of the streets, cut to the
+// district; block is what stands between the streets, or null where an
+// avenue left too little of it.
+function blocksOf(district) {
+  if (district.blocks) return district.blocks;
+  // Most districts are out in the country: skip them without laying out a grid.
+  const reach = 2 * DISTRICT_CELL;
+  const candidates = settlementsNear(district.x, district.y, reach);
+  district.blocks = new Map();
+  if (candidates.length === 0) return district.blocks;
+  // The Voronoi cell: a square cut by the bisectors to the sites around.
+  let cell = [
+    [district.x - reach, district.y - reach],
+    [district.x + reach, district.y - reach],
+    [district.x + reach, district.y + reach],
+    [district.x - reach, district.y + reach],
+  ];
+  for (let dj = -2; dj <= 2; dj++) {
+    for (let di = -2; di <= 2; di++) {
+      if (di || dj) cell = bisect(cell, district, districtIn(district.i + di, district.j + dj));
+    }
+  }
+  const inner = inset(cell, AVENUE);
+  let minU = Infinity;
+  let maxU = -Infinity;
+  let minV = Infinity;
+  let maxV = -Infinity;
+  for (const [x, y] of cell) {
+    const [u, v] = toGrid(district, x, y);
+    minU = Math.min(minU, u);
+    maxU = Math.max(maxU, u);
+    minV = Math.min(minV, v);
+    maxV = Math.max(maxV, v);
+  }
+  const blocks = district.blocks;
+  for (let gj = Math.floor(minV / BLOCK_WIDTH); gj <= Math.floor(maxV / BLOCK_WIDTH); gj++) {
+    for (let gi = Math.floor(minU / BLOCK_LENGTH); gi <= Math.floor(maxU / BLOCK_LENGTH); gi++) {
+      const u0 = gi * BLOCK_LENGTH;
+      const v0 = gj * BLOCK_WIDTH;
+      const [mx, my] = fromGrid(district, u0 + BLOCK_LENGTH / 2, v0 + BLOCK_WIDTH / 2);
+      if (!candidates.some((s) => Math.hypot(mx - s.x, my - s.y) < s.radius * (1 + EDGE_RAGGEDNESS) + BLOCK_LENGTH)) continue;
+      // Most blocks lie wholly inside the district and need no cutting.
+      const rectangle = gridRectangle(district, u0, v0, u0 + BLOCK_LENGTH, v0 + BLOCK_WIDTH);
+      const ground = containsAll(cell, rectangle) ? rectangle : intersect(rectangle, cell);
+      if (ground.length < 3) continue;
+      const settlement = settlementCovering(...middleOf(ground), candidates);
+      if (!settlement) continue;
+      const full = gridRectangle(district, u0 + STREET, v0 + STREET, u0 + BLOCK_LENGTH - STREET, v0 + BLOCK_WIDTH - STREET);
+      const block = inner.length < 3 ? [] : containsAll(inner, full) ? full : intersect(full, inner);
+      const xs = ground.map(([x]) => x);
+      const ys = ground.map(([, y]) => y);
+      blocks.set(cellKey(gi, gj), {
+        ground,
+        block: block.length >= 3 && Math.abs(area(block)) > MIN_BLOCK_SHARE * Math.abs(area(full)) ? block : null,
+        settlement,
+        // From 0 to 1, so the map can tell blocks apart by their shade.
+        shade: hash(district.i * 1024 + gi, district.j * 1024 + gj, salted(920)),
+        box: [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)],
+      });
+    }
+  }
+  return blocks;
+}
+
+// The ruined block at a world point, streets included, or undefined.
+function ruinedBlockAt(x, y) {
+  const district = districtAt(x, y);
+  const [u, v] = toGrid(district, x, y);
+  return blocksOf(district).get(cellKey(Math.floor(u / BLOCK_LENGTH), Math.floor(v / BLOCK_WIDTH)));
+}
+
+// The settlement whose ruins are at a Mercator point, or null.
 export function settlementAt(mx, my) {
   const { x, y } = toWorld(mx, my);
   return settlementAtWorld(x, y);
 }
 
 function settlementAtWorld(x, y) {
-  const cx = Math.floor(x / SETTLEMENT_CELL);
-  const cy = Math.floor(y / SETTLEMENT_CELL);
-  for (let dy = -1; dy <= 1; dy++) {
-    for (let dx = -1; dx <= 1; dx++) {
-      const settlement = settlementIn(cx + dx, cy + dy);
-      if (!settlement) continue;
-      const ox = x - settlement.x;
-      const oy = y - settlement.y;
-      if (ox * ox + oy * oy > settlement.reach ** 2) continue;
-      const u = ox * settlement.cos + oy * settlement.sin;
-      const v = -ox * settlement.sin + oy * settlement.cos;
-      if (blocksOf(settlement).has(Math.floor(u / BLOCK_LENGTH), Math.floor(v / BLOCK_WIDTH))) return settlement;
+  return ruinedBlockAt(x, y)?.settlement ?? null;
+}
+
+// Ruined blocks that may show inside a Mercator rectangle, in world units.
+// Draw them with fromWorld().
+export function ruinsIn(minMX, minMY, maxMX, maxMY) {
+  const { x: minX, y: minY } = toWorld(minMX, minMY);
+  const { x: maxX, y: maxY } = toWorld(maxMX, maxMY);
+  const found = [];
+  for (let j = Math.floor(minY / DISTRICT_CELL) - 1; j <= Math.floor(maxY / DISTRICT_CELL) + 1; j++) {
+    for (let i = Math.floor(minX / DISTRICT_CELL) - 1; i <= Math.floor(maxX / DISTRICT_CELL) + 1; i++) {
+      for (const block of blocksOf(districtIn(i, j)).values()) {
+        const [x0, y0, x1, y1] = block.box;
+        if (x1 >= minX && x0 <= maxX && y1 >= minY && y0 <= maxY) found.push(block);
+      }
     }
   }
-  return null;
-}
-
-// Icons are drawn with their base at (x, y), extending upward, `size` pixels tall.
-// `variant` is a number in [0, 1) used to vary their look.
-
-function startIcon(ctx, x, y, size) {
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.scale(size, size);
-  ctx.lineWidth = 1.2 / size;
-  ctx.lineJoin = 'round';
-  ctx.lineCap = 'round';
-  ctx.strokeStyle = INK;
-}
-
-// The meadow sign of topographic maps: upright strokes on a short ground line.
-function drawGrass(ctx, x, y, size) {
-  startIcon(ctx, x, y, size);
-  ctx.strokeStyle = GRASS_INK;
-  ctx.beginPath();
-  ctx.moveTo(-0.5, 0);
-  ctx.lineTo(0.5, 0);
-  ctx.moveTo(-0.25, 0);
-  ctx.lineTo(-0.25, -0.55);
-  ctx.moveTo(0, 0);
-  ctx.lineTo(0, -0.85);
-  ctx.moveTo(0.25, 0);
-  ctx.lineTo(0.25, -0.55);
-  ctx.stroke();
-  ctx.restore();
-}
-
-function drawTree(ctx, x, y, size, variant) {
-  startIcon(ctx, x, y, size);
-  ctx.beginPath();
-  ctx.moveTo(0, 0);
-  ctx.lineTo(0, -0.4);
-  ctx.stroke();
-  ctx.beginPath();
-  if (variant < 0.5) {
-    ctx.arc(0, -0.65, 0.33, 0, Math.PI * 2);
-    ctx.fillStyle = '#7d9a58';
-  } else {
-    ctx.moveTo(-0.32, -0.25);
-    ctx.lineTo(0.32, -0.25);
-    ctx.lineTo(0, -1);
-    ctx.closePath();
-    ctx.fillStyle = '#62804a';
-  }
-  ctx.fill();
-  ctx.stroke();
-  ctx.restore();
+  return found;
 }

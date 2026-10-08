@@ -42,8 +42,9 @@ All code is in `js/`, loaded from `index.html` via `js/main.js`.
 | `sun.js` | Sun elevation from time and position (simplified NOAA formulas), for telling day from night |
 | `clock.js` | Game time (`now()`), which debug mode can speed up |
 | `map.js` | `MapView`: canvas rendering, pan and zoom gestures, recentering, markers (shelter, landmarks, enemies, the rescue target and an arrow to it), short map animations (`playSweep`, `playRipple`) |
-| `terrain.js` | The world (World ID seed and center) and, inside it, procedural biomes (warped-noise forests, settlements with street grids), the invisible radiation layer, ground colors and icon drawing, as pure functions of the position relative to the world's center |
-| `terrain-tiles.js` | Renders terrain into cached tiles per zoom level: sampled ground, settlements drawn as shapes, icons |
+| `terrain.js` | The world (World ID seed and center) and, inside it, procedural biomes (warped-noise forests, settlements laid out in Voronoi districts with street grids of their own), the invisible radiation layer and ground colors, as pure functions of the position relative to the world's center |
+| `terrain-tiles.js` | Renders terrain into cached tiles per zoom level: sampled ground, ruins drawn as shapes (light blocks in varied shades of grey on dark streets), the topographic signs in forests |
+| `polygon.js` | Convex polygons cut by straight lines: clipping, insetting, intersecting, Voronoi bisectors; the ruins are built from these |
 | `noise.js` | Seeded simplex noise and integer hashing |
 | `dice.js` | Dice notation (`2d6+1d3`, `1d6+2`): rolling, ranges, averages; used for strength in fights |
 | `fx.js` | DOM helpers: `iconElement`, flying icons, replaying CSS animations |

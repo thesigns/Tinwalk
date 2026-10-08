@@ -115,21 +115,23 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
 
 ### Mapa
 
-- Aplikacja nie pokazuje prawdziwej mapy. W tle rysowana jest fikcyjna, proceduralnie generowana mapa terenu ze schematycznymi ikonami. Są trzy biomy: równiny (rzadkie kępki trawy, rysowane jak znak łąki na mapach topograficznych: pionowe kreski na krótkiej linii gruntu), las (drzewa) i ruiny (plan zrujnowanego miasta).
+- Aplikacja nie pokazuje prawdziwej mapy. W tle rysowana jest fikcyjna, proceduralnie generowana mapa terenu w stylu papierowej mapy topograficznej. Są trzy biomy: równiny (pusty grunt, bez znaków), las i ruiny (plan zrujnowanego miasta).
+- Las ma płaski zielony kolor, bez obrysu, i znaki jak na mapie topograficznej: kółko (drzewa liściaste) albo daszek (iglaste), losowo, w regularnym szachownicowym rytmie co ok. 12 px ekranu. Znaki trzymają się kilka pikseli od brzegu lasu, żeby brzeg był czysty. Ich siatka jest liczona od środka świata, więc gracze z tym samym World ID widzą te same znaki.
 - Równiny zajmują ok. 50% świata, bo dają najbardziej zrównoważony łup. Lasy i ruiny zajmują po ok. 25%.
 - Równiny to tło: wszystko, co nie jest lasem ani ruinami.
 - Lasy powstają z szumu simplex zniekształconego drugim szumem (domain warping), więc mają nieregularne brzegi, zatoki i polany, a nie obłe plamy.
-- Ruiny to pozostałości osad. Świat jest podzielony na komórki ok. 1,85 km, a w każdej może stać jedna osada o promieniu ok. 185–925 m. Osada ma własną, obróconą siatkę ulic z prostokątnymi kwartałami (ok. 90 × 60 m) i szerszą arterią co cztery przecznice. Jej brzeg jest postrzępiony szumem, a część kwartałów to puste działki.
-- Gdy osady się stykają, każdy kwartał należy do tej, której brzeg jest bliżej, więc łączą się jak dzielnice jednego miasta.
+- Ruiny to pozostałości osad. Świat jest podzielony na komórki ok. 1,85 km, a w każdej może stać jedna osada o promieniu ok. 185–925 m. Jej brzeg jest postrzępiony szumem.
+- Ruiny są ułożone w dzielnice: komórki diagramu Voronoi wokół punktów rozrzuconych po jednym na kwadrat ok. 400 m. Każda dzielnica ma własną siatkę ulic, obróconą pod swoim kątem, z prostokątnymi kwartałami (ok. 90 × 60 m), a między dzielnicami biegną szersze arterie. Kwartały przecięte granicą dzielnicy są nieregularne (trójkąty, trapezy), a skrawki odcięte przez arterię zostają pustym placem.
+- Kwartał należy do ruin, jeśli jego środek leży w osadzie. Gdy osady się stykają, liczy się ta, której brzeg jest bliżej, więc łączą się jak dzielnice jednego miasta. Na postrzępionym brzegu zdarzają się pojedyncze kwartały oderwane od reszty, jak przedmieścia.
 - Ruiny obejmują całe kwartały razem z ulicami, więc na ulicy w osadzie też jest się w ruinach.
 - Osady są rysowane jako wektorowe kształty, a nie próbkowane jak reszta terenu, żeby kwartały i ulice były ostre przy każdym przybliżeniu.
-- Ruiny nie mają ikon. Przy oddaleniu kwartał jest jedną plamą, a przy największych przybliżeniach (do ok. 750 m szerokości widoku) rozpada się na budynki: dwa rzędy wzdłuż dłuższych ulic z podwórzem pośrodku. Część budynków jest uszkodzona (brakuje im rogu), a część zawalona (zostaje tylko przerywany obrys).
+- Ruiny nie mają ikon. Kwartał jest jedną plamą przy każdym przybliżeniu, bez rozbijania na budynki. Kwartały mają kilka odcieni szarości, rozłożonych losowo, żeby miasto nie wyglądało jak równe kafelki.
 - Każda osada ma stałą, wylosowaną nazwę złożoną z dwóch członów, np. „Rustford” albo „Pinemouth”. Nazwy nie ma na mapie, żeby jej nie zaśmiecać; widać ją tylko pod słowem **Ruins** obok kompasu (zob. Interfejs).
-- Grunt ma bardzo delikatne, rozległe cieniowanie, żeby nie był płaski, ale nie wyglądał na poplamiony.
+- Grunt jest jednolity, bez cieniowania szumem.
 - Teren należy do świata gry (zob. [Nowa gra i World ID](#nowa-gra-i-world-id)). Jest generowany deterministycznie (szum simplex) z ziarna wyliczonego z World ID i z położenia względem środka świata, czyli miejsca, w którym zaczęła się gra.
 - Położenie jest mierzone w metrach na wschód i na północ od środka świata, wzdłuż powierzchni Ziemi, a nie we współrzędnych mapy. Stopień długości geograficznej jest krótszy niż stopień szerokości, a jednostka mapy (Web Mercator) ma inną długość w Warszawie i w Lizbonie, więc tylko metry dają ten sam teren na każdej szerokości geograficznej. Na dystansie spaceru (kilka km) wynik jest identyczny.
 - Rozmiary terenu są dobrane w jednostkach ok. 0,62 m (jednostka Web Mercator na 52°N, w której teren był strojony), więc w Polsce teren ma takie same rozmiary jak przed wprowadzeniem światów.
-- Teren jest renderowany w kafelkach na niewidocznych płótnach (offscreen canvas) i trzymany w pamięci podręcznej, żeby nie rysować wszystkich ikon w każdej klatce.
+- Teren jest renderowany w kafelkach na niewidocznych płótnach (offscreen canvas) i trzymany w pamięci podręcznej, żeby nie rysować całego terenu w każdej klatce.
 - Szum lasu jest próbkowany na rzadkiej siatce, ale granica lasu jest wyznaczana dopiero z wartości interpolowanej dla każdego piksela kafelka. Dzięki temu jest gładka i ostra, a nie schodkowa.
 - Regiony terenu mają skalę od kilkuset metrów do około kilometra, tak żeby typowy spacer przechodził przez kilka różnych terenów. Na prostym odcinku 3 km teren zmienia się średnio ok. 6 razy.
 - Mapa jest zawsze skierowana na północ.
