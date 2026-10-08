@@ -126,8 +126,9 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
 - Ruiny nie mają ikon. Przy oddaleniu kwartał jest jedną plamą, a przy największych przybliżeniach (do ok. 750 m szerokości widoku) rozpada się na budynki: dwa rzędy wzdłuż dłuższych ulic z podwórzem pośrodku. Część budynków jest uszkodzona (brakuje im rogu), a część zawalona (zostaje tylko przerywany obrys).
 - Każda osada ma stałą, wylosowaną nazwę złożoną z dwóch członów, np. „Rustford” albo „Pinemouth”. Nazwy nie ma na mapie, żeby jej nie zaśmiecać; widać ją tylko pod słowem **Ruins** obok kompasu (zob. Interfejs).
 - Grunt ma bardzo delikatne, rozległe cieniowanie, żeby nie był płaski, ale nie wyglądał na poplamiony.
-- Teren jest generowany deterministycznie z szerokości i długości geograficznej (np. szum simplex), więc to samo miejsce na Ziemi zawsze wygląda tak samo.
-- Szum jest próbkowany we współrzędnych metrycznych (Web Mercator), a nie bezpośrednio w stopniach. Stopień długości geograficznej jest krótszy niż stopień szerokości (w Polsce ok. 65–70 km wobec 111 km), więc próbkowanie w stopniach rozciągałoby teren w poziomie.
+- Teren należy do świata gry (zob. [Nowa gra i World ID](#nowa-gra-i-world-id)). Jest generowany deterministycznie (szum simplex) z ziarna wyliczonego z World ID i z położenia względem środka świata, czyli miejsca, w którym zaczęła się gra.
+- Położenie jest mierzone w metrach na wschód i na północ od środka świata, wzdłuż powierzchni Ziemi, a nie we współrzędnych mapy. Stopień długości geograficznej jest krótszy niż stopień szerokości, a jednostka mapy (Web Mercator) ma inną długość w Warszawie i w Lizbonie, więc tylko metry dają ten sam teren na każdej szerokości geograficznej. Na dystansie spaceru (kilka km) wynik jest identyczny.
+- Rozmiary terenu są dobrane w jednostkach ok. 0,62 m (jednostka Web Mercator na 52°N, w której teren był strojony), więc w Polsce teren ma takie same rozmiary jak przed wprowadzeniem światów.
 - Teren jest renderowany w kafelkach na niewidocznych płótnach (offscreen canvas) i trzymany w pamięci podręcznej, żeby nie rysować wszystkich ikon w każdej klatce.
 - Szum lasu jest próbkowany na rzadkiej siatce, ale granica lasu jest wyznaczana dopiero z wartości interpolowanej dla każdego piksela kafelka. Dzięki temu jest gładka i ostra, a nie schodkowa.
 - Regiony terenu mają skalę od kilkuset metrów do około kilometra, tak żeby typowy spacer przechodził przez kilka różnych terenów. Na prostym odcinku 3 km teren zmienia się średnio ok. 6 razy.
@@ -162,11 +163,22 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
 - Przy każdym uruchomieniu aplikacji, zanim pojawi się cokolwiek innego, aplikacja pokazuje ekran startowy. Zasłania on całą mapę.
 - Na górze jest logo Tinwalk (`img/logos/tinwalk-logo-stacked.svg`), pod nim małym drukiem przypomnienie o bezpieczeństwie: „When you walk outdoors, stay aware of your surroundings. Don't enter restricted, private or dangerous areas, and keep an eye on traffic.”.
 - Pod spodem są przyciski:
-  - **Continue Game**, jeśli gracz ma założony schron albo gra już trwa (powrót z menu), a w przeciwnym razie **New Game**,
-  - **Settings**: otwiera ustawienia (dźwięk, wibracje, eksport, import i reset zapisu),
+  - **Continue Game**, jeśli gra jest zaczęta (ma świat), a w przeciwnym razie **New Game**, które otwiera ekran nowej gry (niżej),
+  - **Settings**: otwiera ustawienia (dźwięk, wibracje, eksport, import i reset zapisu oraz World ID bieżącej gry, które można zaznaczyć i skopiować),
   - **Help**: na razie nieaktywny.
-- Na dole małym drukiem jest data ostatniej aktualizacji i wersja zapisu, np. „Last updated 7 Oct 2026 · Save version 11”.
-- Dopiero po kliknięciu **New Game** albo **Continue Game** aplikacja zaczyna śledzić pozycję, a nowemu graczowi najpierw pokazuje ekran powitalny.
+- Na dole małym drukiem jest data ostatniej aktualizacji i wersja zapisu, np. „Last updated 8 Oct 2026 · Save version 12”.
+- Dopiero po rozpoczęciu gry (**Begin Game** na ekranie nowej gry) albo po **Continue Game** aplikacja zaczyna śledzić pozycję, a nowemu graczowi najpierw pokazuje ekran powitalny.
+- Reset zapisu w ustawieniach kończy grę: przycisk zmienia się na **New Game**, a mapa jest pusta, dopóki nie zacznie się nowej gry.
+
+#### Nowa gra i World ID
+
+- **New Game** otwiera pełnoekranową warstwę nad ekranem startowym (nie okienko, żeby nie tracić miejsca na marginesy) z ilustracją grzyba atomowego w okrągłym medalionie (`img/pictures/mushroom-cloud.svg`, w stylu ilustracji landmarków) i krótkim wstępem fabularnym pod tytułem **The World After**.
+- Pod wstępem jest wskazówka „Start at home: that is where your shelter will stand.” i pole **World ID** z losowym identyfikatorem (dziesięć cyfr). Gracz może go zostawić albo wpisać własny, do 32 znaków, także słowa, np. „Kowalscy”. Wielkość liter i spacje na początku i końcu nie mają znaczenia. Puste pole daje nowe losowe ID.
+- Pod polem jest wyjaśnienie: „Everyone who starts with the same World ID gets the same land around their starting point.”.
+- Między wskazówką a polem **World ID** są wyśrodkowane przyciski **Back** (wraca do ekranu startowego) i **Begin Game**. Enter w polu też rozpoczyna grę.
+- **Begin Game** zaczyna nową grę z pustym stanem i wybranym World ID. Środkiem świata zostaje pierwsza dobra pozycja GPS po rozpoczęciu gry. Do tego czasu mapa jest pustym papierem. W trybie debug bez pozycji środkiem świata jest punkt startowy mapy debug (Warszawa).
+- Dwie osoby z tym samym World ID dostają ten sam teren (biomy, osady z nazwami, strefy radiacji) w tych samych odległościach i kierunkach od swoich punktów startu, gdziekolwiek są. Łup, wrogowie, landmarki i wezwania przez radio są losowane przy przeszukiwaniu, więc są różne.
+- Zapisy sprzed światów dostają losowe World ID ze środkiem świata w miejscu schronu, więc teren pod nimi się zmienia. Zapisy bez schronu nie mają świata i zaczynają od **New Game**.
 - Datę aktualizacji trzeba zmieniać ręcznie (stała `APP_UPDATED` w `js/version.js`), bo aplikacja nie ma kroku budowania.
 
 #### Pierwsze uruchomienie

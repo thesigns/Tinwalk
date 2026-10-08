@@ -5,6 +5,7 @@
 
 import { SEARCH_INFLUENCE, SEARCH_RADIUS, searchWeight } from './game.js';
 import { fromMercator, mercatorUnitsPerMeter, toMercator } from './geo.js';
+import { hasWorld } from './terrain.js';
 import { TerrainTiles } from './terrain-tiles.js';
 
 // How many meters the shorter side of the screen covers.
@@ -112,6 +113,12 @@ export class MapView {
   }
 
   // Moves the map by a drag of (dx, dy) screen pixels.
+  // Drops the rendered terrain, after the world has changed.
+  clearTerrain() {
+    this.tiles.clear();
+    this.requestFrame();
+  }
+
   panBy(dx, dy) {
     const { center } = this;
     if (!center) return;
@@ -212,7 +219,8 @@ export class MapView {
       return;
     }
 
-    const complete = this.drawTerrain(center);
+    // Until the game knows its world, the map is blank paper.
+    const complete = hasWorld() ? this.drawTerrain(center) : true;
     if (!complete) this.requestFrame();
     this.drawSearchedAreas(center, scene.searchedAreas);
     this.drawBadges(center, scene.landmarks, 'landmark-icons', LANDMARK_STYLE);

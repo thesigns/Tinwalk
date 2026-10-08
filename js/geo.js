@@ -1,7 +1,7 @@
 // Geographic math: distances between points and the Web Mercator projection used by the map.
 
-const EARTH_RADIUS = 6371008.8;
-const MERCATOR_RADIUS = 6378137;
+export const EARTH_RADIUS = 6371008.8;
+export const MERCATOR_RADIUS = 6378137;
 
 function toRadians(degrees) {
   return (degrees * Math.PI) / 180;

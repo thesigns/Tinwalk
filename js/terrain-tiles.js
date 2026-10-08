@@ -13,9 +13,12 @@ import {
   blocksOf,
   forestFieldAt,
   fromGrid,
+  fromWorld,
   groundShadeAt,
   isEmptyLot,
   settlementsIn,
+  toWorld,
+  worldScale,
 } from './terrain.js';
 
 export const TILE_SIZE = 256;
@@ -62,6 +65,11 @@ export class TerrainTiles {
 
   static worldSize(level) {
     return TILE_SIZE * 2 ** level;
+  }
+
+  // A new world makes every rendered tile wrong.
+  clear() {
+    this.cache.clear();
   }
 
   setPixelRatio(ratio) {
@@ -272,21 +280,23 @@ export class TerrainTiles {
   }
 
   // Icons sit at jittered points of a grid fixed in the world, so an icon near
-  // a tile edge is drawn identically by both tiles it overlaps.
+  // a tile edge is drawn identically by both tiles it overlaps, and players
+  // in the same world see the same trees.
   drawIcons(ctx, level, left, top, unitsPerPixel) {
-    const cell = ICON_CELL * unitsPerPixel;
+    const cell = ICON_CELL * unitsPerPixel * worldScale();
     const size = TerrainTiles.worldSize(level);
     const salt = level * 16;
-    const minX = Math.floor(left / cell) - 1;
-    const maxX = Math.floor((left + size) / cell) + 1;
-    const minY = Math.floor((top - size) / cell) - 1;
-    const maxY = Math.floor(top / cell) + 1;
+    const topLeft = toWorld(left, top);
+    const bottomRight = toWorld(left + size, top - size);
+    const minX = Math.floor(topLeft.x / cell) - 1;
+    const maxX = Math.floor(bottomRight.x / cell) + 1;
+    const minY = Math.floor(bottomRight.y / cell) - 1;
+    const maxY = Math.floor(topLeft.y / cell) + 1;
 
     // North to south, so icons further south overlap the ones behind them.
     for (let cy = maxY; cy >= minY; cy--) {
       for (let cx = minX; cx <= maxX; cx++) {
-        const x = (cx + hash(cx, cy, salt + 1)) * cell;
-        const y = (cy + hash(cx, cy, salt + 2)) * cell;
+        const { x, y } = fromWorld((cx + hash(cx, cy, salt + 1)) * cell, (cy + hash(cx, cy, salt + 2)) * cell);
         const biome = biomeAt(x, y);
         if (hash(cx, cy, salt + 3) >= biome.iconDensity) continue;
         const iconSize = biome.iconSize * (0.8 + 0.4 * hash(cx, cy, salt + 4));

@@ -238,6 +238,25 @@
     </div>
   </section>
 
+  <!-- A new game: how the world ended, and which world to play in. A layer
+       over the start screen, so the story gets the whole screen. -->
+  <section id="new-game-screen" class="start-screen layer paper" hidden>
+    <div class="layer-content">
+      <img class="landmark-art" src="img/pictures/mushroom-cloud.svg" alt="" width="512" height="512">
+      <h2>The World After</h2>
+      <p>Nobody agrees on what came first: the sirens, the flash, or the silence after. The cities emptied, the roads went quiet and the lights never came back.</p>
+      <p>You lived through the first winter. Now the cans are running out, and out there someone is still calling for help.</p>
+      <p class="muted">Start at home: that is where your shelter will stand.</p>
+      <div class="dialog-buttons new-game-buttons">
+        <button class="btn btn-ink" type="button" data-choice="back">Back</button>
+        <button id="begin-button" class="btn btn-paint" type="button" data-choice="begin">Begin Game</button>
+      </div>
+      <h3><label for="world-id">World ID</label></h3>
+      <input id="world-id" name="world" maxlength="32" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <p class="muted world-id-note">Everyone who starts with the same World ID gets the same land around their starting point.</p>
+    </div>
+  </section>
+
   <section id="welcome-screen" class="overlay" hidden>
     <div class="card paper">
       <h1 class="wordmark">Tinwalk</h1>
@@ -453,6 +472,7 @@
     </div>
     <h3>Your save</h3>
     <p class="muted">Your game is saved only in this browser. Export it now and then, so you can bring it back if the browser loses it.</p>
+    <p id="world-id-line" class="muted" hidden>World ID: <span id="world-id-shown" class="world-id"></span></p>
     <div class="menu-buttons">
       <button id="export-button" class="btn btn-ink" type="button"><svg class="icon"><use href="#i-export"/></svg><span>Export save</span></button>
       <button id="import-button" class="btn btn-ink" type="button"><svg class="icon"><use href="#i-import"/></svg><span>Import save</span></button>

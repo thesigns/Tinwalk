@@ -1,6 +1,12 @@
 // Procedural terrain: which biome is where, its ground color and its icons.
-// Everything is a pure function of Web Mercator coordinates, so the same
-// place on Earth always looks the same.
+//
+// The terrain belongs to a world: a World ID, which seeds the noise and the
+// settlements, and the point where the game began, which is the world's
+// center. Inside a world everything is a pure function of the position
+// relative to that center, measured in world units of fixed length, so
+// players who share a World ID get the same land around their starting
+// points wherever they are on Earth. The exported functions take Web Mercator
+// coordinates, like the map, and convert them.
 //
 // Plains are the open ground everywhere. Forests grow where a warped noise
 // field is high, so they get ragged edges, bays and clearings. Ruins are the
@@ -13,13 +19,27 @@
 // Radiation is a separate, invisible layer over the biomes: patches of fallout
 // covering about a fifth of the world, regardless of the biome underneath.
 
+import { EARTH_RADIUS, MERCATOR_RADIUS, fromMercator, toMercator } from './geo.js';
 import { SETTLEMENT_NAME_ENDS, SETTLEMENT_NAME_STARTS } from './names.js';
 import { createSimplex, hash } from './noise.js';
 
-const noise = createSimplex(20261001);
-const radiationNoise = createSimplex(20261005);
+// The terrain was tuned in Mercator units at 52°N, where one is ~0.62 m, so
+// that is the length of a world unit everywhere.
+const WORLD_UNIT_METERS = Math.cos((52 * Math.PI) / 180);
 
-// Sizes are in Mercator units. One Mercator unit is ~0.62 m at 52°N.
+// World units per degree of latitude.
+const UNITS_PER_DEGREE = (EARTH_RADIUS * Math.PI) / 180 / WORLD_UNIT_METERS;
+
+// The current world: its center, world units per degree of latitude and of
+// longitude there, world units per Mercator unit, and a salt for the
+// settlement hashes. Until the game sets one, the terrain is laid out around
+// 0°N 0°E with the default seed.
+let world = { lat: 0, lon: 0, perLat: UNITS_PER_DEGREE, perLon: UNITS_PER_DEGREE, scale: 1, salt: 0 };
+let worldSet = false;
+let noise = createSimplex(20261001);
+let radiationNoise = createSimplex(20261005);
+
+// Sizes are in world units.
 const FOREST_FREQUENCY = 1 / 3200;
 const FOREST_WARP = 0.4;
 // Forests cover about a third of the land outside settlements.
@@ -50,6 +70,63 @@ const RADIATION_WARP = 0.4;
 const RADIATION_THRESHOLD = 0.305;
 const RADIATION_RANGE = 0.3;
 
+// A 32-bit seed from a World ID. Letter case and surrounding spaces don't
+// matter, so an ID read aloud or typed on another phone gives the same world.
+export function worldSeed(id) {
+  let h = 0x811c9dc5;
+  for (const char of id.trim().toLowerCase()) {
+    h = Math.imul(h ^ char.codePointAt(0), 0x01000193);
+  }
+  return Math.floor(hash(h, 0, 709) * 4294967296);
+}
+
+// Sets the world the terrain belongs to: { seed, origin: { lat, lon } }, or
+// null until the game knows it.
+export function setWorld(settings) {
+  settlementCache.clear();
+  worldSet = Boolean(settings);
+  if (!settings) return;
+  const { seed, origin } = settings;
+  const cos = Math.cos((origin.lat * Math.PI) / 180);
+  world = {
+    lat: origin.lat,
+    lon: origin.lon,
+    perLat: UNITS_PER_DEGREE,
+    // Meridians close in towards the poles; world units don't shrink with them.
+    perLon: UNITS_PER_DEGREE * cos,
+    scale: (cos * EARTH_RADIUS) / MERCATOR_RADIUS / WORLD_UNIT_METERS,
+    salt: Math.floor(hash(seed, 3, 709) * 4294967296) | 0,
+  };
+  noise = createSimplex(Math.floor(hash(seed, 1, 709) * 4294967296));
+  radiationNoise = createSimplex(Math.floor(hash(seed, 2, 709) * 4294967296));
+}
+
+export function hasWorld() {
+  return worldSet;
+}
+
+// World units per Mercator unit, near the center.
+export function worldScale() {
+  return world.scale;
+}
+
+// World coordinates of a Mercator point: meters east and north of the center
+// (as world units), along the ground rather than on the map. Over a walk of a
+// few kilometers this keeps the land identical at any latitude.
+export function toWorld(x, y) {
+  const { lat, lon } = fromMercator({ x, y });
+  return { x: (lon - world.lon) * world.perLon, y: (lat - world.lat) * world.perLat };
+}
+
+export function fromWorld(x, y) {
+  return toMercator({ lat: world.lat + y / world.perLat, lon: world.lon + x / world.perLon });
+}
+
+// Hash salts differ from world to world, so settlements do too.
+function salted(salt) {
+  return world.salt ^ salt;
+}
+
 const INK = '#5b4a35';
 const GRASS_INK = 'rgba(91, 74, 53, 0.55)';
 
@@ -75,7 +152,12 @@ function fbm(x, y, octaves, source = noise) {
 
 // Positive in forests, negative on plains, and changing smoothly, so the
 // map can interpolate it and draw sharp borders from a few samples.
-export function forestFieldAt(x, y) {
+export function forestFieldAt(mx, my) {
+  const { x, y } = toWorld(mx, my);
+  return forestField(x, y);
+}
+
+function forestField(x, y) {
   const fx = x * FOREST_FREQUENCY - 391.5;
   const fy = y * FOREST_FREQUENCY + 145.2;
   // Domain warping bends the noise, so forests don't come out as round blobs.
@@ -84,17 +166,15 @@ export function forestFieldAt(x, y) {
   return fbm(wx, wy, 3) - FOREST_THRESHOLD;
 }
 
-// Forest or plains, ignoring settlements.
-export function landAt(x, y) {
-  return forestFieldAt(x, y) > 0 ? BIOMES.forest : BIOMES.plains;
-}
-
-export function biomeAt(x, y) {
-  return settlementAt(x, y) ? BIOMES.ruins : landAt(x, y);
+export function biomeAt(mx, my) {
+  const { x, y } = toWorld(mx, my);
+  if (settlementAtWorld(x, y)) return BIOMES.ruins;
+  return forestField(x, y) > 0 ? BIOMES.forest : BIOMES.plains;
 }
 
 // How radioactive a place is: 0 outside the fallout, rising towards 1 deeper in.
-export function radiationAt(x, y) {
+export function radiationAt(mx, my) {
+  const { x, y } = toWorld(mx, my);
   const fx = x * RADIATION_FREQUENCY + 211.7;
   const fy = y * RADIATION_FREQUENCY - 87.3;
   // Warped like forests, so the patches aren't round blobs.
@@ -105,7 +185,8 @@ export function radiationAt(x, y) {
 }
 
 // Brightness factor around 1, for a little small-scale variation inside a biome.
-export function groundShadeAt(x, y) {
+export function groundShadeAt(mx, my) {
+  const { x, y } = toWorld(mx, my);
   return 1 + DETAIL_STRENGTH * noise(x * DETAIL_FREQUENCY, y * DETAIL_FREQUENCY);
 }
 
@@ -115,28 +196,29 @@ const settlementCache = new Map();
 const MAX_CACHED_SETTLEMENTS = 4096;
 
 // The settlement in a grid cell, or null:
-// { name, x, y, radius, reach, cos, sin, seed, cx, cy, blocks }, with blocks filled in by blocksOf().
+// { name, x, y, radius, reach, cos, sin, seed, cx, cy, blocks }, with blocks
+// filled in by blocksOf(). Positions and sizes are in world units.
 // Its street grid is rotated by an angle of its own; block (i, j) spans
 // [i, i + 1] block lengths by [j, j + 1] block widths in the grid's coordinates.
 function settlementIn(cx, cy) {
   const key = `${cx},${cy}`;
   if (settlementCache.has(key)) return settlementCache.get(key);
   let settlement = null;
-  if (hash(cx, cy, 701) < SETTLEMENT_CHANCE) {
-    const size = hash(cx, cy, 704);
+  if (hash(cx, cy, salted(701)) < SETTLEMENT_CHANCE) {
+    const size = hash(cx, cy, salted(704));
     const radius = SETTLEMENT_MIN_RADIUS + (SETTLEMENT_MAX_RADIUS - SETTLEMENT_MIN_RADIUS) * size;
-    const angle = hash(cx, cy, 705) * (Math.PI / 2);
-    const start = SETTLEMENT_NAME_STARTS[Math.floor(hash(cx, cy, 707) * SETTLEMENT_NAME_STARTS.length)];
-    const end = SETTLEMENT_NAME_ENDS[Math.floor(hash(cx, cy, 708) * SETTLEMENT_NAME_ENDS.length)];
+    const angle = hash(cx, cy, salted(705)) * (Math.PI / 2);
+    const start = SETTLEMENT_NAME_STARTS[Math.floor(hash(cx, cy, salted(707)) * SETTLEMENT_NAME_STARTS.length)];
+    const end = SETTLEMENT_NAME_ENDS[Math.floor(hash(cx, cy, salted(708)) * SETTLEMENT_NAME_ENDS.length)];
     settlement = {
       name: start + end,
-      x: (cx + 0.15 + 0.7 * hash(cx, cy, 702)) * SETTLEMENT_CELL,
-      y: (cy + 0.15 + 0.7 * hash(cx, cy, 703)) * SETTLEMENT_CELL,
+      x: (cx + 0.15 + 0.7 * hash(cx, cy, salted(702))) * SETTLEMENT_CELL,
+      y: (cy + 0.15 + 0.7 * hash(cx, cy, salted(703))) * SETTLEMENT_CELL,
       radius,
       reach: radius * (1 + EDGE_RAGGEDNESS) + 2 * BLOCK_LENGTH,
       cos: Math.cos(angle),
       sin: Math.sin(angle),
-      seed: Math.floor(hash(cx, cy, 706) * 1e6),
+      seed: Math.floor(hash(cx, cy, salted(706)) * 1e6),
       cx,
       cy,
       blocks: null,
@@ -148,11 +230,17 @@ function settlementIn(cx, cy) {
 }
 
 // World coordinates of a point given in a settlement's street grid.
-export function fromGrid(settlement, u, v) {
+function gridToWorld(settlement, u, v) {
   return {
     x: settlement.x + u * settlement.cos - v * settlement.sin,
     y: settlement.y + u * settlement.sin + v * settlement.cos,
   };
+}
+
+// Mercator coordinates of a point given in a settlement's street grid, for drawing.
+export function fromGrid(settlement, u, v) {
+  const { x, y } = gridToWorld(settlement, u, v);
+  return fromWorld(x, y);
 }
 
 // Settlements whose blocks could meet this one's.
@@ -175,7 +263,7 @@ function neighborsOf(settlement) {
 function isBlock(settlement, neighbors, i, j) {
   const u = (i + 0.5) * BLOCK_LENGTH;
   const v = (j + 0.5) * BLOCK_WIDTH;
-  const { x, y } = fromGrid(settlement, u, v);
+  const { x, y } = gridToWorld(settlement, u, v);
   const distance = Math.hypot(u, v);
   const edge = settlement.radius * (1 + EDGE_RAGGEDNESS * noise(x * EDGE_FREQUENCY + 7.7, y * EDGE_FREQUENCY - 3.3));
   if (distance >= edge) return false;
@@ -206,8 +294,10 @@ export function blocksOf(settlement) {
   return settlement.blocks;
 }
 
-// Settlements that may have blocks inside the given rectangle.
-export function settlementsIn(minX, minY, maxX, maxY) {
+// Settlements that may have blocks inside the given Mercator rectangle.
+export function settlementsIn(minMX, minMY, maxMX, maxMY) {
+  const { x: minX, y: minY } = toWorld(minMX, minMY);
+  const { x: maxX, y: maxY } = toWorld(maxMX, maxMY);
   const found = [];
   for (let cy = Math.floor(minY / SETTLEMENT_CELL) - 1; cy <= Math.floor(maxY / SETTLEMENT_CELL) + 1; cy++) {
     for (let cx = Math.floor(minX / SETTLEMENT_CELL) - 1; cx <= Math.floor(maxX / SETTLEMENT_CELL) + 1; cx++) {
@@ -227,7 +317,12 @@ export function settlementsIn(minX, minY, maxX, maxY) {
 }
 
 // The settlement with a block at the point, streets included, or null.
-export function settlementAt(x, y) {
+export function settlementAt(mx, my) {
+  const { x, y } = toWorld(mx, my);
+  return settlementAtWorld(x, y);
+}
+
+function settlementAtWorld(x, y) {
   const cx = Math.floor(x / SETTLEMENT_CELL);
   const cy = Math.floor(y / SETTLEMENT_CELL);
   for (let dy = -1; dy <= 1; dy++) {

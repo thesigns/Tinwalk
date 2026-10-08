@@ -1,0 +1,189 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- The end of the old world, seen from the road into town: a mushroom
+       cloud rising over a city whose towers are still standing. Shown when a
+       new game begins. -->
+  <defs>
+    <clipPath id="disc"><circle cx="256" cy="256" r="232"/></clipPath>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a8946c"/>
+      <stop offset="0.45" stop-color="#d6c08e"/>
+      <stop offset="0.7" stop-color="#f0dfb0"/>
+    </linearGradient>
+    <!-- The heat behind the cloud. -->
+    <radialGradient id="glow" cx="256" cy="250" r="190" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f6dc96"/>
+      <stop offset="0.45" stop-color="#ecc77a" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#ecc77a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cap" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eadbb6"/>
+      <stop offset="1" stop-color="#cdb085"/>
+    </linearGradient>
+    <linearGradient id="stem" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#b8986a"/>
+      <stop offset="0.6" stop-color="#d9c49c"/>
+      <stop offset="1" stop-color="#c2a476"/>
+    </linearGradient>
+    <!-- Fire still burning under the cap. -->
+    <linearGradient id="fire" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cf5b3e"/>
+      <stop offset="1" stop-color="#e0921f"/>
+    </linearGradient>
+    <linearGradient id="field" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c9b07a"/>
+      <stop offset="1" stop-color="#a88c55"/>
+    </linearGradient>
+    <linearGradient id="road" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b3ab98"/>
+      <stop offset="1" stop-color="#8f897a"/>
+    </linearGradient>
+    <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <path d="M0 0v7" stroke="#33281c" stroke-width="1.6" opacity="0.5"/>
+    </pattern>
+    <pattern id="hatch-sky" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-20)">
+      <path d="M0 0v8" stroke="#6a5842" stroke-width="1.4" opacity="0.4"/>
+    </pattern>
+    <!-- The billows of the cap, drawn twice: outlined, then filled over, so
+         only the outer edge keeps its ink. -->
+    <g id="cap-billows">
+      <circle cx="256" cy="118" r="50"/>
+      <circle cx="204" cy="132" r="42"/>
+      <circle cx="308" cy="132" r="42"/>
+      <circle cx="226" cy="100" r="36"/>
+      <circle cx="288" cy="100" r="36"/>
+      <circle cx="162" cy="164" r="36"/>
+      <circle cx="350" cy="164" r="36"/>
+      <circle cx="136" cy="196" r="24"/>
+      <circle cx="376" cy="196" r="24"/>
+      <circle cx="192" cy="182" r="34"/>
+      <circle cx="320" cy="182" r="34"/>
+      <circle cx="256" cy="176" r="44"/>
+      <path d="M142 198c22 16 62 24 114 24s92-8 114-24V176H142z"/>
+    </g>
+    <g id="base-billows">
+      <circle cx="146" cy="352" r="18"/>
+      <circle cx="176" cy="340" r="26"/>
+      <circle cx="212" cy="334" r="30"/>
+      <circle cx="256" cy="330" r="32"/>
+      <circle cx="300" cy="334" r="30"/>
+      <circle cx="336" cy="340" r="26"/>
+      <circle cx="366" cy="352" r="18"/>
+      <path d="M128 352h256v12H128z"/>
+    </g>
+    <!-- The collar: a ring of cloud around the stem. Seen from below, its near
+         half crosses the stem and the far half shows under it at the sides. -->
+    <g id="collar-near">
+      <ellipse cx="256" cy="266" rx="68" ry="8"/>
+      <circle cx="328" cy="272" r="9.6"/>
+      <circle cx="322.5" cy="267.4" r="10.5"/>
+      <circle cx="306.9" cy="263.5" r="14.1"/>
+      <circle cx="283.6" cy="260.9" r="14.1"/>
+      <circle cx="256" cy="260" r="15.3"/>
+      <circle cx="228.4" cy="260.9" r="13.6"/>
+      <circle cx="205.1" cy="263.5" r="13.9"/>
+      <circle cx="189.5" cy="267.4" r="10.8"/>
+      <circle cx="184" cy="272" r="9.4"/>
+    </g>
+    <g id="collar-far">
+      <ellipse cx="256" cy="279" rx="70" ry="8"/>
+      <circle cx="328" cy="274" r="7.3"/>
+      <circle cx="322.5" cy="278.6" r="7.7"/>
+      <circle cx="306.9" cy="282.5" r="9.6"/>
+      <circle cx="283.6" cy="285.1" r="9.6"/>
+      <circle cx="256" cy="286" r="10.2"/>
+      <circle cx="228.4" cy="285.1" r="9.3"/>
+      <circle cx="205.1" cy="282.5" r="9.5"/>
+      <circle cx="189.5" cy="278.6" r="7.9"/>
+      <circle cx="184" cy="274" r="7.2"/>
+    </g>
+    <clipPath id="collar-near-clip">
+      <circle cx="328" cy="272" r="9.6"/>
+      <circle cx="322.5" cy="267.4" r="10.5"/>
+      <circle cx="306.9" cy="263.5" r="14.1"/>
+      <circle cx="283.6" cy="260.9" r="14.1"/>
+      <circle cx="256" cy="260" r="15.3"/>
+      <circle cx="228.4" cy="260.9" r="13.6"/>
+      <circle cx="205.1" cy="263.5" r="13.9"/>
+      <circle cx="189.5" cy="267.4" r="10.8"/>
+      <circle cx="184" cy="272" r="9.4"/>
+      <ellipse cx="256" cy="266" rx="68" ry="8"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#disc)">
+    <!-- A heavy sky, lit from below by the blast. -->
+    <rect width="512" height="512" fill="url(#sky)"/>
+    <path d="M0 0h512v120H0z" fill="url(#hatch-sky)"/>
+    <circle cx="256" cy="250" r="190" fill="url(#glow)"/>
+
+    <!-- Crows, fleeing. -->
+    <path d="M86 132q7-7 14 0q7-7 14 0M412 104q6-6 12 0q6-6 12 0M440 150q5-5 10 0q5-5 10 0M66 186q5-5 10 0q5-5 10 0" fill="none" stroke="#33281c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Fire still burning under the cap, glowing out from beneath it. -->
+    <path d="M146 204c22 16 60 24 110 24s88-8 110-24c-4 14-18 24-40 30-20 6-46 8-70 8s-50-2-70-8c-22-6-36-16-40-30z" fill="url(#fire)" stroke="#33281c" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M170 226c22 8 52 12 86 12s64-4 86-12c-14 8-26 12-40 14-14 2-30 3-46 3s-32-1-46-3c-14-2-26-6-40-14z" fill="url(#hatch)"/>
+    <!-- The stem, threaded through the collar of cloud that rings it. -->
+    <!-- The far half of the collar, behind the stem. -->
+    <use href="#collar-far" fill="none" stroke="#33281c" stroke-width="5"/>
+    <use href="#collar-far" fill="#c4a678"/>
+    <path d="M178 286c20 8 40 10 78 10s58-2 78-10" fill="none" stroke="#6a5842" stroke-width="1.6" opacity="0.6"/>
+    <path d="M232 206c-2 40-4 76-12 112-4 18-12 30-22 40h116c-10-10-18-22-22-40-8-36-10-72-12-112z" fill="url(#stem)" stroke="#33281c" stroke-width="3.5" stroke-linejoin="round"/>
+    <path d="M232 214c-2 38-4 70-10 104-3 14-8 24-14 32h22c4-30 6-80 6-136z" fill="url(#hatch)"/>
+    <path d="M246 230c0 30-2 70-6 110M266 226c2 34 4 74 10 114" fill="none" stroke="#6a5842" stroke-width="1.6" opacity="0.6"/>
+    <!-- The near half of the collar, in front of the stem. -->
+    <use href="#collar-near" fill="none" stroke="#33281c" stroke-width="6"/>
+    <use href="#collar-near" fill="#e6d5ad"/>
+    <g clip-path="url(#collar-near-clip)">
+      <ellipse cx="256" cy="278" rx="88" ry="14" fill="#c9ad7f"/>
+      <ellipse cx="256" cy="278" rx="88" ry="14" fill="url(#hatch)"/>
+    </g>
+    <path d="M316.2 271.1c3.1 3.1 9.4 3.1 12.6 0M298.4 268.5c4.2 4.2 12.7 4.2 17 0M275.1 265.9c4.2 4.2 12.7 4.2 17 0M246.8 265.4c4.6 4.6 13.8 4.6 18.4 0M220.3 265.7c4.1 4.1 12.3 4.1 16.4 0M196.7 268.4c4.2 4.2 12.5 4.2 16.7 0M183 271.2c3.2 3.2 9.7 3.2 13 0" fill="none" stroke="#6a5842" stroke-width="1.6" stroke-linecap="round" opacity="0.75"/>
+    <!-- The fire above catches the tops of the billows. -->
+    <path d="M297.3 257.9A11.1 11.1 0 0 1 315.4 256.4M273.9 255.3A11.1 11.1 0 0 1 292.1 253.8M245.3 253.8A12.3 12.3 0 0 1 265.4 252.1M219.2 255.6A10.6 10.6 0 0 1 236.6 254.1M195.6 258A10.9 10.9 0 0 1 213.5 256.5" fill="none" stroke="#f6dc96" stroke-width="2.2" stroke-linecap="round"/>
+
+    <!-- The cap. -->
+    <use href="#cap-billows" fill="none" stroke="#33281c" stroke-width="7"/>
+    <use href="#cap-billows" fill="url(#cap)"/>
+    <!-- Inner folds of the billows. -->
+    <g fill="none" stroke="#6a5842" stroke-width="2" stroke-linecap="round" opacity="0.75">
+      <path d="M210 112c8-14 22-20 36-18M268 94c14-2 26 6 30 18M170 152c8-10 20-14 32-10M318 140c12-2 24 4 30 14"/>
+      <path d="M150 196c10-8 22-10 34-6M330 190c10-4 22-2 32 6M228 166c12-10 30-12 44-4"/>
+    </g>
+    <!-- Distant hills. -->
+    <path d="M0 360c40-14 80-18 120-12 30 4 50 4 80 0h112c30 4 50 4 80 0 40-6 80-2 120 12v152H0z" fill="#a9ab7c"/>
+
+    <!-- Dust rolling out from the foot of the cloud. -->
+    <use href="#base-billows" fill="none" stroke="#33281c" stroke-width="6"/>
+    <use href="#base-billows" fill="#dcc9a0"/>
+    <path d="M160 356c14-8 30-10 46-6M240 346c14-6 30-6 44 0M306 352c12-6 26-6 38 0" fill="none" stroke="#6a5842" stroke-width="1.8" stroke-linecap="round" opacity="0.7"/>
+
+    <!-- The city on the horizon, still standing for the moment: towers dark
+         against the blast, their windows catching the flash. -->
+    <g stroke="#33281c" stroke-linejoin="round">
+      <path d="M51 286v-22M47 276h8M375 290v-22M371 280h8" fill="none" stroke-width="2" stroke-linecap="round"/>
+      <path d="M18 364V314H44V364zM40 364V286H62V364zM60 364V310H66V300H84V310H90V364zM88 364V280L94 272L98 250L102 272L108 280V364zM106 364V318H134V364zM132 364V304H136.4V294H149.6V304H154V364zM152 364V330H170V364zM170 364V344H194V364zM192 364V336H210V364zM300 364V340H320V364zM318 364V348H344V364zM342 364V326H364V364zM362 364V290H388V364zM386 364V274L391 266L395 244L399 266L404 274V364zM402 364V316H408V306H426V316H432V364zM430 364V280H454V364zM452 364V326H458.8V316H479.2V326H486V364z" fill="#7f7a6c" stroke-width="2.4"/>
+    </g>
+    <path d="M35.5 320h2.6v3.4h-2.6zM29.5 327h2.6v3.4h-2.6zM29.5 334h2.6v3.4h-2.6zM23.5 341h2.6v3.4h-2.6zM23.5 348h2.6v3.4h-2.6zM29.5 348h2.6v3.4h-2.6zM29.5 355h2.6v3.4h-2.6zM35.5 355h2.6v3.4h-2.6zM46.5 292h2.6v3.4h-2.6zM52.5 292h2.6v3.4h-2.6zM46.5 299h2.6v3.4h-2.6zM46.5 306h2.6v3.4h-2.6zM52.5 320h2.6v3.4h-2.6zM52.5 327h2.6v3.4h-2.6zM46.5 334h2.6v3.4h-2.6zM46.5 341h2.6v3.4h-2.6zM46.5 355h2.6v3.4h-2.6zM52.5 355h2.6v3.4h-2.6zM70.5 316h2.6v3.4h-2.6zM76.5 316h2.6v3.4h-2.6zM64.5 323h2.6v3.4h-2.6zM70.5 323h2.6v3.4h-2.6zM82.5 323h2.6v3.4h-2.6zM64.5 330h2.6v3.4h-2.6zM70.5 330h2.6v3.4h-2.6zM76.5 330h2.6v3.4h-2.6zM64.5 337h2.6v3.4h-2.6zM76.5 337h2.6v3.4h-2.6zM82.5 337h2.6v3.4h-2.6zM70.5 344h2.6v3.4h-2.6zM82.5 344h2.6v3.4h-2.6zM64.5 351h2.6v3.4h-2.6zM70.5 351h2.6v3.4h-2.6zM76.5 351h2.6v3.4h-2.6zM93.5 282h2.6v3.4h-2.6zM99.5 282h2.6v3.4h-2.6zM93.5 289h2.6v3.4h-2.6zM99.5 289h2.6v3.4h-2.6zM93.5 296h2.6v3.4h-2.6zM99.5 296h2.6v3.4h-2.6zM93.5 303h2.6v3.4h-2.6zM99.5 303h2.6v3.4h-2.6zM99.5 310h2.6v3.4h-2.6zM93.5 317h2.6v3.4h-2.6zM99.5 317h2.6v3.4h-2.6zM93.5 324h2.6v3.4h-2.6zM93.5 331h2.6v3.4h-2.6zM99.5 331h2.6v3.4h-2.6zM99.5 338h2.6v3.4h-2.6zM99.5 352h2.6v3.4h-2.6zM124.5 324h2.6v3.4h-2.6zM112.5 331h2.6v3.4h-2.6zM124.5 331h2.6v3.4h-2.6zM112.5 338h2.6v3.4h-2.6zM118.5 338h2.6v3.4h-2.6zM124.5 338h2.6v3.4h-2.6zM112.5 345h2.6v3.4h-2.6zM124.5 345h2.6v3.4h-2.6zM118.5 352h2.6v3.4h-2.6zM124.5 352h2.6v3.4h-2.6zM138.5 324h2.6v3.4h-2.6zM144.5 324h2.6v3.4h-2.6zM138.5 338h2.6v3.4h-2.6zM138.5 345h2.6v3.4h-2.6zM144.5 345h2.6v3.4h-2.6zM138.5 352h2.6v3.4h-2.6zM144.5 352h2.6v3.4h-2.6zM156.5 336h2.6v3.4h-2.6zM162.5 336h2.6v3.4h-2.6zM162.5 343h2.6v3.4h-2.6zM156.5 350h2.6v3.4h-2.6zM162.5 350h2.6v3.4h-2.6zM174.5 350h2.6v3.4h-2.6zM180.5 350h2.6v3.4h-2.6zM186.5 350h2.6v3.4h-2.6zM202.5 342h2.6v3.4h-2.6zM348.5 339h2.6v3.4h-2.6zM354.5 339h2.6v3.4h-2.6zM373.5 296h2.6v3.4h-2.6zM379.5 296h2.6v3.4h-2.6zM367.5 303h2.6v3.4h-2.6zM373.5 303h2.6v3.4h-2.6zM367.5 317h2.6v3.4h-2.6zM367.5 324h2.6v3.4h-2.6zM373.5 324h2.6v3.4h-2.6zM367.5 331h2.6v3.4h-2.6zM379.5 331h2.6v3.4h-2.6zM367.5 338h2.6v3.4h-2.6zM373.5 338h2.6v3.4h-2.6zM379.5 338h2.6v3.4h-2.6zM367.5 352h2.6v3.4h-2.6zM373.5 352h2.6v3.4h-2.6zM379.5 352h2.6v3.4h-2.6zM390.5 283h2.6v3.4h-2.6zM396.5 283h2.6v3.4h-2.6zM390.5 290h2.6v3.4h-2.6zM396.5 290h2.6v3.4h-2.6zM390.5 297h2.6v3.4h-2.6zM396.5 297h2.6v3.4h-2.6zM396.5 304h2.6v3.4h-2.6zM396.5 325h2.6v3.4h-2.6zM390.5 332h2.6v3.4h-2.6zM396.5 332h2.6v3.4h-2.6zM390.5 339h2.6v3.4h-2.6zM396.5 339h2.6v3.4h-2.6zM390.5 346h2.6v3.4h-2.6zM418.5 322h2.6v3.4h-2.6zM424.5 322h2.6v3.4h-2.6zM406.5 329h2.6v3.4h-2.6zM412.5 329h2.6v3.4h-2.6zM418.5 329h2.6v3.4h-2.6zM424.5 329h2.6v3.4h-2.6zM412.5 336h2.6v3.4h-2.6zM418.5 336h2.6v3.4h-2.6zM424.5 336h2.6v3.4h-2.6zM406.5 343h2.6v3.4h-2.6zM412.5 343h2.6v3.4h-2.6zM424.5 343h2.6v3.4h-2.6zM412.5 350h2.6v3.4h-2.6zM418.5 350h2.6v3.4h-2.6zM424.5 350h2.6v3.4h-2.6zM434.5 286h2.6v3.4h-2.6zM440.5 286h2.6v3.4h-2.6zM446.5 286h2.6v3.4h-2.6zM434.5 300h2.6v3.4h-2.6zM440.5 300h2.6v3.4h-2.6zM434.5 307h2.6v3.4h-2.6zM440.5 307h2.6v3.4h-2.6zM446.5 307h2.6v3.4h-2.6zM440.5 314h2.6v3.4h-2.6zM440.5 321h2.6v3.4h-2.6zM446.5 321h2.6v3.4h-2.6zM434.5 328h2.6v3.4h-2.6zM440.5 328h2.6v3.4h-2.6zM446.5 328h2.6v3.4h-2.6zM434.5 335h2.6v3.4h-2.6zM440.5 335h2.6v3.4h-2.6zM434.5 349h2.6v3.4h-2.6zM446.5 349h2.6v3.4h-2.6zM464.5 332h2.6v3.4h-2.6zM476.5 332h2.6v3.4h-2.6zM458.5 339h2.6v3.4h-2.6zM464.5 339h2.6v3.4h-2.6zM470.5 339h2.6v3.4h-2.6zM476.5 339h2.6v3.4h-2.6zM458.5 346h2.6v3.4h-2.6zM464.5 346h2.6v3.4h-2.6zM470.5 346h2.6v3.4h-2.6zM458.5 353h2.6v3.4h-2.6zM476.5 353h2.6v3.4h-2.6z" fill="#5f5a4f"/>
+    <path d="M23.5 320h2.6v3.4h-2.6zM29.5 320h2.6v3.4h-2.6zM23.5 327h2.6v3.4h-2.6zM35.5 327h2.6v3.4h-2.6zM23.5 334h2.6v3.4h-2.6zM35.5 334h2.6v3.4h-2.6zM29.5 341h2.6v3.4h-2.6zM35.5 341h2.6v3.4h-2.6zM35.5 348h2.6v3.4h-2.6zM23.5 355h2.6v3.4h-2.6zM52.5 299h2.6v3.4h-2.6zM52.5 306h2.6v3.4h-2.6zM46.5 313h2.6v3.4h-2.6zM52.5 313h2.6v3.4h-2.6zM46.5 320h2.6v3.4h-2.6zM46.5 327h2.6v3.4h-2.6zM52.5 334h2.6v3.4h-2.6zM52.5 341h2.6v3.4h-2.6zM46.5 348h2.6v3.4h-2.6zM52.5 348h2.6v3.4h-2.6zM64.5 316h2.6v3.4h-2.6zM82.5 316h2.6v3.4h-2.6zM76.5 323h2.6v3.4h-2.6zM82.5 330h2.6v3.4h-2.6zM70.5 337h2.6v3.4h-2.6zM64.5 344h2.6v3.4h-2.6zM76.5 344h2.6v3.4h-2.6zM82.5 351h2.6v3.4h-2.6zM93.5 310h2.6v3.4h-2.6zM99.5 324h2.6v3.4h-2.6zM93.5 338h2.6v3.4h-2.6zM93.5 345h2.6v3.4h-2.6zM99.5 345h2.6v3.4h-2.6zM93.5 352h2.6v3.4h-2.6zM112.5 324h2.6v3.4h-2.6zM118.5 324h2.6v3.4h-2.6zM118.5 331h2.6v3.4h-2.6zM118.5 345h2.6v3.4h-2.6zM112.5 352h2.6v3.4h-2.6zM138.5 310h2.6v3.4h-2.6zM144.5 310h2.6v3.4h-2.6zM138.5 317h2.6v3.4h-2.6zM144.5 317h2.6v3.4h-2.6zM138.5 331h2.6v3.4h-2.6zM144.5 331h2.6v3.4h-2.6zM144.5 338h2.6v3.4h-2.6zM156.5 343h2.6v3.4h-2.6zM196.5 342h2.6v3.4h-2.6zM196.5 349h2.6v3.4h-2.6zM202.5 349h2.6v3.4h-2.6zM305.5 346h2.6v3.4h-2.6zM311.5 346h2.6v3.4h-2.6zM305.5 353h2.6v3.4h-2.6zM311.5 353h2.6v3.4h-2.6zM323.5 354h2.6v3.4h-2.6zM329.5 354h2.6v3.4h-2.6zM335.5 354h2.6v3.4h-2.6zM348.5 332h2.6v3.4h-2.6zM354.5 332h2.6v3.4h-2.6zM348.5 346h2.6v3.4h-2.6zM354.5 346h2.6v3.4h-2.6zM348.5 353h2.6v3.4h-2.6zM354.5 353h2.6v3.4h-2.6zM367.5 296h2.6v3.4h-2.6zM379.5 303h2.6v3.4h-2.6zM367.5 310h2.6v3.4h-2.6zM373.5 310h2.6v3.4h-2.6zM379.5 310h2.6v3.4h-2.6zM373.5 317h2.6v3.4h-2.6zM379.5 317h2.6v3.4h-2.6zM379.5 324h2.6v3.4h-2.6zM373.5 331h2.6v3.4h-2.6zM367.5 345h2.6v3.4h-2.6zM373.5 345h2.6v3.4h-2.6zM379.5 345h2.6v3.4h-2.6zM390.5 276h2.6v3.4h-2.6zM396.5 276h2.6v3.4h-2.6zM390.5 304h2.6v3.4h-2.6zM390.5 311h2.6v3.4h-2.6zM396.5 311h2.6v3.4h-2.6zM390.5 318h2.6v3.4h-2.6zM396.5 318h2.6v3.4h-2.6zM390.5 325h2.6v3.4h-2.6zM396.5 346h2.6v3.4h-2.6zM390.5 353h2.6v3.4h-2.6zM396.5 353h2.6v3.4h-2.6zM406.5 322h2.6v3.4h-2.6zM412.5 322h2.6v3.4h-2.6zM406.5 336h2.6v3.4h-2.6zM418.5 343h2.6v3.4h-2.6zM406.5 350h2.6v3.4h-2.6zM434.5 293h2.6v3.4h-2.6zM440.5 293h2.6v3.4h-2.6zM446.5 293h2.6v3.4h-2.6zM446.5 300h2.6v3.4h-2.6zM434.5 314h2.6v3.4h-2.6zM446.5 314h2.6v3.4h-2.6zM434.5 321h2.6v3.4h-2.6zM446.5 335h2.6v3.4h-2.6zM434.5 342h2.6v3.4h-2.6zM440.5 342h2.6v3.4h-2.6zM446.5 342h2.6v3.4h-2.6zM440.5 349h2.6v3.4h-2.6zM458.5 332h2.6v3.4h-2.6zM470.5 332h2.6v3.4h-2.6zM476.5 346h2.6v3.4h-2.6zM464.5 353h2.6v3.4h-2.6zM470.5 353h2.6v3.4h-2.6z" fill="#f3dca0"/>
+    <path d="M42.4 316V362M60.4 288V362M88.4 312V362M106.4 282V362M132.4 320V362M152.4 306V362M168.4 332V362M192.4 346V362M208.4 338V362M301.6 342V362M319.6 350V362M343.6 328V362M363.6 292V362M387.6 276V362M403.6 318V362M431.6 282V362M453.6 328V362" fill="none" stroke="#f3dca0" stroke-width="1.6" stroke-linecap="round" opacity="0.85"/>
+    <path d="M0 364h512" stroke="#33281c" stroke-width="2.5"/>
+
+    <!-- The field, and the road running towards the city. -->
+    <path d="M0 364h512v148H0z" fill="url(#field)"/>
+    <path d="M246 364h20l110 148H136z" fill="url(#road)" stroke="#33281c" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M256 372v10M256 392v14M256 418v18M256 450v24M256 488v24" stroke="#ece0c0" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+    <path d="M0 400c40-4 80-2 130 4M380 404c50-6 90-6 132-2M0 450c50-4 90 0 120 6M396 452c40-6 80-6 116 0" fill="none" stroke="#6a5842" stroke-width="1.6" opacity="0.5"/>
+
+    <!-- Dry grass. -->
+    <g fill="none" stroke="#5c6a2c" stroke-width="2.6" stroke-linecap="round">
+      <path d="M20 486c4-18 8-28 16-38M32 490c2-16 2-26-2-38M44 488c4-12 10-20 18-26"/>
+      <path d="M392 494c4-16 8-26 16-34M404 496c0-14-2-24-6-32M470 480c4-14 8-22 16-28M482 484c0-12-2-20-6-28"/>
+    </g>
+
+  </g>
+
+  <!-- The medallion's frame. -->
+  <circle cx="256" cy="256" r="232" fill="none" stroke="#33281c" stroke-width="5"/>
+  <circle cx="256" cy="256" r="244" fill="none" stroke="#33281c" stroke-width="9"/>
+  <circle cx="256" cy="256" r="238" fill="none" stroke="#ece0c0" stroke-width="3"/>
+</svg>

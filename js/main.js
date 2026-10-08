@@ -77,7 +77,17 @@ import { LocationTracker } from './gps.js';
 import { Haptics, canVibrate } from './haptics.js';
 import { MapView } from './map.js';
 import { SoundEffects } from './sound.js';
-import { STATE_VERSION, createInitialState, exportState, loadState, parseSave, requestPersistentStorage, saveState } from './state.js';
+import {
+  STATE_VERSION,
+  createInitialState,
+  exportState,
+  loadState,
+  parseSave,
+  randomWorldId,
+  requestPersistentStorage,
+  saveState,
+} from './state.js';
+import { setWorld, worldSeed } from './terrain.js';
 import { APP_UPDATED } from './version.js';
 
 const SHELTER_LOCATING_MS = 10_000;
@@ -230,6 +240,10 @@ const ui = {
   scaleLine: $('scale-line'),
   welcomeScreen: $('welcome-screen'),
   startScreen: $('start-screen'),
+  newGameScreen: $('new-game-screen'),
+  worldIdInput: $('world-id'),
+  worldIdLine: $('world-id-line'),
+  worldIdShown: $('world-id-shown'),
   playButton: $('play-button'),
   menuDialog: $('menu-dialog'),
   importInput: $('import-input'),
@@ -333,6 +347,13 @@ function crackle() {
 }
 
 function update() {
+  // The world is centered where the game began: at the first good position after it.
+  if (state.world && !state.world.origin && tracker.hasGoodSignal) {
+    const { lat, lon } = tracker.position;
+    state.world.origin = { lat, lon };
+    saveState(state);
+    applyWorld();
+  }
   inShelter = isInShelter(state.shelter, tracker.position, inShelter);
   const { position } = tracker;
   if (walkAwayCard && position && distanceMeters(position, walkAwayCard.point) > WALK_AWAY_RANGE) {
@@ -346,7 +367,7 @@ function update() {
   debugPanel?.update();
   if (tab === 'you') renderYouPage();
   // Importing or resetting a save from the start screen's settings changes this.
-  const play = state.shelter || started ? 'Continue Game' : 'New Game';
+  const play = state.world ? 'Continue Game' : 'New Game';
   if (ui.playButton.textContent !== play) ui.playButton.textContent = play;
 }
 
@@ -577,6 +598,23 @@ function ask(dialog) {
   dialog.showModal();
   return new Promise((resolve) => {
     dialog.addEventListener('close', () => resolve(dialog.returnValue), { once: true });
+  });
+}
+
+// Shows a full-screen layer until one of its [data-choice] buttons is
+// pressed, then hides it and resolves with that choice.
+function waitForChoice(layer) {
+  layer.hidden = false;
+  layer.scrollTop = 0;
+  return new Promise((resolve) => {
+    const onClick = (event) => {
+      const button = event.target.closest('[data-choice]');
+      if (!button) return;
+      layer.removeEventListener('click', onClick);
+      layer.hidden = true;
+      resolve(button.dataset.choice);
+    };
+    layer.addEventListener('click', onClick);
   });
 }
 
@@ -1542,9 +1580,41 @@ function replaceState(newState) {
   // Other code holds a reference to `state`, so its contents are replaced in place.
   for (const key of Object.keys(state)) delete state[key];
   Object.assign(state, newState);
+  applyWorld();
   inShelter = false;
   mapView.recenter();
   saveAndUpdate();
+}
+
+// Lays the terrain out for the saved world, once its center is known.
+function applyWorld() {
+  const { world } = state;
+  setWorld(world?.origin ? { seed: worldSeed(world.id), origin: world.origin } : null);
+  mapView.clearTerrain();
+  ui.worldIdLine.hidden = !world;
+  ui.worldIdShown.textContent = world?.id ?? '';
+}
+
+// The story so far, and a World ID the player may keep or replace with their own.
+async function newGame() {
+  ui.worldIdInput.value = randomWorldId();
+  if ((await waitForChoice(ui.newGameScreen)) !== 'begin') {
+    ui.playButton.focus();
+    return;
+  }
+  const id = ui.worldIdInput.value.trim() || randomWorldId();
+  // Without GPS, debug mode starts the world where its map starts.
+  const origin = isDebug && !tracker.position ? { ...DEBUG_START } : null;
+  replaceState({ ...createInitialState(), world: { id, origin } });
+  showTab('wastes');
+  enterGame();
+}
+
+function enterGame() {
+  ui.startScreen.hidden = true;
+  if (started) return;
+  if (state.shelter || hasBeenWelcomed()) startTracking();
+  else ui.welcomeScreen.hidden = false;
 }
 
 function hasBeenWelcomed() {
@@ -1593,11 +1663,8 @@ document.fonts?.ready.then(update);
 // The start screen comes first at every start; then the welcome screen for a
 // new player, or the game.
 ui.playButton.addEventListener('click', () => {
-  ui.startScreen.hidden = true;
-  if (started) return;
-  showTab('wastes');
-  if (state.shelter || hasBeenWelcomed()) startTracking();
-  else ui.welcomeScreen.hidden = false;
+  if (state.world) enterGame();
+  else newGame();
 });
 $('settings-button').addEventListener('click', () => ui.menuDialog.showModal());
 
@@ -1665,6 +1732,11 @@ document.addEventListener(
   { capture: true },
 );
 
+ui.worldIdInput.addEventListener('keydown', (event) => {
+  if (event.key !== 'Enter') return;
+  event.preventDefault();
+  $('begin-button').click();
+});
 // Enter in the name field should create the shelter, not hit the first (Cancel) button.
 ui.shelterName.addEventListener('keydown', (event) => {
   if (event.key !== 'Enter') return;
@@ -1689,6 +1761,8 @@ if (isDebug) mapView.onTap = (point) => tracker.setManualPosition(point);
 setInterval(tick, TICK_MS);
 
 requestPersistentStorage();
+applyWorld();
+showTab('wastes');
 tick();
 const updated = new Date(`${APP_UPDATED}T12:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 $('app-meta').textContent = `Last updated ${updated} · Save version ${STATE_VERSION}`;

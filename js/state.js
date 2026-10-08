@@ -4,7 +4,8 @@ import { now } from './clock.js';
 import { ENEMIES, ITEMS, LANDMARKS, MANUALS, RESOURCES, emptyResources } from './game.js';
 
 const STORAGE_KEY = 'tinwalk.state';
-export const STATE_VERSION = 11;
+export const STATE_VERSION = 12;
+export const WORLD_ID_MAX_LENGTH = 32;
 
 const INVALID_SAVE = "This file isn't a valid Tinwalk save";
 const OTHER_VERSION = 'This save comes from a different version of Tinwalk';
@@ -101,7 +102,20 @@ const MIGRATIONS = {
     }
     save.version = 11;
   },
+  // Worlds: the terrain is laid out around where the game began, seeded by a
+  // World ID. Older games get a new world centered on their shelter.
+  11(save) {
+    const { shelter } = save;
+    save.world = isPoint(shelter) ? { id: randomWorldId(), origin: { lat: shelter.lat, lon: shelter.lon } } : null;
+    save.version = 12;
+  },
 };
+
+// A World ID for a new game: ten random digits.
+export function randomWorldId() {
+  const digits = crypto.getRandomValues(new Uint32Array(10));
+  return Array.from(digits, (n, i) => (i === 0 ? 1 + (n % 9) : n % 10)).join('');
+}
 
 function migrate(save) {
   while (isObject(save) && MIGRATIONS[save.version]) MIGRATIONS[save.version](save);
@@ -111,6 +125,10 @@ function migrate(save) {
 export function createInitialState() {
   return {
     version: STATE_VERSION,
+    // { id, origin: { lat, lon } | null }: the World ID the player chose, and
+    // where the game began, the center of the world. The origin is null until
+    // the first good position after the game began. null before a new game.
+    world: null,
     // { name, lat, lon, createdAt, storage, contaminatedFood, items, manuals,
     //   radio: { builtAt, lastListenAt, quietSince } | null,
     //   survivors: [{ name, arrivedAt, lastMealAt, woundedAt, sickAt }],
@@ -208,6 +226,12 @@ const isLandmark = (value) => isLandmarkPoint(value) && isNumber(value.discovere
 const isEnemy = (value) => isPoint(value) && Object.hasOwn(ENEMIES, value.type) && isNumber(value.foundAt);
 const isMission = (value) =>
   isObject(value) && typeof value.survivor === 'string' && isLandmarkPoint(value.landmark) && isNumber(value.calledAt);
+const isWorld = (value) =>
+  isObject(value) &&
+  typeof value.id === 'string' &&
+  value.id.trim().length > 0 &&
+  value.id.length <= WORLD_ID_MAX_LENGTH &&
+  (value.origin === null || isPoint(value.origin));
 const isRadio = (value) =>
   isObject(value) &&
   isNumber(value.builtAt) &&
@@ -236,6 +260,7 @@ function isValidState(state) {
   return (
     isObject(state) &&
     state.version === STATE_VERSION &&
+    (state.world === null || isWorld(state.world)) &&
     (state.shelter === null || isValidShelter(state.shelter)) &&
     Array.isArray(state.searchedAreas) &&
     state.searchedAreas.every((area) => isPoint(area) && isNumber(area.searchedAt)) &&
