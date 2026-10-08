@@ -249,6 +249,11 @@ const ui = {
   importDialog: $('import-dialog'),
   resetDialog: $('reset-dialog'),
   landmarkDialog: $('landmark-dialog'),
+  enemyDialog: $('enemy-dialog'),
+  enemyArt: $('enemy-art'),
+  enemyName: $('enemy-name'),
+  enemyFlavor: $('enemy-flavor'),
+  enemyStrength: $('enemy-strength'),
   landmarkArt: $('landmark-art'),
   landmarkName: $('landmark-name'),
   landmarkVisited: $('landmark-visited'),
@@ -1567,6 +1572,17 @@ async function openLandmark(landmark, discovered = false) {
   showToast(`The ${label} is off your map`, landmark.type);
 }
 
+// An enemy's card, from a tap on its badge: its portrait, a line about it
+// and its strength, so the player can judge it before coming back to fight.
+async function openEnemy(enemy) {
+  const { label, strength, flavor } = ENEMIES[enemy.type];
+  ui.enemyArt.src = `img/enemies/${enemy.type}.svg`;
+  ui.enemyName.textContent = label;
+  ui.enemyFlavor.textContent = flavor;
+  showStrength(ui.enemyStrength, strength);
+  await ask(ui.enemyDialog);
+}
+
 async function resetSave() {
   if ((await ask(ui.resetDialog)) !== 'reset') return;
   replaceState(createInitialState());
@@ -1757,6 +1773,7 @@ document.addEventListener('visibilitychange', () => {
 });
 
 mapView.onLandmarkTap = openLandmark;
+mapView.onEnemyTap = openEnemy;
 if (isDebug) {
   mapView.onTap = (point) => {
     // Without a compass, the cone points along the move, as if walking there.

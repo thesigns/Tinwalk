@@ -516,6 +516,24 @@
     </form>
   </dialog>
 
+  <!-- An enemy left on the map: what waits there, and how strong it is. -->
+  <dialog id="enemy-dialog" class="paper">
+    <form method="dialog">
+      <img id="enemy-art" class="landmark-art" alt="" width="512" height="512">
+      <h2 id="enemy-name"></h2>
+      <p id="enemy-flavor" class="landmark-flavor"></p>
+      <div class="duel">
+        <div class="duel-side">
+          <span class="duel-label">Strength</span>
+          <div id="enemy-strength" class="duel-value enemy"></div>
+        </div>
+      </div>
+      <div class="dialog-buttons">
+        <button class="btn btn-paint" value="close" autofocus>Close</button>
+      </div>
+    </form>
+  </dialog>
+
   <dialog id="remove-landmark-dialog" class="paper">
     <form method="dialog">
       <h2>Remove landmark?</h2>

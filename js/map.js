@@ -1,7 +1,7 @@
 // Draws the map on a canvas: north-up, in Web Mercator, centered on the scene's
 // center unless the user has dragged it elsewhere. Handles dragging, zooming
-// (pinch, mouse wheel) and reports single taps via onLandmarkTap when they hit
-// a landmark, and via onTap otherwise.
+// (pinch, mouse wheel) and reports single taps via onEnemyTap or onLandmarkTap
+// when they hit an enemy or a landmark, and via onTap otherwise.
 
 import { SEARCH_INFLUENCE, SEARCH_RADIUS, searchWeight } from './game.js';
 import { fromMercator, mercatorUnitsPerMeter, toMercator } from './geo.js';
@@ -101,6 +101,7 @@ export class MapView {
     this.pendingFrame = null;
     this.onTap = null; // (point: { lat, lon }) => void
     this.onLandmarkTap = null; // (landmark) => void, with a landmark from the scene
+    this.onEnemyTap = null; // (enemy) => void, with an enemy from the scene
     this.onScaleChange = null; // (meters, pixels) => void
     this.scale = null;
     this.effects = []; // short animations drawn over the map
@@ -200,9 +201,12 @@ export class MapView {
     const release = (event) => {
       if (!pointers.delete(event.pointerId)) return;
       if (event.type === 'pointerup' && tap && pointers.size === 0) {
-        const landmark = this.onLandmarkTap && this.landmarkAt(tap.x, tap.y);
-        const point = !landmark && this.screenToLatLon(tap.x, tap.y);
-        if (landmark) this.onLandmarkTap(landmark);
+        // Enemies are drawn over landmarks, so they are hit first.
+        const enemy = this.onEnemyTap && this.markerAt(this.scene.enemies, tap.x, tap.y);
+        const landmark = !enemy && this.onLandmarkTap && this.markerAt(this.scene.landmarks, tap.x, tap.y);
+        const point = !enemy && !landmark && this.screenToLatLon(tap.x, tap.y);
+        if (enemy) this.onEnemyTap(enemy);
+        else if (landmark) this.onLandmarkTap(landmark);
         else if (point) this.onTap?.(point);
       }
       if (pointers.size < 2) pinch = null;
@@ -574,18 +578,19 @@ export class MapView {
     ctx.stroke();
   }
 
-  // The landmark whose badge is under a screen point, the nearest if badges
-  // overlap, or null. A finger is coarse, so the badge gets a little margin.
-  landmarkAt(x, y) {
+  // The marker (a landmark or an enemy) whose badge is under a screen point,
+  // the nearest if badges overlap, or null. A finger is coarse, so the badge
+  // gets a little margin.
+  markerAt(markers, x, y) {
     const { center } = this;
     if (!center) return null;
     let nearest = null;
     let nearestDistance = BADGE_PX / 2 + TAP_MARGIN_PX;
-    for (const landmark of this.scene.landmarks) {
-      const point = this.toScreen(center, landmark);
+    for (const marker of markers) {
+      const point = this.toScreen(center, marker);
       const distance = Math.hypot(point.x - x, point.y - y);
       if (distance <= nearestDistance) {
-        nearest = landmark;
+        nearest = marker;
         nearestDistance = distance;
       }
     }

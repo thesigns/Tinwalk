@@ -1058,6 +1058,8 @@ dialog input:focus,
 
 #landmark-dialog h2,
 #landmark-dialog p,
+#enemy-dialog h2,
+#enemy-dialog p,
 #encounter-dialog h2,
 #encounter-dialog p {
   text-align: center;

@@ -86,6 +86,7 @@ Siłę zapisuje się jak rzut kośćmi w grach fabularnych: `xdy+z`, czyli x rzu
 - Wróg, którego użytkownik nie pokonał (ucieczka albo przegrana), zostaje na mapie na zawsze, w miejscu, w którym go spotkał.
 - Na mapie wróg to odznaka jego rodzaju na czerwonym tle, żeby odróżniał się od landmarków na papierze (`img/enemy-icons/<rodzaj>.svg`, tak jak odznaki landmarków).
 - Znika dopiero po pokonaniu.
+- Stuknięcie odznaki wroga otwiera jego kartę: ilustrację, nazwę, opis i siłę w kostkach z zakresem, tak jak przed rzutem w walce, np. 2d3 i (2–6), oraz przycisk **Close**. Dzięki temu można ocenić wroga, zanim się do niego wróci. Wrogowie są rysowani nad landmarkami, więc gdy odznaki się nakładają, stuknięcie trafia we wroga.
 - Wróg stoi w środku przeszukanego obszaru, więc walka z nim jest możliwa dopiero, gdy ten obszar wygaśnie (zob. [bootstrap.md](bootstrap.md#przeszukiwanie-search-area)).
 
 ## Rany
