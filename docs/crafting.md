@@ -20,11 +20,11 @@ Przedmioty i wyposażenie schronu wytwarza się w schronie z zasobów z magazynu
 - Przeszukanie zakończone ucieczką albo przegraną walką nie losuje podręcznika i nie zwiększa szansy (zob. [combat.md](combat.md)).
 - Gdy użytkownik ma już Radio Manual, to, który podręcznik wypada, zależy od biomu. Wagi dotyczą tylko podręczników, których użytkownik jeszcze nie ma:
 
-| Podręcznik           | Plains | Forest | Ruins |
-|----------------------|--------|--------|-------|
-| Knifemaking Manual   | 1      | 1      | 1     |
-| Pharmacology Manual  | 1      | 1      | 2     |
-| Electric Tools Manual | 1     | 1      | 2     |
+| Podręcznik            | Barrens | Forest | Ruins |
+|-----------------------|---------|--------|-------|
+| Knifemaking Manual    | 1       | 1      | 1     |
+| Pharmacology Manual   | 1       | 1      | 2     |
+| Electric Tools Manual | 1       | 1      | 2     |
 
 ### Zabieranie
 

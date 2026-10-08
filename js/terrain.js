@@ -8,12 +8,13 @@
 // points wherever they are on Earth. The exported functions take Web Mercator
 // coordinates, like the map, and convert them.
 //
-// Plains are the open ground everywhere. Forests grow where a warped noise
+// Barrens are the open ground everywhere, flat or mountainous on the map;
+// their id stays 'plains', which saved games use. Forests grow where a warped noise
 // field is high, so they get ragged edges, bays and clearings. Ruins are the
 // remains of settlements, scattered over the world one per cell at most, laid
 // out in districts, each with a street grid of its own (see below).
 //
-// Plains cover about half of the world, forests and ruins a quarter each. A
+// Barrens cover about half of the world, forests and ruins a quarter each. A
 // straight 3 km walk crosses about 6 borders between them.
 //
 // Radiation is a separate, invisible layer over the biomes: patches of fallout
@@ -138,7 +139,7 @@ function salted(salt) {
 }
 
 export const BIOMES = {
-  plains: { name: 'plains', label: 'Plains' },
+  plains: { name: 'plains', label: 'Barrens' },
   forest: { name: 'forest', label: 'Forest' },
   ruins: { name: 'ruins', label: 'Ruins' },
 };
@@ -156,7 +157,7 @@ function fbm(x, y, octaves, source = noise) {
   return sum / total;
 }
 
-// At a world point: positive in forests, negative on plains, and changing
+// At a world point: positive in forests, negative in the barrens, and changing
 // smoothly, so the map can sample it sparsely and still draw a clean edge.
 export function forestField(x, y) {
   const fx = x * FOREST_FREQUENCY - 391.5;

@@ -32,7 +32,7 @@ Ilość łupu zależy od odległości od środka schronu w linii prostej, w miej
 
 Wagi zasobów zależą od biomu w miejscu przeszukania.
 
-*Plains*
+*Barrens*
 
 | Zasób | Waga |
 |-------|------|

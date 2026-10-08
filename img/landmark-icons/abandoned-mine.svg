@@ -8,7 +8,7 @@
   <g clip-path="url(#inside)">
     <!-- Spoil heap behind. -->
     <path d="M58 75 72 46q4-4 8 0l14 29z" fill="#6b665c" stroke="#33281c" stroke-width="2.6" stroke-linejoin="round"/>
-    <path d="M0 75H96V96H0z" fill="#cdb67c"/>
+    <path d="M0 75H96V96H0z" fill="#c6b89e"/>
     <path d="M0 75H96" stroke="#33281c" stroke-width="2.4"/>
   </g>
 

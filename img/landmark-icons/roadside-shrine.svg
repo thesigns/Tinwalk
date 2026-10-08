@@ -6,7 +6,7 @@
 
   <circle cx="48" cy="48" r="45" fill="#ece0c0"/>
   <g clip-path="url(#inside)">
-    <path d="M0 75H96V96H0z" fill="#cdb67c"/>
+    <path d="M0 75H96V96H0z" fill="#c6b89e"/>
     <path d="M0 75H96" stroke="#33281c" stroke-width="2.4"/>
   </g>
 

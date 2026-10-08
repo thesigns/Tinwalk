@@ -29,7 +29,7 @@ Rodzaj landmarku zależy od biomu w miejscu odkrycia i jest losowany „z worka�
 - Worki są zapisywane w stanie gry. Zapisy sprzed tej zasady zaczynają z pustymi workami.
 - Nazwy są ogólne, więc kilka landmarków może się nazywać tak samo.
 
-| Plains          | Forest         | Ruins          |
+| Barrens         | Forest         | Ruins          |
 |-----------------|----------------|----------------|
 | Abandoned Mine  | Watchtower     | Pharmacy       |
 | Farmstead       | Lean-to        | Gas Station    |

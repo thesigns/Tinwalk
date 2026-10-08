@@ -115,16 +115,16 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
 
 ### Mapa
 
-- Aplikacja nie pokazuje prawdziwej mapy. W tle rysowana jest fikcyjna, proceduralnie generowana mapa terenu w stylu mapy świata ze starej postapokaliptycznej gry (wzorem jest Fallout 1): cieniowana rzeźba terenu w wypranych, lekko chłodnych szarościach i brązach, z ziarnem jak na starym zdjęciu lotniczym. Są trzy biomy: równiny, las i ruiny.
+- Aplikacja nie pokazuje prawdziwej mapy. W tle rysowana jest fikcyjna, proceduralnie generowana mapa terenu w stylu mapy świata ze starej postapokaliptycznej gry (wzorem jest Fallout 1): cieniowana rzeźba terenu w wypranych, lekko chłodnych szarościach i brązach, z ziarnem jak na starym zdjęciu lotniczym. Są trzy biomy: nieużytki (**Barrens**), las i ruiny.
 - Mapa udaje dużo większą krainę, niż obejmuje spacer: między miastami wznoszą się pasma gór z poszarpanymi, erodowanymi graniami, a między nimi leżą szerokie, pyliste niecki, miejscami poprzecinane żlebami. Rzeźba jest tylko rysunkiem: nie zmienia biomów ani reguł gry. Jest wyliczana z World ID, więc gracze z tym samym światem widzą te same góry.
 - Światło pada z północnego zachodu, jak na większości map cieniowanych, więc wzniesienia wyglądają na wypukłe.
-- Równiny to pył w jaśniejszych i ciemniejszych plamach, z rdzawymi zboczami i jasnymi graniami w górach.
+- Nieużytki to ziemia bez lasu i bez miasta, płaska albo górzysta: pył w jaśniejszych i ciemniejszych plamach, z rdzawymi zboczami i jasnymi graniami w górach. Dawniej nazywały się równinami (Plains), ale na mapie z górami ta nazwa przestała pasować. W kodzie i w zapisie gry ich identyfikator to nadal `plains`.
 - Las jest ciemnooliwkowy, z własnym, gruboziarnistym ziarnem koron drzew. Korony chowają większość rzeźby gór pod lasem i stoją trochę ponad gruntem, więc brzeg lasu łapie światło z jednej strony i rzuca cień z drugiej. Brzeg lasu jest lekko postrzępiony.
 - Ruiny to gęsta, ciemna faktura miasta: ulice, kwartały w kilku odcieniach, a na nich budynki z cieniami i kupy gruzu. W centrum osady budynki są duże i wysokie, ku brzegom przechodzą w małe domki z podwórkami; czasem cały kwartał zajmuje hala. Miasto jest nałożone na rzeźbę tak, że ta przez nie prześwituje, ale las już nie: w mieście lasu nie ma. Teren pod miastem jest wypłaszczony.
 - Na mapie jest jasna siatka kwadratów, jak na starych mapach, liczona w metrach od środka świata: co 100, 250, 500, 1000 albo 2500 m, tyle, żeby kratka miała na ekranie co najmniej ok. 70 px. Podziałka w legendzie zostaje, bo kratka zmienia rozmiar przy przybliżaniu.
 - Napisy legendy i pierścień schronu mają papierową obwódkę, żeby były czytelne i na ciemnym lesie, i na jasnym pyle.
-- Równiny zajmują ok. 50% świata, bo dają najbardziej zrównoważony łup. Lasy i ruiny zajmują po ok. 25%.
-- Równiny to tło: wszystko, co nie jest lasem ani ruinami.
+- Nieużytki zajmują ok. 50% świata, bo dają najbardziej zrównoważony łup. Lasy i ruiny zajmują po ok. 25%.
+- Nieużytki to tło: wszystko, co nie jest lasem ani ruinami.
 - Lasy powstają z szumu simplex zniekształconego drugim szumem (domain warping), więc mają nieregularne brzegi, zatoki i polany, a nie obłe plamy.
 - Ruiny to pozostałości osad. Świat jest podzielony na komórki ok. 1,85 km, a w każdej może stać jedna osada o promieniu ok. 185–925 m. Jej brzeg jest postrzępiony szumem.
 - Ruiny są ułożone w dzielnice: komórki diagramu Voronoi wokół punktów rozrzuconych po jednym na kwadrat ok. 400 m. Każda dzielnica ma własną siatkę ulic, obróconą pod swoim kątem, z prostokątnymi kwartałami (ok. 90 × 60 m), a między dzielnicami biegną szersze arterie. Kwartały przecięte granicą dzielnicy są nieregularne (trójkąty, trapezy), a skrawki odcięte przez arterię zostają pustym placem.
@@ -163,7 +163,7 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
   - **Wastes**: mapa. Po wejściu do gry otwiera się ta zakładka.
 - Pod zakładkami jest zawsze pasek stanu: zawartość plecaka (np. „Backpack 12/50”), czy idzie z nami ocalały, oraz jakość sygnału GPS. Dotknięcie plecaka otwiera panel plecaka, w którym można wyrzucić rzeczy.
 - Na zakładce **Wastes** przyciski zależą od kontekstu: **Create a Shelter**, **Search area**, **Unload**.
-- W lewym górnym rogu mapy, jedno pod drugim: słowo mówiące, gdzie stoi użytkownik (**Shelter**, **Plains**, **Forest** albo **Ruins**), pod nim pora dnia i czas do jej zmiany, np. „Day · dark in 3 h” (zob. [night.md](night.md)), a na dole podziałka mapy. Układ jest pionowy, żeby podziałka, która wydłuża się i skraca przy przybliżaniu, nie przesuwała reszty. Dzięki temu na granicy biomów nie trzeba zgadywać z mapy, jaki łup da przeszukanie. Bez pozycji słowa nie ma, a przy słabym sygnale jest przygaszone, tak jak pinezka.
+- W lewym górnym rogu mapy, jedno pod drugim: słowo mówiące, gdzie stoi użytkownik (**Shelter**, **Barrens**, **Forest** albo **Ruins**), pod nim pora dnia i czas do jej zmiany, np. „Day · dark in 3 h” (zob. [night.md](night.md)), a na dole podziałka mapy. Układ jest pionowy, żeby podziałka, która wydłuża się i skraca przy przybliżaniu, nie przesuwała reszty. Dzięki temu na granicy biomów nie trzeba zgadywać z mapy, jaki łup da przeszukanie. Bez pozycji słowa nie ma, a przy słabym sygnale jest przygaszone, tak jak pinezka.
 - Zakładka **Shelter** pokazuje nazwę schronu, stan magazynu, przedmioty i podręczniki, warsztat (zob. [crafting.md](crafting.md)), radio (zob. [landmarks.md](landmarks.md#radio)) oraz ocalałych z ich etapem głodu i ranami (zob. [survivors.md](survivors.md)). Bez schronu mówi tylko, że trzeba go założyć na zakładce **Wastes**. Po odebraniu wezwania przez radio aplikacja przechodzi na mapę, żeby pokazać, gdzie iść.
 
 #### Ekran startowy

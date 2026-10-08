@@ -4,7 +4,7 @@ Na pustkowiu są strefy skażone radiacją. Nie widać ich na mapie. Wykrywa je 
 
 ## Strefy
 
-- Radiacja to osobna warstwa nad biomami (zob. [bootstrap.md](bootstrap.md#mapa)), niezależna od nich: strefa może leżeć na równinach, w lesie i w ruinach.
+- Radiacja to osobna warstwa nad biomami (zob. [bootstrap.md](bootstrap.md#mapa)), niezależna od nich: strefa może leżeć na nieużytkach, w lesie i w ruinach.
 - Strefy powstają z szumu simplex zniekształconego drugim szumem, tak jak lasy, ale z innym ziarnem. Są deterministyczne: to samo miejsce na Ziemi jest zawsze tak samo skażone.
 - Strefy zajmują ok. 20% powierzchni świata.
 - Typowe przejście przez strefę to ok. 250 m (połowa przejść ma od 130 do 420 m).
