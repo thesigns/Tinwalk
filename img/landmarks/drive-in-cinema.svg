@@ -8,8 +8,8 @@
       <stop offset="0.7" stop-color="#f3e9cc"/>
     </linearGradient>
     <linearGradient id="field" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#d4bf86"/>
-      <stop offset="1" stop-color="#b89c5e"/>
+      <stop offset="0" stop-color="#cbbd9e"/>
+      <stop offset="1" stop-color="#a7977a"/>
     </linearGradient>
     <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
       <path d="M0 0v7" stroke="#33281c" stroke-width="1.6" opacity="0.55"/>
@@ -31,8 +31,13 @@
     <!-- Crows. -->
     <path d="M86 132q7-7 14 0q7-7 14 0M412 104q6-6 12 0q6-6 12 0M440 150q5-5 10 0q5-5 10 0" fill="none" stroke="#33281c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
 
+    <!-- A hazy mountain range on the horizon. -->
+    <path d="M-12 265 7 304 21 273 45 291 66 253 91 292 105 269 139 293 155 277 192 303 211 291 228 309 245 258 264 297 291 259 319 304 338 274 356 291 371 279 397 297 419 270 442 307 466 262 495 302 523 281V356H-12z" fill="#c4baa6"/>
+    <path d="M-12 265L7 304L-7 356zM21 273L45 291L27 356zM66 253L91 292L72 356zM105 269L139 293L114 356zM155 277L192 303L164 356zM211 291L228 309L215 356zM245 258L264 297L250 356zM291 259L319 304L298 356zM338 274L356 291L343 356zM371 279L397 297L378 356zM419 270L442 307L425 356zM466 262L495 302L474 356z" fill="#6a5842" opacity="0.16"/>
+    <path d="M-12 265 7 304 21 273 45 291 66 253 91 292 105 269 139 293 155 277 192 303 211 291 228 309 245 258 264 297 291 259 319 304 338 274 356 291 371 279 397 297 419 270 442 307 466 262 495 302 523 281" fill="none" stroke="#6a5842" stroke-width="2.2" stroke-linejoin="round"/>
+
     <!-- Distant hills. -->
-    <path d="M0 336c50-20 100-24 150-14s80 2 120-6 90-10 130 2 80 12 112 6V512H0z" fill="#a9ab7c"/>
+    <path d="M0 336c50-20 100-24 150-14s80 2 120-6 90-10 130 2 80 12 112 6V512H0z" fill="#b5a98f"/>
     <path d="M0 336c50-20 100-24 150-14s80 2 120-6 90-10 130 2 80 12 112 6" fill="none" stroke="#6a5842" stroke-width="2.5"/>
 
     <!-- Dry field. -->
@@ -126,7 +131,7 @@
     </g>
 
     <!-- Tall dry grass. -->
-    <g fill="none" stroke="#5c6a2c" stroke-width="2.6" stroke-linecap="round">
+    <g fill="none" stroke="#7a6a44" stroke-width="2.6" stroke-linecap="round">
       <path d="M40 470c4-20 8-32 16-44M50 474c2-18 2-30-2-44M62 472c4-14 10-24 18-30"/>
       <path d="M430 476c4-16 8-26 16-34M442 478c0-14-2-24-6-32M454 476c4-12 8-20 16-24"/>
     </g>

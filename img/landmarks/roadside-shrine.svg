@@ -9,8 +9,8 @@
       <stop offset="0.7" stop-color="#f3e9cc"/>
     </linearGradient>
     <linearGradient id="field" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#bfb57e"/>
-      <stop offset="1" stop-color="#9f9a5c"/>
+      <stop offset="0" stop-color="#cbbd9e"/>
+      <stop offset="1" stop-color="#a7977a"/>
     </linearGradient>
     <linearGradient id="road" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#cdb88a"/>
@@ -43,6 +43,11 @@
     </g>
     <path d="M86 128q6-6 12 0q6-6 12 0M396 178q5-5 10 0q5-5 10 0" fill="none" stroke="#33281c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
 
+    <!-- A hazy mountain range on the horizon. -->
+    <path d="M-12 277 20 307 49 282 86 291 106 290 136 310 150 271 172 302 194 253 215 296 243 283 263 308 277 277 296 290 324 260 345 312 372 264 409 302 434 260 470 305 500 288 522 298V345H-12z" fill="#c4baa6"/>
+    <path d="M-12 277L20 307L-4 345zM49 282L86 291L58 345zM106 290L136 310L114 345zM150 271L172 302L156 345zM194 253L215 296L199 345zM243 283L263 308L248 345zM277 277L296 290L282 345zM324 260L345 312L329 345zM372 264L409 302L382 345zM434 260L470 305L443 345zM500 288L522 298L505 345z" fill="#6a5842" opacity="0.16"/>
+    <path d="M-12 277 20 307 49 282 86 291 106 290 136 310 150 271 172 302 194 253 215 296 243 283 263 308 277 277 296 290 324 260 345 312 372 264 409 302 434 260 470 305 500 288 522 298" fill="none" stroke="#6a5842" stroke-width="2.2" stroke-linejoin="round"/>
+
     <!-- Fields in strips running to the horizon, a far tree line. -->
     <path d="M0 330c60-10 140-14 230-12s190 6 282-2V512H0z" fill="url(#field)"/>
     <path d="M0 330c60-10 140-14 230-12s190 6 282-2" fill="none" stroke="#6a5842" stroke-width="2.5"/>
@@ -52,7 +57,7 @@
       <path d="M440 318c4-14 9-20 14-20s9 9 10 20z"/>
       <path d="M462 318c3-10 7-15 11-15s8 7 9 15z"/>
     </g>
-    <path d="M0 352c80-6 150-8 210-6M0 380c60-6 120-8 180-6M300 340c60-2 140-2 212-6M320 366c70-2 130-4 192-8" fill="none" stroke="#7e7a46" stroke-width="2" stroke-linecap="round"/>
+    <path d="M0 352c80-6 150-8 210-6M0 380c60-6 120-8 180-6M300 340c60-2 140-2 212-6M320 366c70-2 130-4 192-8" fill="none" stroke="#8f8160" stroke-width="2" stroke-linecap="round"/>
 
     <!-- The pollard willow behind: a squat knobbly trunk and a spray of thin shoots. -->
     <g stroke-linecap="round" stroke-linejoin="round">
@@ -166,7 +171,7 @@
     </g>
 
     <!-- Tall grass and chamomile in the foreground. -->
-    <g fill="none" stroke="#5c6a2c" stroke-width="2.6" stroke-linecap="round">
+    <g fill="none" stroke="#7a6a44" stroke-width="2.6" stroke-linecap="round">
       <path d="M20 470c4-20 8-32 16-44M30 474c2-18 2-30-2-44M42 472c4-14 10-24 18-30"/>
       <path d="M110 480c2-16 6-26 12-34M120 482c0-14-2-24-8-32M130 480c4-12 8-20 16-24"/>
       <path d="M196 470c2-14 6-24 12-30M206 472c0-14-2-22-6-30"/>

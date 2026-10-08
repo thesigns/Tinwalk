@@ -9,8 +9,8 @@
       <stop offset="0.7" stop-color="#f3e9cc"/>
     </linearGradient>
     <linearGradient id="field" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#d4bf86"/>
-      <stop offset="1" stop-color="#b89c5e"/>
+      <stop offset="0" stop-color="#cbbd9e"/>
+      <stop offset="1" stop-color="#a7977a"/>
     </linearGradient>
     <linearGradient id="asphalt" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#9d968a"/>
@@ -44,8 +44,13 @@
     <!-- Crows. -->
     <path d="M230 150q7-7 14 0q7-7 14 0M270 130q5-5 10 0q5-5 10 0" fill="none" stroke="#33281c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
 
+    <!-- A hazy mountain range on the horizon. -->
+    <path d="M-12 261 6 299 21 255 46 310 72 283 93 302 110 259 129 295 157 285 191 308 206 264 236 306 264 287 282 303 306 272 326 300 339 289 374 302 392 288 420 309 447 272 473 303 492 258 515 308 528 254V344H-12z" fill="#c4baa6"/>
+    <path d="M-12 261L6 299L-7 344zM21 255L46 310L27 344zM72 283L93 302L78 344zM110 259L129 295L115 344zM157 285L191 308L166 344zM206 264L236 306L214 344zM264 287L282 303L268 344zM306 272L326 300L311 344zM339 289L374 302L348 344zM392 288L420 309L399 344zM447 272L473 303L454 344zM492 258L515 308L498 344z" fill="#6a5842" opacity="0.16"/>
+    <path d="M-12 261 6 299 21 255 46 310 72 283 93 302 110 259 129 295 157 285 191 308 206 264 236 306 264 287 282 303 306 272 326 300 339 289 374 302 392 288 420 309 447 272 473 303 492 258 515 308 528 254" fill="none" stroke="#6a5842" stroke-width="2.2" stroke-linejoin="round"/>
+
     <!-- Distant hills, a tree line and a row of roadside poplars. -->
-    <path d="M0 324c50-20 100-24 150-14s80 2 120-6 90-10 130 2 80 12 112 6V512H0z" fill="#a9ab7c"/>
+    <path d="M0 324c50-20 100-24 150-14s80 2 120-6 90-10 130 2 80 12 112 6V512H0z" fill="#b5a98f"/>
     <path d="M0 324c50-20 100-24 150-14s80 2 120-6 90-10 130 2 80 12 112 6" fill="none" stroke="#6a5842" stroke-width="2.5"/>
     <g fill="#6f7f45" stroke="#33281c" stroke-width="2.2" stroke-linejoin="round">
       <path d="M440 316c2-30 6-54 12-54s10 24 12 54z"/>
@@ -139,7 +144,7 @@
     </g>
 
     <!-- Tall dry grass over the ditch. -->
-    <g fill="none" stroke="#5c6a2c" stroke-width="2.6" stroke-linecap="round">
+    <g fill="none" stroke="#7a6a44" stroke-width="2.6" stroke-linecap="round">
       <path d="M150 402c2-16 6-26 12-34M160 404c0-14-2-24-8-32M170 402c4-12 8-20 16-24"/>
       <path d="M250 396c3-14 8-22 14-28M260 398c0-12-2-20-6-26M270 396c4-10 8-16 14-18"/>
       <path d="M340 390c2-16 6-26 12-34M350 392c0-14-2-24-8-32M360 390c4-12 8-20 16-24"/>

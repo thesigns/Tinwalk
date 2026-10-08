@@ -8,8 +8,8 @@
       <stop offset="0.7" stop-color="#f3e9cc"/>
     </linearGradient>
     <linearGradient id="field" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#d4bf86"/>
-      <stop offset="1" stop-color="#b89c5e"/>
+      <stop offset="0" stop-color="#cbbd9e"/>
+      <stop offset="1" stop-color="#a7977a"/>
     </linearGradient>
     <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
       <path d="M0 0v7" stroke="#33281c" stroke-width="1.6" opacity="0.55"/>
@@ -35,8 +35,13 @@
     <!-- Crows. -->
     <path d="M86 132q7-7 14 0q7-7 14 0M412 104q6-6 12 0q6-6 12 0M440 150q5-5 10 0q5-5 10 0" fill="none" stroke="#33281c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
 
+    <!-- A hazy mountain range on the horizon. -->
+    <path d="M-12 284 22 301 39 252 69 300 95 267 128 296 154 281 180 302 204 260 232 308 249 284 280 309 298 256 332 308 352 256 372 304 389 290 418 294 442 266 478 310 500 278V356H-12z" fill="#c4baa6"/>
+    <path d="M-12 284L22 301L-3 356zM39 252L69 300L46 356zM95 267L128 296L103 356zM154 281L180 302L161 356zM204 260L232 308L211 356zM249 284L280 309L257 356zM298 256L332 308L306 356zM352 256L372 304L357 356zM389 290L418 294L396 356zM442 266L478 310L451 356z" fill="#6a5842" opacity="0.16"/>
+    <path d="M-12 284 22 301 39 252 69 300 95 267 128 296 154 281 180 302 204 260 232 308 249 284 280 309 298 256 332 308 352 256 372 304 389 290 418 294 442 266 478 310 500 278" fill="none" stroke="#6a5842" stroke-width="2.2" stroke-linejoin="round"/>
+
     <!-- Distant hills. -->
-    <path d="M0 336c50-20 100-24 150-14s80 2 120-6 90-10 130 2 80 12 112 6V512H0z" fill="#a9ab7c"/>
+    <path d="M0 336c50-20 100-24 150-14s80 2 120-6 90-10 130 2 80 12 112 6V512H0z" fill="#b5a98f"/>
     <path d="M0 336c50-20 100-24 150-14s80 2 120-6 90-10 130 2 80 12 112 6" fill="none" stroke="#6a5842" stroke-width="2.5"/>
 
     <!-- Dry field. -->
@@ -103,7 +108,7 @@
     </g>
 
     <!-- Tall dry grass. -->
-    <g fill="none" stroke="#5c6a2c" stroke-width="2.6" stroke-linecap="round">
+    <g fill="none" stroke="#7a6a44" stroke-width="2.6" stroke-linecap="round">
       <path d="M40 470c4-20 8-32 16-44M50 474c2-18 2-30-2-44M62 472c4-14 10-24 18-30"/>
       <path d="M430 476c4-16 8-26 16-34M442 478c0-14-2-24-6-32M454 476c4-12 8-20 16-24"/>
     </g>
