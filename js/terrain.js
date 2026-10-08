@@ -138,9 +138,9 @@ function salted(salt) {
 
 export const BIOMES = {
   // Plains have no icons: open ground is told apart by having none.
-  plains: { name: 'plains', label: 'Plains', color: [214, 204, 159] },
+  plains: { name: 'plains', label: 'Plains', color: [192, 186, 154] },
   // The map marks forests with topographic signs, see terrain-tiles.js.
-  forest: { name: 'forest', label: 'Forest', color: [170, 184, 136] },
+  forest: { name: 'forest', label: 'Forest', color: [152, 166, 120] },
   // Ruins have no icons: their blocks are drawn with the settlement plan.
   ruins: { name: 'ruins', label: 'Ruins', color: [190, 183, 168] },
 };
