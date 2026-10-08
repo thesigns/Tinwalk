@@ -22,7 +22,12 @@ Przy przeszukiwaniu można czasem odkryć landmark, np. opuszczoną kopalnię al
 
 ### Rodzaje
 
-Rodzaj landmarku jest losowany z listy dla biomu w miejscu odkrycia, z równymi wagami. Nazwy są ogólne, więc kilka landmarków może się nazywać tak samo.
+Rodzaj landmarku zależy od biomu w miejscu odkrycia i jest losowany „z worka”:
+
+- Każdy biom ma własny worek ze wszystkimi swoimi rodzajami (zob. tabela). Odkrycie wyciąga z worka losowy rodzaj, więc dany rodzaj wraca dopiero po znalezieniu wszystkich pozostałych rodzajów tego biomu. Np. po Water Tower następna Water Tower trafi się dopiero po pięciu pozostałych landmarkach ruin.
+- Pusty worek napełnia się od nowa. Pierwszy rodzaj z nowego worka nie może być tym, który był ostatni w poprzednim, więc ten sam rodzaj nigdy nie trafia się dwa razy pod rząd.
+- Worki są zapisywane w stanie gry. Zapisy sprzed tej zasady zaczynają z pustymi workami.
+- Nazwy są ogólne, więc kilka landmarków może się nazywać tak samo.
 
 | Plains          | Forest         | Ruins          |
 |-----------------|----------------|----------------|
@@ -32,6 +37,10 @@ Rodzaj landmarku jest losowany z listy dla biomu w miejscu odkrycia, z równymi 
 | Grain Silo      | Ranger Station | School         |
 | Bus Wreck       | Bunker         | Water Tower    |
 | Roadside Shrine | Plane Wreck    | Church         |
+| Radio Mast      |                |                |
+| Drive-in Cinema |                |                |
+| Junkyard        |                |                |
+| Lone Oak        |                |                |
 
 Każdy rodzaj ma własną ikonę w interfejsie, własną odznakę na mapie i własną dużą ilustrację na ekranie landmarku.
 

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <!-- Map badge: a huge old oak alone in a field, its crown wider than it is tall. -->
+  <defs>
+    <clipPath id="inside"><circle cx="48" cy="48" r="42"/></clipPath>
+  </defs>
+
+  <circle cx="48" cy="48" r="45" fill="#ece0c0"/>
+  <g clip-path="url(#inside)">
+    <path d="M0 75H96V96H0z" fill="#cdb67c"/>
+    <path d="M0 75H96" stroke="#33281c" stroke-width="2.4"/>
+  </g>
+  <!-- Trunk and roots. -->
+  <path d="M42 75q3-10 2-22h8q-1 12 2 22zM40 75q2-3 6-4M56 75q-2-3-6-4" fill="#6b4f30" stroke="#33281c" stroke-width="2.6" stroke-linejoin="round"/>
+  <path d="M46 56l-8-6M50 54l8-7" stroke="#33281c" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- The crown: billows outlined once, then filled over. -->
+  <defs>
+    <g id="crown">
+      <circle cx="30" cy="40" r="11"/>
+      <circle cx="44" cy="30" r="14"/>
+      <circle cx="60" cy="31" r="13"/>
+      <circle cx="70" cy="42" r="10"/>
+      <circle cx="48" cy="44" r="13"/>
+      <circle cx="22" cy="49" r="7"/>
+      <circle cx="76" cy="51" r="6"/>
+    </g>
+  </defs>
+  <use href="#crown" fill="none" stroke="#33281c" stroke-width="5.2"/>
+  <use href="#crown" fill="#7d8a52"/>
+  <path d="M28 46q6 4 12 1M52 49q8 3 14-1M40 34q4-3 9-1M58 36q4-2 8 0" fill="none" stroke="#33281c" stroke-width="1.6" stroke-linecap="round" opacity="0.6"/>
+  <circle cx="48" cy="48" r="45" fill="none" stroke="#33281c" stroke-width="4"/>
+</svg>

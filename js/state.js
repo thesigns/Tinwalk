@@ -4,7 +4,7 @@ import { now } from './clock.js';
 import { ENEMIES, ITEMS, LANDMARKS, MANUALS, RESOURCES, emptyResources } from './game.js';
 
 const STORAGE_KEY = 'tinwalk.state';
-export const STATE_VERSION = 12;
+export const STATE_VERSION = 13;
 export const WORLD_ID_MAX_LENGTH = 32;
 
 const INVALID_SAVE = "This file isn't a valid Tinwalk save";
@@ -109,7 +109,18 @@ const MIGRATIONS = {
     save.world = isPoint(shelter) ? { id: randomWorldId(), origin: { lat: shelter.lat, lon: shelter.lon } } : null;
     save.version = 12;
   },
+  // Landmark types are drawn from a bag per biome. The bags start empty and
+  // fill up at the next discovery.
+  12(save) {
+    save.landmarkBags = emptyLandmarkBags();
+    save.version = 13;
+  },
 };
+
+// One bag of landmark types per biome; see drawLandmarkType() in game.js.
+function emptyLandmarkBags() {
+  return { plains: [], forest: [], ruins: [] };
+}
 
 // A World ID for a new game: ten random digits.
 export function randomWorldId() {
@@ -136,6 +147,8 @@ export function createInitialState() {
     shelter: null,
     searchedAreas: [], // [{ lat, lon, searchedAt }]
     landmarks: [], // [{ type, lat, lon, discoveredAt, visitedAt }]
+    // The landmark types each biome has yet to give before they repeat: { plains, forest, ruins }.
+    landmarkBags: emptyLandmarkBags(),
     // The rescue mission under way: { survivor, landmark: { type, lat, lon }, calledAt }
     mission: null,
     enemies: [], // enemies not beaten yet, where they were met: [{ type, lat, lon, foundAt }]
@@ -232,6 +245,15 @@ const isWorld = (value) =>
   value.id.trim().length > 0 &&
   value.id.length <= WORLD_ID_MAX_LENGTH &&
   (value.origin === null || isPoint(value.origin));
+// Each bag holds distinct types of its own biome.
+const isLandmarkBags = (value) =>
+  isObject(value) &&
+  Object.entries(emptyLandmarkBags()).every(
+    ([biome]) =>
+      Array.isArray(value[biome]) &&
+      value[biome].every((type) => LANDMARKS[type]?.biome === biome) &&
+      new Set(value[biome]).size === value[biome].length,
+  );
 const isRadio = (value) =>
   isObject(value) &&
   isNumber(value.builtAt) &&
@@ -266,6 +288,7 @@ function isValidState(state) {
     state.searchedAreas.every((area) => isPoint(area) && isNumber(area.searchedAt)) &&
     Array.isArray(state.landmarks) &&
     state.landmarks.every(isLandmark) &&
+    isLandmarkBags(state.landmarkBags) &&
     Array.isArray(state.enemies) &&
     state.enemies.every(isEnemy) &&
     // A mission needs a radio, which is in the shelter.

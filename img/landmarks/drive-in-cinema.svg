@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- A drive-in cinema on the plains: a tall screen on a wooden frame, torn and faded, rows of rusted cars still parked facing it, speaker posts between them and a dead neon arrow. -->
+  <defs>
+    <clipPath id="disc"><circle cx="256" cy="256" r="232"/></clipPath>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cdb98c"/>
+      <stop offset="0.45" stop-color="#e6d7b0"/>
+      <stop offset="0.7" stop-color="#f3e9cc"/>
+    </linearGradient>
+    <linearGradient id="field" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d4bf86"/>
+      <stop offset="1" stop-color="#b89c5e"/>
+    </linearGradient>
+    <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <path d="M0 0v7" stroke="#33281c" stroke-width="1.6" opacity="0.55"/>
+    </pattern>
+    <pattern id="hatch-sky" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-20)">
+      <path d="M0 0v8" stroke="#6a5842" stroke-width="1.4" opacity="0.45"/>
+    </pattern>
+  </defs>
+
+  <g clip-path="url(#disc)">
+    <!-- Heavy sky. -->
+    <rect width="512" height="512" fill="url(#sky)"/>
+    <!-- Clouds: rounded tops, hatched bellies. -->
+    <g stroke="#6a5842" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M24 116c10-22 36-28 52-14 10-24 46-28 60-6 18-12 44-4 48 16 14 0 24 10 22 22H24z" fill="#eadcb6"/>
+      <path d="M24 124h182v12H24z" fill="url(#hatch-sky)" stroke="none"/>
+      <path d="M340 186c6-12 22-16 32-8 8-12 28-12 36 0 12-4 24 4 24 14H340z" fill="#efe3c2"/>
+    </g>
+    <!-- Crows. -->
+    <path d="M86 132q7-7 14 0q7-7 14 0M412 104q6-6 12 0q6-6 12 0M440 150q5-5 10 0q5-5 10 0" fill="none" stroke="#33281c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Distant hills. -->
+    <path d="M0 336c50-20 100-24 150-14s80 2 120-6 90-10 130 2 80 12 112 6V512H0z" fill="#a9ab7c"/>
+    <path d="M0 336c50-20 100-24 150-14s80 2 120-6 90-10 130 2 80 12 112 6" fill="none" stroke="#6a5842" stroke-width="2.5"/>
+
+    <!-- Dry field. -->
+    <path d="M0 372c80-14 170-16 256-12s180 2 256-6V512H0z" fill="url(#field)"/>
+    <path d="M0 372c80-14 170-16 256-12s180 2 256-6" fill="none" stroke="#6a5842" stroke-width="2.5"/>
+    <path d="M0 432c90-10 200-12 300-6s150 2 212-6V512H0z" fill="#33281c" opacity="0.06"/>
+
+    <!-- The screen's frame: posts and braces under it, struts behind. -->
+    <g stroke="#33281c" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M140 262V372M210 262V368M302 262V366M372 262V368" stroke-width="7"/>
+      <path d="M140 262V372M210 262V368M302 262V366M372 262V368" stroke="#8b6a42" stroke-width="3.5"/>
+      <path d="M140 300 210 340 302 300 372 340M140 340 210 300 302 340 372 300" stroke-width="3"/>
+    </g>
+    <!-- The screen: weathered white panels, a dark gap where some fell. -->
+    <g stroke="#33281c" stroke-linejoin="round">
+      <path d="M112 96h288v166H112z" fill="#efe6cf" stroke-width="4.5"/>
+      <path d="M112 96h288v14H112z" fill="#8a8377" stroke-width="3"/>
+      <path d="M160 110v152M208 110v152M256 110v152M304 110v152M352 110v152" stroke-width="1.4" opacity="0.4"/>
+      <!-- Stains running down from the top edge. -->
+      <path d="M130 110v60M182 110v34M276 110v80M330 110v46M380 110v28" stroke="#a39d90" stroke-width="7" opacity="0.45"/>
+      <!-- The torn corner, showing the timber frame behind. -->
+      <path d="M304 262 318 206 340 214 352 176 376 190 400 182V262z" fill="#2a2016" stroke-width="3"/>
+      <path d="M314 262 330 222M344 262 360 196M372 262 384 200M318 236h70M330 210l50 -14" stroke="#8b6a42" stroke-width="3"/>
+      <path d="M318 206l-10 26 22-8z" fill="#efe6cf" stroke-width="2.4"/>
+    </g>
+
+    <!-- The neon arrow on its pole, every bulb dead. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M444 372V196" stroke-width="5"/>
+      <path d="M418 200h44l16 22-16 22h-44z" fill="#b4432b" stroke-width="3.2"/>
+      <path d="M426 222h40" stroke="#efe6cf" stroke-width="4"/>
+      <g fill="#efe6cf" stroke-width="1.6">
+        <circle cx="428" cy="206" r="2.6"/><circle cx="440" cy="206" r="2.6"/><circle cx="452" cy="206" r="2.6"/>
+        <circle cx="428" cy="238" r="2.6"/><circle cx="440" cy="238" r="2.6"/><circle cx="452" cy="238" r="2.6"/>
+      </g>
+    </g>
+
+    <!-- Speaker posts between the rows. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M150 398v-34M262 396v-34M368 398v-34" stroke-width="3.5"/>
+      <path d="M144 362h12v8h-12zM256 360h12v8h-12zM362 362h12v8h-12z" fill="#6b665c" stroke-width="2.4"/>
+    </g>
+
+    <!-- The far row of cars, small with distance. -->
+    <g transform="translate(206 396) scale(0.62)" stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M-44 0v-26q0-8 8-10l10-18q2-4 6-4h40q4 0 6 4l10 18q8 2 8 10V0z" fill="#8b6a42" stroke-width="3.5"/>
+      <path d="M-24-52h48l9 15h-66z" fill="#2a2016" stroke-width="3"/>
+      <path d="M-40-22h12v8h-12zM28-22h12v8H28z" fill="#82301c" stroke-width="2.4"/>
+      <path d="M-14-16h28v8h-28z" fill="#e6dcc4" stroke-width="2.2"/>
+      <path d="M-44-4h88" stroke-width="3"/>
+      <path d="M-38 0v8h14V0M24 0v8h14V0" fill="#2a2016" stroke-width="3"/>
+      <path d="M-30-30l8 10M10-34l14 8" stroke="#82301c" stroke-width="4" opacity="0.35"/>
+    </g>
+    <g transform="translate(318 398) scale(0.62)" stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M-44 0v-26q0-8 8-10l10-18q2-4 6-4h40q4 0 6 4l10 18q8 2 8 10V0z" fill="#a9ab7c" stroke-width="3.5"/>
+      <path d="M-24-52h48l9 15h-66z" fill="#2a2016" stroke-width="3"/>
+      <path d="M-40-22h12v8h-12zM28-22h12v8H28z" fill="#82301c" stroke-width="2.4"/>
+      <path d="M-14-16h28v8h-28z" fill="#e6dcc4" stroke-width="2.2"/>
+      <path d="M-44-4h88" stroke-width="3"/>
+      <path d="M-38 0v8h14V0M24 0v8h14V0" fill="#2a2016" stroke-width="3"/>
+      <path d="M-30-30l8 10M10-34l14 8" stroke="#82301c" stroke-width="4" opacity="0.35"/>
+    </g>
+    <g transform="translate(96 400) scale(0.6)" stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M-44 0v-26q0-8 8-10l10-18q2-4 6-4h40q4 0 6 4l10 18q8 2 8 10V0z" fill="#a39d90" stroke-width="3.5"/>
+      <path d="M-24-52h48l9 15h-66z" fill="#2a2016" stroke-width="3"/>
+      <path d="M-40-22h12v8h-12zM28-22h12v8H28z" fill="#82301c" stroke-width="2.4"/>
+      <path d="M-14-16h28v8h-28z" fill="#e6dcc4" stroke-width="2.2"/>
+      <path d="M-44-4h88" stroke-width="3"/>
+      <path d="M-38 0v8h14V0M24 0v8h14V0" fill="#2a2016" stroke-width="3"/>
+      <path d="M-30-30l8 10M10-34l14 8" stroke="#82301c" stroke-width="4" opacity="0.35"/>
+    </g>
+
+    <!-- The near row, still facing the screen. -->
+    <g transform="translate(150 470) scale(1.05)" stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M-44 0v-26q0-8 8-10l10-18q2-4 6-4h40q4 0 6 4l10 18q8 2 8 10V0z" fill="#7d8a52" stroke-width="3.5"/>
+      <path d="M-24-52h48l9 15h-66z" fill="#2a2016" stroke-width="3"/>
+      <path d="M-40-22h12v8h-12zM28-22h12v8H28z" fill="#82301c" stroke-width="2.4"/>
+      <path d="M-14-16h28v8h-28z" fill="#e6dcc4" stroke-width="2.2"/>
+      <path d="M-44-4h88" stroke-width="3"/>
+      <path d="M-38 0v8h14V0M24 0v8h14V0" fill="#2a2016" stroke-width="3"/>
+      <path d="M-30-30l8 10M10-34l14 8" stroke="#82301c" stroke-width="4" opacity="0.35"/>
+    </g>
+    <g transform="translate(372 474) scale(1.05)" stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M-44 0v-26q0-8 8-10l10-18q2-4 6-4h40q4 0 6 4l10 18q8 2 8 10V0z" fill="#b4432b" stroke-width="3.5"/>
+      <path d="M-24-52h48l9 15h-66z" fill="#2a2016" stroke-width="3"/>
+      <path d="M-40-22h12v8h-12zM28-22h12v8H28z" fill="#82301c" stroke-width="2.4"/>
+      <path d="M-14-16h28v8h-28z" fill="#e6dcc4" stroke-width="2.2"/>
+      <path d="M-44-4h88" stroke-width="3"/>
+      <path d="M-38 0v8h14V0M24 0v8h14V0" fill="#2a2016" stroke-width="3"/>
+      <path d="M-30-30l8 10M10-34l14 8" stroke="#82301c" stroke-width="4" opacity="0.35"/>
+    </g>
+
+    <!-- Tall dry grass. -->
+    <g fill="none" stroke="#5c6a2c" stroke-width="2.6" stroke-linecap="round">
+      <path d="M40 470c4-20 8-32 16-44M50 474c2-18 2-30-2-44M62 472c4-14 10-24 18-30"/>
+      <path d="M430 476c4-16 8-26 16-34M442 478c0-14-2-24-6-32M454 476c4-12 8-20 16-24"/>
+    </g>
+  </g>
+
+  <!-- The medallion's frame. -->
+  <circle cx="256" cy="256" r="232" fill="none" stroke="#33281c" stroke-width="5"/>
+  <circle cx="256" cy="256" r="244" fill="none" stroke="#33281c" stroke-width="9"/>
+  <circle cx="256" cy="256" r="238" fill="none" stroke="#ece0c0" stroke-width="3"/>
+</svg>

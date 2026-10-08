@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <!-- Map badge: the tall torn screen of a drive-in cinema on its posts, two old cars facing it. -->
+  <defs>
+    <clipPath id="inside"><circle cx="48" cy="48" r="42"/></clipPath>
+  </defs>
+
+  <circle cx="48" cy="48" r="45" fill="#ece0c0"/>
+  <g clip-path="url(#inside)">
+    <path d="M0 75H96V96H0z" fill="#cdb67c"/>
+    <path d="M0 75H96" stroke="#33281c" stroke-width="2.4"/>
+  </g>
+  <!-- Posts and bracing under the screen. -->
+  <g stroke="#33281c" stroke-width="2.6" stroke-linecap="round" fill="none">
+    <path d="M26 54V75M70 54V75M48 54V75M26 66 48 58l22 8"/>
+  </g>
+
+  <!-- The screen, a panel torn off its lower right corner. -->
+  <g stroke="#33281c" stroke-width="2.8" stroke-linejoin="round">
+    <path d="M16 22h64v32H16z" fill="#f3ead2"/>
+    <path d="M62 54 70 40 80 44V54z" fill="#33281c"/>
+  </g>
+  <path d="M37 22v32M58 22v18" stroke="#33281c" stroke-width="1.4" opacity="0.5"/>
+
+  <!-- Two cars from behind, rusting. -->
+  <g stroke="#33281c" stroke-width="2.4" stroke-linejoin="round">
+    <path d="M18 75v-8q0-3 3-4l3-5h14l3 5q3 1 3 4v8z" fill="#8b6a42"/>
+    <path d="M27 60h8l2 4H25z" fill="#33281c"/>
+    <path d="M52 75v-8q0-3 3-4l3-5h14l3 5q3 1 3 4v8z" fill="#7d8a52"/>
+    <path d="M61 60h8l2 4H59z" fill="#33281c"/>
+  </g>
+  <path d="M21 69h3M38 69h3M55 69h3M72 69h3" stroke="#b4432b" stroke-width="2.4" stroke-linecap="round"/>
+  <circle cx="48" cy="48" r="45" fill="none" stroke="#33281c" stroke-width="4"/>
+</svg>

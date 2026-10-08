@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <!-- Map badge: heaps of scrap and a crane, its magnet holding a car in mid-air. -->
+  <defs>
+    <clipPath id="inside"><circle cx="48" cy="48" r="42"/></clipPath>
+  </defs>
+
+  <circle cx="48" cy="48" r="45" fill="#ece0c0"/>
+  <g clip-path="url(#inside)">
+    <path d="M0 75H96V96H0z" fill="#cdb67c"/>
+    <path d="M0 75H96" stroke="#33281c" stroke-width="2.4"/>
+  </g>
+  <!-- The crane's boom and the cable down to the magnet. -->
+  <g stroke="#33281c" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M70 66 34 22" stroke-width="3.2"/>
+    <path d="M34 22v14" stroke-width="1.6"/>
+  </g>
+  <g stroke="#33281c" stroke-width="2.4" stroke-linejoin="round">
+    <path d="M28 36h12v4H28z" fill="#6b665c"/>
+    <!-- The car hanging from the magnet. -->
+    <path d="M24 40h20l-2 9H26z" fill="#b4432b"/>
+  </g>
+
+  <!-- Heaps of scrap, a tyre and a door sticking out. -->
+  <g stroke="#33281c" stroke-width="2.6" stroke-linejoin="round">
+    <path d="M6 75q8-20 22-22 10 4 14 10 6-8 14-6 10 2 16 18z" fill="#a39d90"/>
+    <path d="M14 66l8-6 3 5-7 5zM46 62h8v9h-8z" fill="#6b665c"/>
+  </g>
+  <circle cx="34" cy="68" r="4.6" fill="none" stroke="#33281c" stroke-width="2.6"/>
+
+  <!-- The crane's cab on its tracks. -->
+  <g stroke="#33281c" stroke-width="2.6" stroke-linejoin="round">
+    <path d="M62 75v-5h22v5z" fill="#33281c"/>
+    <path d="M64 70V58h14l4 6v6z" fill="#e0bd68"/>
+    <path d="M70 61h5v4h-5z" fill="#33281c"/>
+  </g>
+  <circle cx="48" cy="48" r="45" fill="none" stroke="#33281c" stroke-width="4"/>
+</svg>

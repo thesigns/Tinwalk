@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- A radio mast on the plains: a lattice tower held by slack guy wires, dead red lamps, a concrete transmitter hut with a dish on its roof, crows on the wires and a warning sign by the road. -->
+  <defs>
+    <clipPath id="disc"><circle cx="256" cy="256" r="232"/></clipPath>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cdb98c"/>
+      <stop offset="0.45" stop-color="#e6d7b0"/>
+      <stop offset="0.7" stop-color="#f3e9cc"/>
+    </linearGradient>
+    <linearGradient id="field" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d4bf86"/>
+      <stop offset="1" stop-color="#b89c5e"/>
+    </linearGradient>
+    <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <path d="M0 0v7" stroke="#33281c" stroke-width="1.6" opacity="0.55"/>
+    </pattern>
+    <pattern id="hatch-sky" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-20)">
+      <path d="M0 0v8" stroke="#6a5842" stroke-width="1.4" opacity="0.45"/>
+    </pattern>
+    <linearGradient id="steel" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8a8377"/>
+      <stop offset="1" stop-color="#5e5a52"/>
+    </linearGradient>
+  </defs>
+
+  <g clip-path="url(#disc)">
+    <!-- Heavy sky. -->
+    <rect width="512" height="512" fill="url(#sky)"/>
+    <!-- Clouds: rounded tops, hatched bellies. -->
+    <g stroke="#6a5842" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M24 116c10-22 36-28 52-14 10-24 46-28 60-6 18-12 44-4 48 16 14 0 24 10 22 22H24z" fill="#eadcb6"/>
+      <path d="M24 124h182v12H24z" fill="url(#hatch-sky)" stroke="none"/>
+      <path d="M340 186c6-12 22-16 32-8 8-12 28-12 36 0 12-4 24 4 24 14H340z" fill="#efe3c2"/>
+    </g>
+    <!-- Crows. -->
+    <path d="M86 132q7-7 14 0q7-7 14 0M412 104q6-6 12 0q6-6 12 0M440 150q5-5 10 0q5-5 10 0" fill="none" stroke="#33281c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Distant hills. -->
+    <path d="M0 336c50-20 100-24 150-14s80 2 120-6 90-10 130 2 80 12 112 6V512H0z" fill="#a9ab7c"/>
+    <path d="M0 336c50-20 100-24 150-14s80 2 120-6 90-10 130 2 80 12 112 6" fill="none" stroke="#6a5842" stroke-width="2.5"/>
+
+    <!-- Dry field. -->
+    <path d="M0 372c80-14 170-16 256-12s180 2 256-6V512H0z" fill="url(#field)"/>
+    <path d="M0 372c80-14 170-16 256-12s180 2 256-6" fill="none" stroke="#6a5842" stroke-width="2.5"/>
+    <path d="M0 432c90-10 200-12 300-6s150 2 212-6V512H0z" fill="#33281c" opacity="0.06"/>
+
+    <!-- The mast's shadow across the field. -->
+    <path d="M232 392h48l170 64h-60z" fill="#33281c" opacity="0.16"/>
+
+    <!-- Guy wires, from two heights down to anchors in the field. -->
+    <g fill="none" stroke="#33281c" stroke-width="1.6">
+      <path d="M254 130 40 412M258 130 476 404M254 250 104 404M258 250 430 398"/>
+    </g>
+    <g fill="#b9b2a2" stroke="#33281c" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M30 412h22l-3 10H33zM466 404h22l-3 10h-16zM94 404h20l-3 9H97zM420 398h20l-3 9h-14z"/>
+    </g>
+    <!-- Crows resting on the upper wire. -->
+    <g fill="#33281c">
+      <path d="M110 316c2-6 8-8 12-5l4-3 1 4c-2 5-8 8-14 7zM132 288c2-5 7-7 11-4l3-3 1 4c-2 4-7 7-12 6z"/>
+    </g>
+
+    <!-- The mast: two legs in front, the third behind, cross-braced all the way up. -->
+    <g stroke="#33281c" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M256 392V76" stroke="#6a5842" stroke-width="2.5" opacity="0.7"/>
+      <path d="M226 392L283.9 363.3M286 392L228.1 363.3M228.1 363.3L281.8 334.5M283.9 363.3L230.2 334.5M230.2 334.5L279.7 305.8M281.8 334.5L232.3 305.8M232.3 305.8L277.6 277.1M279.7 305.8L234.4 277.1M234.4 277.1L275.5 248.4M277.6 277.1L236.5 248.4M236.5 248.4L273.5 219.6M275.5 248.4L238.5 219.6M238.5 219.6L271.4 190.9M273.5 219.6L240.6 190.9M240.6 190.9L269.3 162.2M271.4 190.9L242.7 162.2M242.7 162.2L267.2 133.5M269.3 162.2L244.8 133.5M244.8 133.5L265.1 104.7M267.2 133.5L246.9 104.7M246.9 104.7L263 76M265.1 104.7L249 76" stroke-width="1.8"/>
+      <path d="M226 392H286M228.1 363.3H283.9M230.2 334.5H281.8M232.3 305.8H279.7M234.4 277.1H277.6M236.5 248.4H275.5M238.5 219.6H273.5M240.6 190.9H271.4M242.7 162.2H269.3M244.8 133.5H267.2M246.9 104.7H265.1M249 76H263" stroke-width="2.4"/>
+      <path d="M226 392 249 76M286 392 263 76" stroke-width="6.5"/>
+      <path d="M226 392 249 76M286 392 263 76" stroke="url(#steel)" stroke-width="3"/>
+      <!-- Aerials at the top, and the pole to the highest lamp. -->
+      <path d="M256 76V40" stroke-width="5"/>
+      <path d="M226 104h60M230 132h52" stroke-width="3"/>
+      <path d="M226 96v16M286 96v16M230 124v16M282 124v16" stroke-width="3"/>
+    </g>
+    <!-- Dead aviation lamps. -->
+    <g fill="#b4432b" stroke="#33281c" stroke-width="2.4">
+      <path d="M248 40a8 8 0 0 1 16 0z"/>
+      <circle cx="238" cy="228" r="5"/>
+      <circle cx="274" cy="228" r="5"/>
+    </g>
+
+    <!-- The concrete transmitter hut, a cable tray running to the mast. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M268 344h32" stroke-width="7"/>
+      <path d="M268 344h32" stroke="#8a8377" stroke-width="3"/>
+      <path d="M300 392V322h104v70z" fill="#b9b2a2" stroke-width="3.5"/>
+      <path d="M372 322h32v70h-32z" fill="url(#hatch)" stroke="none"/>
+      <path d="M294 324h116v-10H294z" fill="#8a8377" stroke-width="3"/>
+      <path d="M318 392v-46h28v46z" fill="#2a2016" stroke-width="3"/>
+      <path d="M332 346l18 4v40l-18-2z" fill="#8b6a42" stroke-width="2.6"/>
+      <path d="M362 340h26v16h-26z" fill="#2a2016" stroke-width="2.6"/>
+      <path d="M362 348h26M375 340v16" stroke="#8b6a42" stroke-width="2.4"/>
+      <!-- A dish on the roof, tipped over to one side. -->
+      <path d="M380 314v-12" stroke-width="3"/>
+      <path d="M356 286a30 18 -30 0 0 46 22z" fill="#cdc6b4" stroke-width="3"/>
+      <path d="M379 297l14-12" stroke-width="2.2"/>
+    </g>
+
+    <!-- A warning sign by the track, its post leaning. -->
+    <g transform="translate(130 452) rotate(-8)" stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M0 0v-56" stroke-width="4"/>
+      <path d="M0-102 24-62H-24z" fill="#e0bd68" stroke-width="3.2"/>
+      <path d="M2-90-6-74h8l-6 12" fill="none" stroke-width="3"/>
+    </g>
+
+    <!-- Tall dry grass. -->
+    <g fill="none" stroke="#5c6a2c" stroke-width="2.6" stroke-linecap="round">
+      <path d="M40 470c4-20 8-32 16-44M50 474c2-18 2-30-2-44M62 472c4-14 10-24 18-30"/>
+      <path d="M430 476c4-16 8-26 16-34M442 478c0-14-2-24-6-32M454 476c4-12 8-20 16-24"/>
+    </g>
+  </g>
+
+  <!-- The medallion's frame. -->
+  <circle cx="256" cy="256" r="232" fill="none" stroke="#33281c" stroke-width="5"/>
+  <circle cx="256" cy="256" r="244" fill="none" stroke="#33281c" stroke-width="9"/>
+  <circle cx="256" cy="256" r="238" fill="none" stroke="#ece0c0" stroke-width="3"/>
+</svg>

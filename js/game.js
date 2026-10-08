@@ -139,6 +139,26 @@ export const LANDMARKS = {
     biome: 'plains',
     flavor: 'Someone still lights a candle here. You never see who.',
   },
+  'radio-mast': {
+    label: 'Radio Mast',
+    biome: 'plains',
+    flavor: 'The red light on top went dark long ago. On still nights the wires still hum.',
+  },
+  'drive-in-cinema': {
+    label: 'Drive-in Cinema',
+    biome: 'plains',
+    flavor: 'The screen is torn, and the cars still face it, waiting for a film that never starts.',
+  },
+  junkyard: {
+    label: 'Junkyard',
+    biome: 'plains',
+    flavor: 'Mountains of scrap and a crane frozen mid-swing. Someone has been picking through it.',
+  },
+  'lone-oak': {
+    label: 'Lone Oak',
+    biome: 'plains',
+    flavor: 'It was old before the towns were built, and it will outlast what is left of them.',
+  },
   watchtower: {
     label: 'Watchtower',
     biome: 'forest',
@@ -550,14 +570,30 @@ function rollManual(state, biome, random) {
 // Discovers a landmark where the player searched, if this search is due one
 // and nothing else stands nearby. Returns it, or null. The position may carry
 // the player's speed in m/s (see gps.js).
+// The next landmark type for a biome, drawn from a bag that holds each of its
+// types once and refills when empty, so a type comes back only after all the
+// others have been found. A refilled bag doesn't start with the type found
+// last, so the same type never turns up twice in a row.
+function drawLandmarkType(state, biome, random) {
+  let bag = state.landmarkBags[biome];
+  let choices = bag;
+  if (bag.length === 0) {
+    bag = Object.keys(LANDMARKS).filter((type) => LANDMARKS[type].biome === biome);
+    const last = state.landmarks.filter(({ type }) => LANDMARKS[type].biome === biome).at(-1)?.type;
+    choices = bag.length > 1 ? bag.filter((type) => type !== last) : bag;
+  }
+  const type = choices[Math.floor(random() * choices.length)];
+  state.landmarkBags[biome] = bag.filter((other) => other !== type);
+  return type;
+}
+
 function findLandmark(state, position, biome, time, random) {
   // An unknown speed counts as walking: it is unknown mostly when standing still.
   if (position.speed > MAX_LANDMARK_SPEED) return null;
   if (activeSearchedAreas(state, time).length % LANDMARK_SEARCH_INTERVAL !== 0) return null;
   const places = [state.shelter, ...state.landmarks];
   if (places.some((place) => distanceMeters(place, position) < LANDMARK_SPACING)) return null;
-  const types = Object.keys(LANDMARKS).filter((type) => LANDMARKS[type].biome === biome);
-  const type = types[Math.floor(random() * types.length)];
+  const type = drawLandmarkType(state, biome, random);
   const landmark = { type, lat: position.lat, lon: position.lon, discoveredAt: time, visitedAt: time };
   state.landmarks.push(landmark);
   return landmark;

@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- A junkyard on the plains: heaps of scrap and tyres, a stack of crushed cars, a crawler crane frozen mid-swing with a car hanging from its magnet, and a wheelbarrow of salvage left by whoever has been picking through it. -->
+  <defs>
+    <clipPath id="disc"><circle cx="256" cy="256" r="232"/></clipPath>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cdb98c"/>
+      <stop offset="0.45" stop-color="#e6d7b0"/>
+      <stop offset="0.7" stop-color="#f3e9cc"/>
+    </linearGradient>
+    <linearGradient id="field" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d4bf86"/>
+      <stop offset="1" stop-color="#b89c5e"/>
+    </linearGradient>
+    <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <path d="M0 0v7" stroke="#33281c" stroke-width="1.6" opacity="0.55"/>
+    </pattern>
+    <pattern id="hatch-sky" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-20)">
+      <path d="M0 0v8" stroke="#6a5842" stroke-width="1.4" opacity="0.45"/>
+    </pattern>
+  </defs>
+
+  <g clip-path="url(#disc)">
+    <!-- Heavy sky. -->
+    <rect width="512" height="512" fill="url(#sky)"/>
+    <!-- Clouds: rounded tops, hatched bellies. -->
+    <g stroke="#6a5842" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M24 116c10-22 36-28 52-14 10-24 46-28 60-6 18-12 44-4 48 16 14 0 24 10 22 22H24z" fill="#eadcb6"/>
+      <path d="M24 124h182v12H24z" fill="url(#hatch-sky)" stroke="none"/>
+      <path d="M340 186c6-12 22-16 32-8 8-12 28-12 36 0 12-4 24 4 24 14H340z" fill="#efe3c2"/>
+    </g>
+    <!-- Crows. -->
+    <path d="M86 132q7-7 14 0q7-7 14 0M412 104q6-6 12 0q6-6 12 0M440 150q5-5 10 0q5-5 10 0" fill="none" stroke="#33281c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Distant hills. -->
+    <path d="M0 336c50-20 100-24 150-14s80 2 120-6 90-10 130 2 80 12 112 6V512H0z" fill="#a9ab7c"/>
+    <path d="M0 336c50-20 100-24 150-14s80 2 120-6 90-10 130 2 80 12 112 6" fill="none" stroke="#6a5842" stroke-width="2.5"/>
+
+    <!-- Dry field. -->
+    <path d="M0 372c80-14 170-16 256-12s180 2 256-6V512H0z" fill="url(#field)"/>
+    <path d="M0 372c80-14 170-16 256-12s180 2 256-6" fill="none" stroke="#6a5842" stroke-width="2.5"/>
+    <path d="M0 432c90-10 200-12 300-6s150 2 212-6V512H0z" fill="#33281c" opacity="0.06"/>
+
+    <!-- A sagging chain-link fence along the back. -->
+    <g stroke="#33281c" stroke-linecap="round" fill="none">
+      <path d="M0 352h512" stroke-width="1.4" opacity="0.6"/>
+      <path d="M20 372v-34M90 368v-34M160 366v-32M380 364v-32M450 366v-34M500 370v-34" stroke-width="3"/>
+      <path d="M20 340q35 6 70 0M90 336q35 6 70 0M380 334q35 6 70 0M450 336q25 6 50 0" stroke-width="1.6"/>
+    </g>
+
+    <!-- The left heap: car doors, a fridge, tyres and pipes sticking out. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M-10 400c20-60 50-96 90-104 30 8 50 30 70 50 20-6 40 0 60 20 10 14 14 24 16 34z" fill="#a39d90" stroke-width="3.5"/>
+      <path d="M-10 400c20-60 50-96 90-104 30 8 50 30 70 50 20-6 40 0 60 20 10 14 14 24 16 34z" fill="url(#hatch)" stroke="none" opacity="0.35"/>
+      <path d="M40 330l26-14 10 18-26 14z" fill="#7d8a52" stroke-width="3"/>
+      <path d="M96 318h30v44H96z" fill="#e6dcc4" stroke-width="3"/>
+      <path d="M96 336h30M120 324v8" stroke-width="2.4"/>
+      <path d="M150 352l40-18M154 362l36-16" stroke-width="5"/>
+      <path d="M20 360l24 8M60 372l18-4M176 380l22 6" stroke-width="3"/>
+      <circle cx="66" cy="380" r="16" fill="#2a2016" stroke-width="3.5"/>
+      <circle cx="66" cy="380" r="6" fill="#6b665c" stroke-width="2"/>
+    </g>
+
+    <!-- The crane: tracks, cab and a lattice boom reaching over the yard. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M308 392v-22h120v22z" fill="#2a2016" stroke-width="3.5"/>
+      <path d="M316 382h104" stroke="#6b665c" stroke-width="3" stroke-dasharray="6 6"/>
+      <path d="M322 370v-56h62l22 26v30z" fill="#e0bd68" stroke-width="3.5"/>
+      <path d="M384 314h0l22 26v30h-22z" fill="url(#hatch)" stroke="none"/>
+      <path d="M368 322h22l12 16h-34z" fill="#2a2016" stroke-width="3"/>
+      <path d="M322 334h46" stroke-width="2.4"/>
+      <!-- The boom. -->
+      <path d="M340 320 196 132M366 320 210 128" stroke-width="5"/>
+      <path d="M346 304 212 140M356 296 206 150M330 300 360 290M310 274 338 264M290 248 318 238M270 222 298 212M250 196 278 186M230 170 258 160" stroke-width="2"/>
+      <!-- The cable and the magnet, a car hanging from it. -->
+      <path d="M200 132V190" stroke-width="2.4"/>
+      <path d="M176 190h48l-4 12h-40z" fill="#6b665c" stroke-width="3"/>
+    </g>
+    <g transform="translate(200 236) rotate(8)" stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M-58 0v-18q0-6 6-8l12-14q3-3 7-3h44q4 0 7 3l12 14q6 2 6 8V0z" fill="#b4432b" stroke-width="3.2"/>
+      <path d="M-30-38h24v12h-30zM2-38h22l8 12H2z" fill="#2a2016" stroke-width="2.4"/>
+      <path d="M-46 0a10 10 0 0 0 20 0M24 0a10 10 0 0 0 20 0" fill="#2a2016" stroke-width="2.6"/>
+      <path d="M-40-20 10-22" stroke="#82301c" stroke-width="5" opacity="0.4"/>
+    </g>
+
+    <!-- Crushed cars stacked into a block. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M220 410v-30h90v30z" fill="#7d8a52" stroke-width="3.5"/>
+      <path d="M226 380v-28h82v28z" fill="#8b6a42" stroke-width="3.5"/>
+      <path d="M232 352v-26h72v26z" fill="#a39d90" stroke-width="3.5"/>
+      <path d="M220 394h90M226 366h82M232 340h72" stroke-width="1.6" opacity="0.6"/>
+      <path d="M250 406l10-8M282 376l12-6M246 348l14-6" stroke-width="2"/>
+    </g>
+
+    <!-- A wheelbarrow of salvage: someone has been picking through the heaps. -->
+    <g transform="translate(372 452) rotate(-6)" stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M-56-30h76l-12 26h-54z" fill="#6b665c" stroke-width="3.2"/>
+      <path d="M-50-30l8-16 14 4 6-10 14 8 10-4 6 18z" fill="#b9b2a2" stroke-width="2.6"/>
+      <path d="M20-30l40-14" stroke-width="4"/>
+      <circle cx="-34" cy="2" r="10" fill="#2a2016" stroke-width="3"/>
+      <path d="M8-4 14 10" stroke-width="3.5"/>
+    </g>
+
+    <!-- A pile of tyres in front. -->
+    <g stroke="#33281c" stroke-width="3.5">
+      <ellipse cx="128" cy="446" rx="30" ry="12" fill="#2a2016"/>
+      <ellipse cx="128" cy="430" rx="30" ry="12" fill="#2a2016"/>
+      <ellipse cx="128" cy="414" rx="30" ry="12" fill="#2a2016"/>
+      <ellipse cx="128" cy="414" rx="12" ry="5" fill="#6b665c" stroke-width="2"/>
+    </g>
+
+    <!-- Tall dry grass. -->
+    <g fill="none" stroke="#5c6a2c" stroke-width="2.6" stroke-linecap="round">
+      <path d="M40 470c4-20 8-32 16-44M50 474c2-18 2-30-2-44M62 472c4-14 10-24 18-30"/>
+      <path d="M430 476c4-16 8-26 16-34M442 478c0-14-2-24-6-32M454 476c4-12 8-20 16-24"/>
+    </g>
+  </g>
+
+  <!-- The medallion's frame. -->
+  <circle cx="256" cy="256" r="232" fill="none" stroke="#33281c" stroke-width="5"/>
+  <circle cx="256" cy="256" r="244" fill="none" stroke="#33281c" stroke-width="9"/>
+  <circle cx="256" cy="256" r="238" fill="none" stroke="#ece0c0" stroke-width="3"/>
+</svg>
