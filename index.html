@@ -170,19 +170,22 @@
       </details>
     </div>
 
+    <!-- Stacked, so the scale bar can grow without pushing the rest aside. -->
     <div id="map-legend">
+      <div class="legend-row">
+        <!-- Where the player stands, so they don't have to judge it from the map at a border. -->
+        <div id="location" hidden>
+          <span id="location-label"></span>
+          <span id="location-daylight"></span>
+        </div>
+        <!-- The Geiger counter's warning, shown only with one in the backpack. -->
+        <div id="fallout" hidden aria-label="Radiation">
+          <svg class="icon"><use href="#i-radiation"/></svg>
+        </div>
+      </div>
       <div id="scale-bar" aria-hidden="true">
         <span id="scale-label"></span>
         <div id="scale-line"></div>
-      </div>
-      <!-- Where the player stands, so they don't have to judge it from the map at a border. -->
-      <div id="location" hidden>
-        <span id="location-label"></span>
-        <span id="location-daylight"></span>
-      </div>
-      <!-- The Geiger counter's warning, shown only with one in the backpack. -->
-      <div id="fallout" hidden aria-label="Radiation">
-        <svg class="icon"><use href="#i-radiation"/></svg>
       </div>
     </div>
     <!-- The rescue mission under way: who is waiting, where, and for how long. -->

@@ -31,6 +31,6 @@ Pora dnia w grze to prawdziwa pora dnia w miejscu, w którym jest użytkownik. P
 
 ## Interfejs
 
-- Pod słowem biomu przy podziałce mapy jest pora dnia i czas do zmiany, np. „Day · dark in 3 h” albo „Night · light in 5 h”. Podczas dnia albo nocy polarnej jest samo „Day” albo „Night”.
+- Pod słowem biomu w lewym górnym rogu mapy jest pora dnia i czas do zmiany, np. „Day · dark in 3 h” albo „Night · light in 5 h”. Podczas dnia albo nocy polarnej jest samo „Day” albo „Night”.
 - Komunikat po przeszukaniu mówi, gdy zadziałała noc albo latarka, np. „You've found 2 Junk. It was too dark to search well.” albo „You've found 4 Food. Your Flashlight lit up dark corners and went dead.”
 - Komunikat o ciemności pojawia się tylko wtedy, gdy noc naprawdę zabrała sztukę.
