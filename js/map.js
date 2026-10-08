@@ -23,6 +23,10 @@ const SCALE_BAR_LENGTHS = [50, 100, 200, 500, 1000, 2000, 5000];
 // smallest of these spacings that leaves cells at least this wide.
 const GRID_SPACINGS = [100, 250, 500, 1000, 2500];
 const MIN_GRID_CELL_PX = 70;
+// With this many tiles missing and nothing cached to stand in for them
+// (after zooming out, say), the coarser level's few tiles are drawn first,
+// so the screen fills quickly, if blurry, and sharpens as the rest arrive.
+const OVERVIEW_MIN_MISSING = 4;
 const MAX_SCALE_BAR_PX = 110;
 const HATCH_SPACING_PX = 7;
 // Grid on which the outline of searched areas is traced.
@@ -379,11 +383,19 @@ export class MapView {
     const maxX = Math.floor((left + width * units) / tileWorld);
     const minY = Math.floor((top - height * units) / tileWorld);
     const maxY = Math.floor(top / tileWorld);
-    this.tiles.setVisibleCount((maxX - minX + 1) * (maxY - minY + 1));
+    const visible = (maxX - minX + 1) * (maxY - minY + 1);
+    // The tiles askAhead() asks for: a ring around the screen and the
+    // coarser level over it.
+    const ahead = (maxX - minX + 3) * (maxY - minY + 3) - visible + (Math.floor(maxX / 2) - Math.floor(minX / 2) + 1) * (Math.floor(maxY / 2) - Math.floor(minY / 2) + 1);
+    this.tiles.setVisibleCount(visible, ahead);
     this.tiles.beginFrame();
     ctx.fillStyle = COLORS.ground;
     ctx.fillRect(0, 0, width, height);
 
+    // How far a tile's middle is from the screen's, for the order they come in.
+    const distance = (tx, ty) => Math.hypot(((tx + 0.5) * tileWorld - c.x) / units, ((ty + 0.5) * tileWorld - c.y) / units);
+    const uncovered = [];
+    let missing = 0;
     for (let ty = maxY; ty >= minY; ty--) {
       for (let tx = minX; tx <= maxX; tx++) {
         // Rounded edges, so neighboring tiles meet without hairline gaps.
@@ -395,12 +407,41 @@ export class MapView {
         if (tile) {
           ctx.drawImage(tile, x0, y0, x1 - x0, y1 - y0);
         } else {
-          this.tiles.want(level, tx, ty, Math.hypot((x0 + x1 - width) / 2, (y0 + y1 - height) / 2));
-          this.drawTileFallback(level, tx, ty, x0, y0, x1 - x0, y1 - y0);
+          missing++;
+          this.tiles.want(level, tx, ty, distance(tx, ty));
+          if (!this.drawTileFallback(level, tx, ty, x0, y0, x1 - x0, y1 - y0)) uncovered.push([tx, ty]);
         }
       }
     }
+
+    if (this.tiles.background) {
+      if (uncovered.length >= OVERVIEW_MIN_MISSING) {
+        // Ahead of everything else.
+        for (const [tx, ty] of uncovered) {
+          this.tiles.want(level + 1, Math.floor(tx / 2), Math.floor(ty / 2), distance(tx, ty) - 1e6);
+        }
+      } else if (missing === 0) {
+        this.askAhead(level, minX, maxX, minY, maxY, distance);
+      }
+    }
     return this.tiles.flush(deadline);
+  }
+
+  // Once the screen is drawn, the workers carry on with the tiles it may
+  // need next: a ring around it, for panning, and the coarser level over it,
+  // for zooming out. Each is drawn once and then waits in the cache.
+  askAhead(level, minX, maxX, minY, maxY, distance) {
+    for (let ty = minY - 1; ty <= maxY + 1; ty++) {
+      for (let tx = minX - 1; tx <= maxX + 1; tx++) {
+        if (tx < minX || tx > maxX || ty < minY || ty > maxY) this.tiles.want(level, tx, ty, distance(tx, ty));
+      }
+    }
+    for (let ty = Math.floor(minY / 2); ty <= Math.floor(maxY / 2); ty++) {
+      for (let tx = Math.floor(minX / 2); tx <= Math.floor(maxX / 2); tx++) {
+        // After the ring.
+        this.tiles.want(level + 1, tx, ty, 1e6 + distance(2 * tx + 0.5, 2 * ty + 0.5));
+      }
+    }
   }
 
   // A light grid fixed to the world, like the squares on an old map. Its
@@ -433,24 +474,33 @@ export class MapView {
   }
 
   // Until a tile is rendered, stretches what's cached on the neighboring zoom
-  // levels over its place, so zooming doesn't flash empty squares.
+  // levels over its place, so zooming doesn't flash empty squares: a quarter
+  // of the tile above, a sixteenth of the one above that, or the four below.
+  // Returns false if nothing covers it.
   drawTileFallback(level, tx, ty, x, y, width, height) {
     const { ctx } = this;
-    const parent = this.tiles.get(level + 1, Math.floor(tx / 2), Math.floor(ty / 2));
-    if (parent) {
-      const half = parent.width / 2;
+    for (const up of [1, 2]) {
+      const parts = 2 ** up;
+      const parent = this.tiles.get(level + up, Math.floor(tx / parts), Math.floor(ty / parts));
+      if (!parent) continue;
+      const part = parent.width / parts;
       // Tile y grows to the north, canvas y grows downward.
-      const sx = (tx - 2 * Math.floor(tx / 2)) * half;
-      const sy = (1 - (ty - 2 * Math.floor(ty / 2))) * half;
-      ctx.drawImage(parent, sx, sy, half, half, x, y, width, height);
-      return;
+      const sx = (tx - parts * Math.floor(tx / parts)) * part;
+      const sy = (parts - 1 - (ty - parts * Math.floor(ty / parts))) * part;
+      ctx.drawImage(parent, sx, sy, part, part, x, y, width, height);
+      return true;
     }
+    let covered = false;
     for (let dy = 0; dy < 2; dy++) {
       for (let dx = 0; dx < 2; dx++) {
         const child = this.tiles.get(level - 1, 2 * tx + dx, 2 * ty + dy);
-        if (child) ctx.drawImage(child, x + (dx * width) / 2, y + ((1 - dy) * height) / 2, width / 2, height / 2);
+        if (child) {
+          ctx.drawImage(child, x + (dx * width) / 2, y + ((1 - dy) * height) / 2, width / 2, height / 2);
+          covered = true;
+        }
       }
     }
+    return covered;
   }
 
   // Searched areas are crossed out in grease pencil: they merge into blobs with a

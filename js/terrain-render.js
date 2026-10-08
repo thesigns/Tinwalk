@@ -45,7 +45,7 @@ const FOREST_GRAIN = 85;
 // Both come from tables of this many pixels square, repeated: random grain
 // doesn't show where it repeats, and a table is much faster than hashing
 // every pixel of every tile.
-const GRAIN_SIZE = 512;
+const GRAIN_SIZE = 512; // a power of two, for masking
 const filmGrain = new Float32Array(GRAIN_SIZE * GRAIN_SIZE);
 const crownGrain = new Float32Array(GRAIN_SIZE * GRAIN_SIZE);
 for (let y = 0; y < GRAIN_SIZE; y++) {
@@ -121,6 +121,12 @@ function smooth(t) {
   return t * t * (3 - 2 * t);
 }
 
+// A value between four grid points: k00 and k00 + 1 on one row, k01 and
+// k01 + 1 on the next.
+function bilinear(field, k00, k01, w00, w10, w01, w11) {
+  return field[k00] * w00 + field[k00 + 1] * w10 + field[k01] * w01 + field[k01 + 1] * w11;
+}
+
 function graded(r, g, b) {
   const luminance = 0.3 * r + 0.59 * g + 0.11 * b;
   return [
@@ -176,15 +182,14 @@ function drawGround(ctx, tile) {
       const w10 = fx * (1 - fy);
       const w01 = (1 - fx) * fy;
       const w11 = fx * fy;
-      const lerp = (field) => field[k00] * w00 + field[k00 + 1] * w10 + field[k01] * w01 + field[k01 + 1] * w11;
-      land.forest = lerp(slowFields.forest);
-      land.town = lerp(slowFields.town);
-      land.mountain = lerp(slowFields.mountain);
-      land.base = lerp(slowFields.base);
-      land.warpX = lerp(slowFields.warpX);
-      land.warpY = lerp(slowFields.warpY);
-      land.badlands = lerp(slowFields.badlands);
-      land.tone = lerp(slowFields.tone);
+      land.forest = bilinear(slowFields.forest, k00, k01, w00, w10, w01, w11);
+      land.town = bilinear(slowFields.town, k00, k01, w00, w10, w01, w11);
+      land.mountain = bilinear(slowFields.mountain, k00, k01, w00, w10, w01, w11);
+      land.base = bilinear(slowFields.base, k00, k01, w00, w10, w01, w11);
+      land.warpX = bilinear(slowFields.warpX, k00, k01, w00, w10, w01, w11);
+      land.warpY = bilinear(slowFields.warpY, k00, k01, w00, w10, w01, w11);
+      land.badlands = bilinear(slowFields.badlands, k00, k01, w00, w10, w01, w11);
+      land.tone = bilinear(slowFields.tone, k00, k01, w00, w10, w01, w11);
       const k = row * span + col;
       // Towns clear the forest: none grows between the houses.
       const forest = smooth((land.forest + fringe(x, y, minWavelength)) / 0.007 + 0.5) * (1 - town[k]);
@@ -242,11 +247,15 @@ function drawGround(ctx, tile) {
       // Valleys among the ranges lie in shadow, but some light always comes back.
       const occlusion = 1 - 0.3 * mountain * (1 - ridge) ** 2;
       const shade = Math.min(MAX_SHADE, (AMBIENT + (1 - AMBIENT) * Math.max(0, lambert)) * occlusion);
-      const [r, g, b] = graded(color[0] * shade, color[1] * shade, color[2] * shade);
+      // Graded like graded(), without making an array for every sample.
+      const r = color[0] * shade;
+      const g = color[1] * shade;
+      const b = color[2] * shade;
+      const luminance = 0.3 * r + 0.59 * g + 0.11 * b;
       const i = row * count + col;
-      reds[i] = r;
-      greens[i] = g;
-      blues[i] = b;
+      reds[i] = (luminance + (r - luminance) * SATURATION) * TINT[0];
+      greens[i] = (luminance + (g - luminance) * SATURATION) * TINT[1];
+      blues[i] = (luminance + (b - luminance) * SATURATION) * TINT[2];
       canopy[i] = forest;
     }
   }
@@ -256,30 +265,45 @@ function drawGround(ctx, tile) {
   // Little-endian RGBA: one write per pixel.
   const pixels = new Uint32Array(image.data.buffer);
   const scale = TILE_SIZE / pixelsWide / SAMPLE_STEP;
+  // Bilinear in two passes: down the columns of samples once per row of
+  // pixels, then across between neighbors for each pixel.
+  const rowReds = new Float32Array(count);
+  const rowGreens = new Float32Array(count);
+  const rowBlues = new Float32Array(count);
+  const rowCanopy = new Float32Array(count);
+  const columns = new Int32Array(pixelsWide);
+  const fractions = new Float32Array(pixelsWide);
+  for (let x = 0; x < pixelsWide; x++) {
+    const sx = (x + 0.5) * scale;
+    columns[x] = Math.min(count - 2, Math.floor(sx));
+    fractions[x] = sx - columns[x];
+  }
   for (let y = 0; y < pixelsWide; y++) {
     const sy = (y + 0.5) * scale;
     const row = Math.min(count - 2, Math.floor(sy));
     const fy = sy - row;
+    for (let col = 0, above = row * count, below = above + count; col < count; col++, above++, below++) {
+      rowReds[col] = reds[above] + (reds[below] - reds[above]) * fy;
+      rowGreens[col] = greens[above] + (greens[below] - greens[above]) * fy;
+      rowBlues[col] = blues[above] + (blues[below] - blues[above]) * fy;
+      rowCanopy[col] = canopy[above] + (canopy[below] - canopy[above]) * fy;
+    }
+    const grainRow = (y & (GRAIN_SIZE - 1)) * GRAIN_SIZE;
+    const pixelRow = y * pixelsWide;
     for (let x = 0; x < pixelsWide; x++) {
-      const sx = (x + 0.5) * scale;
-      const col = Math.min(count - 2, Math.floor(sx));
-      const fx = sx - col;
-      const a = row * count + col;
-      const w00 = (1 - fx) * (1 - fy);
-      const w10 = fx * (1 - fy);
-      const w01 = (1 - fx) * fy;
-      const w11 = fx * fy;
-      const grainIndex = (y % GRAIN_SIZE) * GRAIN_SIZE + (x % GRAIN_SIZE);
+      const col = columns[x];
+      const fx = fractions[x];
+      const grainIndex = grainRow + (x & (GRAIN_SIZE - 1));
       let grain = filmGrain[grainIndex];
-      const crowns = canopy[a] * w00 + canopy[a + 1] * w10 + canopy[a + count] * w01 + canopy[a + count + 1] * w11;
+      const crowns = rowCanopy[col] + (rowCanopy[col + 1] - rowCanopy[col]) * fx;
       if (crowns > 0.01) grain += crownGrain[grainIndex] * crowns;
-      let r = reds[a] * w00 + reds[a + 1] * w10 + reds[a + count] * w01 + reds[a + count + 1] * w11 + grain;
-      let g = greens[a] * w00 + greens[a + 1] * w10 + greens[a + count] * w01 + greens[a + count + 1] * w11 + grain;
-      let b = blues[a] * w00 + blues[a + 1] * w10 + blues[a + count] * w01 + blues[a + count + 1] * w11 + grain;
+      let r = rowReds[col] + (rowReds[col + 1] - rowReds[col]) * fx + grain;
+      let g = rowGreens[col] + (rowGreens[col + 1] - rowGreens[col]) * fx + grain;
+      let b = rowBlues[col] + (rowBlues[col + 1] - rowBlues[col]) * fx + grain;
       r = r < 0 ? 0 : r > 255 ? 255 : r;
       g = g < 0 ? 0 : g > 255 ? 255 : g;
       b = b < 0 ? 0 : b > 255 ? 255 : b;
-      pixels[y * pixelsWide + x] = (255 << 24) | (b << 16) | (g << 8) | r;
+      pixels[pixelRow + x] = (255 << 24) | (b << 16) | (g << 8) | r;
     }
   }
   ctx.putImageData(image, 0, 0);
@@ -331,20 +355,20 @@ function drawTowns(ctx, tile) {
   const extent = TILE_SIZE * tile.scaleX;
   const blocks = ruinsIn(tile.x - RUINS_MARGIN, tile.y - extent - RUINS_MARGIN, tile.x + extent + RUINS_MARGIN, tile.y + RUINS_MARGIN);
   if (blocks.length === 0) return;
-  const trace = (points, dx = 0, dy = 0) => {
-    points.forEach(([x, y], index) => {
-      const px = (x - tile.x) / tile.scaleX + dx;
-      const py = (tile.y - y) / tile.scaleY + dy;
-      if (index === 0) ctx.moveTo(px, py);
-      else ctx.lineTo(px, py);
-    });
-    ctx.closePath();
-  };
+  // Shapes are [points, dx, dy], shifted by (dx, dy) tile pixels.
   const fillAll = (style, shapes) => {
     if (shapes.length === 0) return;
     ctx.fillStyle = style;
     ctx.beginPath();
-    for (const shape of shapes) trace(...shape);
+    for (const [points, dx = 0, dy = 0] of shapes) {
+      for (let i = 0; i < points.length; i++) {
+        const px = (points[i][0] - tile.x) / tile.scaleX + dx;
+        const py = (tile.y - points[i][1]) / tile.scaleY + dy;
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+    }
     ctx.fill();
   };
   const shade = (factor) => {

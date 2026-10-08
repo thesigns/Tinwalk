@@ -5,16 +5,21 @@
 // worker draw on an OffscreenCanvas, so a slow tile never stalls panning.
 // Elsewhere they are drawn on the page, a few per frame. Either way the map
 // asks for tiles each frame with want() and flush(), draws whatever is ready,
-// and is told by onTile when another one arrives.
+// and is told by onTile when another one arrives. With workers, the map also
+// asks ahead for tiles it may need soon (see MapView.drawTerrain), since
+// they cost the page nothing.
 
 import { renderTile, setTerrainWorld, TILE_SIZE } from './terrain-render.js';
 
 export { TILE_SIZE };
 const MIN_CACHED_TILES = 48;
-// The cache holds several screens of tiles, so zooming back and forth doesn't re-render them.
-const CACHED_SCREENS = 3;
+// The cache holds the tiles asked for ahead and two screens, so zooming back
+// and forth doesn't re-render them. On a sharp screen a tile takes 1 MB, so
+// it holds no more than that.
+const CACHED_SCREENS = 2;
 const MAX_PIXEL_RATIO = 2;
-const MAX_WORKERS = 2;
+// Phones have several cores; one is left to the page.
+const MAX_WORKERS = 4;
 
 export class TerrainTiles {
   // onTile() is called when a tile rendered in a worker arrives.
@@ -27,9 +32,19 @@ export class TerrainTiles {
     // Bumped whenever rendered tiles go stale, so late arrivals are dropped.
     this.generation = 0;
     this.wanted = [];
+    this.wantedKeys = new Set();
     this.inFlight = new Set();
     this.workers = startWorkers((worker, message) => this.received(worker, message), () => this.stopWorkers());
     this.idle = [...this.workers];
+  }
+
+  // True when tiles are drawn off the page's thread.
+  get background() {
+    return this.workers.length > 0;
+  }
+
+  has(level, tx, ty) {
+    return this.cache.has(`${level}/${tx}/${ty}`);
   }
 
   static levelFor(unitsPerPixel) {
@@ -63,10 +78,11 @@ export class TerrainTiles {
     this.clear();
   }
 
-  // A cache smaller than the screen would evict tiles that are still visible
-  // and re-render them every frame.
-  setVisibleCount(count) {
-    this.capacity = Math.max(MIN_CACHED_TILES, count * CACHED_SCREENS);
+  // A cache smaller than the tiles the map keeps asking for would evict them
+  // and render them again every frame: the visible ones and those asked for
+  // ahead.
+  setVisibleCount(visible, ahead = 0) {
+    this.capacity = Math.max(MIN_CACHED_TILES, visible * CACHED_SCREENS + ahead);
   }
 
   // Returns the cached tile, or null if it hasn't been rendered yet.
@@ -83,12 +99,16 @@ export class TerrainTiles {
   // Starts a frame's list of missing tiles.
   beginFrame() {
     this.wanted = [];
+    this.wantedKeys = new Set();
   }
 
-  // Asks for a missing tile; tiles with a lower priority come first.
+  // Asks for a tile, unless it is ready or on its way; tiles with a lower
+  // priority come first.
   want(level, tx, ty, priority) {
     const key = `${level}/${tx}/${ty}`;
-    if (!this.inFlight.has(key)) this.wanted.push({ key, level, tx, ty, priority });
+    if (this.inFlight.has(key) || this.cache.has(key) || this.wantedKeys.has(key)) return;
+    this.wantedKeys.add(key);
+    this.wanted.push({ key, level, tx, ty, priority });
   }
 
   // Starts on the frame's missing tiles. Workers take them one at a time;
