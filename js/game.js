@@ -189,6 +189,26 @@ export const LANDMARKS = {
     biome: 'forest',
     flavor: "A small plane nosed into the pines. The pilot's seat is empty.",
   },
+  'summer-camp': {
+    label: 'Summer Camp',
+    biome: 'forest',
+    flavor: 'Bunk beds, a faded flag and names carved into the doorframe. That summer never ended.',
+  },
+  sawmill: {
+    label: 'Sawmill',
+    biome: 'forest',
+    flavor: 'The blade has rusted fast. The logs are still stacked for a winter nobody stayed for.',
+  },
+  cave: {
+    label: 'Cave',
+    biome: 'forest',
+    flavor: "Cold air breathes out of the dark. The soot on the ceiling isn't old.",
+  },
+  'giant-boulder': {
+    label: 'Giant Boulder',
+    biome: 'forest',
+    flavor: 'The ice left it here long before people came. Travelers still scratch their marks into it.',
+  },
   pharmacy: {
     label: 'Pharmacy',
     biome: 'ruins',

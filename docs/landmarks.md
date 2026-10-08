@@ -37,10 +37,10 @@ Rodzaj landmarku zależy od biomu w miejscu odkrycia i jest losowany „z worka�
 | Grain Silo      | Ranger Station | School         |
 | Bus Wreck       | Bunker         | Water Tower    |
 | Roadside Shrine | Plane Wreck    | Church         |
-| Radio Mast      |                |                |
-| Drive-in Cinema |                |                |
-| Junkyard        |                |                |
-| Lone Oak        |                |                |
+| Radio Mast      | Summer Camp    |                |
+| Drive-in Cinema | Sawmill        |                |
+| Junkyard        | Cave           |                |
+| Lone Oak        | Giant Boulder  |                |
 
 Każdy rodzaj ma własną ikonę w interfejsie, własną odznakę na mapie i własną dużą ilustrację na ekranie landmarku.
 

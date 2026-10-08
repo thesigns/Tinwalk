@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- A giant boulder in the woods, left by the ice long before people came: moss on its back, lichen on its sides, and the marks travelers have scratched into it, tallies, initials and an arrow pointing on. -->
+  <defs>
+    <clipPath id="disc"><circle cx="256" cy="256" r="232"/></clipPath>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cdb98c"/>
+      <stop offset="0.45" stop-color="#e6d7b0"/>
+      <stop offset="0.7" stop-color="#f3e9cc"/>
+    </linearGradient>
+    <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <path d="M0 0v7" stroke="#33281c" stroke-width="1.6" opacity="0.55"/>
+    </pattern>
+    <pattern id="hatch-sky" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-20)">
+      <path d="M0 0v8" stroke="#6a5842" stroke-width="1.4" opacity="0.45"/>
+    </pattern>
+    <linearGradient id="stone" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#cdc6b4"/>
+      <stop offset="0.55" stop-color="#a39d90"/>
+      <stop offset="1" stop-color="#746f64"/>
+    </linearGradient>
+  </defs>
+
+  <g clip-path="url(#disc)">
+    <rect width="512" height="512" fill="url(#sky)"/>
+    <g stroke="#6a5842" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M150 96c8-18 30-24 44-12 10-20 40-22 52-4 16-8 36 2 38 18 12 0 20 8 18 18H150z" fill="#eadcb6"/>
+      <path d="M150 106h152v10H150z" fill="url(#hatch-sky)" stroke="none"/>
+    </g>
+    <path d="M330 120q6-6 12 0q6-6 12 0" fill="none" stroke="#33281c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- The woods behind. -->
+    <g>
+      <path d="M27 320V332h6V320z" fill="#5e4428" stroke="#33281c" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M30 160 35 186.7 32.5 180 40 213.3 35 206.7 45 240 37.5 233.3 50 266.7 40 260 55 293.3 42.5 286.7 60 320 0 320 17.5 286.7 5 293.3 20 260 10 266.7 22.5 233.3 15 240 25 206.7 20 213.3 27.5 180 25 186.7z" fill="#8f9a6a" stroke="#33281c" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M30 160 35 186.7 32.5 180 40 213.3 35 206.7 45 240 37.5 233.3 50 266.7 40 260 55 293.3 42.5 286.7 60 320 30 320z" fill="url(#hatch)" opacity="0.7"/>
+      <path d="M97 312V324h6V312z" fill="#5e4428" stroke="#33281c" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M100 176 104.5 198.7 102.2 193 109 221.3 104.5 215.7 113.5 244 106.8 238.3 118 266.7 109 261 122.5 289.3 111.2 283.7 127 312 73 312 88.8 283.7 77.5 289.3 91 261 82 266.7 93.2 238.3 86.5 244 95.5 215.7 91 221.3 97.8 193 95.5 198.7z" fill="#8f9a6a" stroke="#33281c" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M100 176 104.5 198.7 102.2 193 109 221.3 104.5 215.7 113.5 244 106.8 238.3 118 266.7 109 261 122.5 289.3 111.2 283.7 127 312 100 312z" fill="url(#hatch)" opacity="0.7"/>
+      <path d="M173 310V322h6V310z" fill="#5e4428" stroke="#33281c" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M176 210 180.3 226.7 178.2 222.5 184.7 243.3 180.3 239.2 189 260 182.5 255.8 193.3 276.7 184.7 272.5 197.7 293.3 186.8 289.2 202 310 150 310 165.2 289.2 154.3 293.3 167.3 272.5 158.7 276.7 169.5 255.8 163 260 171.7 239.2 167.3 243.3 173.8 222.5 171.7 226.7z" fill="#8f9a6a" stroke="#33281c" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M176 210 180.3 226.7 178.2 222.5 184.7 243.3 180.3 239.2 189 260 182.5 255.8 193.3 276.7 184.7 272.5 197.7 293.3 186.8 289.2 202 310 176 310z" fill="url(#hatch)" opacity="0.7"/>
+      <path d="M247 306V318h6V306z" fill="#5e4428" stroke="#33281c" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M250 192 255 211 252.5 206.2 260 230 255 225.2 265 249 257.5 244.2 270 268 260 263.2 275 287 262.5 282.2 280 306 220 306 237.5 282.2 225 287 240 263.2 230 268 242.5 244.2 235 249 245 225.2 240 230 247.5 206.2 245 211z" fill="#8f9a6a" stroke="#33281c" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M250 192 255 211 252.5 206.2 260 230 255 225.2 265 249 257.5 244.2 270 268 260 263.2 275 287 262.5 282.2 280 306 250 306z" fill="url(#hatch)" opacity="0.7"/>
+      <path d="M327 310V322h6V310z" fill="#5e4428" stroke="#33281c" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M330 168 334.7 191.7 332.3 185.8 339.3 215.3 334.7 209.4 344 239 337 233.1 348.7 262.7 339.3 256.7 353.3 286.3 341.7 280.4 358 310 302 310 318.3 280.4 306.7 286.3 320.7 256.7 311.3 262.7 323 233.1 316 239 325.3 209.4 320.7 215.3 327.7 185.8 325.3 191.7z" fill="#8f9a6a" stroke="#33281c" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M330 168 334.7 191.7 332.3 185.8 339.3 215.3 334.7 209.4 344 239 337 233.1 348.7 262.7 339.3 256.7 353.3 286.3 341.7 280.4 358 310 330 310z" fill="url(#hatch)" opacity="0.7"/>
+      <path d="M417 310V322h6V310z" fill="#5e4428" stroke="#33281c" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M420 150 425.3 176.7 422.7 170 430.7 203.3 425.3 196.7 436 230 428 223.3 441.3 256.7 430.7 250 446.7 283.3 433.3 276.7 452 310 388 310 406.7 276.7 393.3 283.3 409.3 250 398.7 256.7 412 223.3 404 230 414.7 196.7 409.3 203.3 417.3 170 414.7 176.7z" fill="#8f9a6a" stroke="#33281c" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M420 150 425.3 176.7 422.7 170 430.7 203.3 425.3 196.7 436 230 428 223.3 441.3 256.7 430.7 250 446.7 283.3 433.3 276.7 452 310 420 310z" fill="url(#hatch)" opacity="0.7"/>
+      <path d="M483 312V324h6V312z" fill="#5e4428" stroke="#33281c" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M486 178 491 200.3 488.5 194.8 496 222.7 491 217.1 501 245 493.5 239.4 506 267.3 496 261.8 511 289.7 498.5 284.1 516 312 456 312 473.5 284.1 461 289.7 476 261.8 466 267.3 478.5 239.4 471 245 481 217.1 476 222.7 483.5 194.8 481 200.3z" fill="#8f9a6a" stroke="#33281c" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M486 178 491 200.3 488.5 194.8 496 222.7 491 217.1 501 245 493.5 239.4 506 267.3 496 261.8 511 289.7 498.5 284.1 516 312 486 312z" fill="url(#hatch)" opacity="0.7"/>
+    </g>
+    <!-- The forest floor and the brush along it. -->
+    <path d="M0 322H512V512H0z" fill="#7d7a4c"/>
+    <path d="M0 340q11 -21.8 22 0q14.5 -20 29 0q10.5 -26 21 0q14 -24.2 28 0q10 -22.4 20 0q13.5 -20.5 27 0q9.5 -26.5 19 0q13 -24.7 26 0q9 -22.9 18 0q12.5 -21.1 25 0q8.5 -27 17 0q12 -25.2 24 0q8 -23.4 16 0q11.5 -21.6 23 0q15 -19.8 30 0q11 -25.7 22 0q14.5 -23.9 29 0q10.5 -22.1 21 0q14 -20.3 28 0q10 -26.3 20 0q13.5 -24.4 27 0q9.5 -22.6 19 0q13 -20.8 26 0V352H0z" fill="#7d8a52" stroke="#33281c" stroke-width="2.4" stroke-linejoin="round"/>
+    <path d="M0 400c120-8 260-10 512-4V512H0z" fill="#33281c" opacity="0.07"/>
+
+    <!-- The boulder's shadow. -->
+    <ellipse cx="270" cy="432" rx="200" ry="22" fill="#33281c" opacity="0.2"/>
+
+    <!-- The boulder. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M86 430c-12-60 4-120 50-160 40-36 100-52 160-42 70 12 116 60 128 120 8 36 4 62-8 82z" fill="url(#stone)" stroke-width="4"/>
+      <path d="M360 260c40 30 56 70 56 110 0 24-4 44-12 60H330c30-60 40-120 30-170z" fill="url(#hatch)" stroke="none" opacity="0.7"/>
+      <!-- Cracks. -->
+      <path d="M150 300l30 40-10 40M330 250l-20 40 16 30M380 330l-24 30" fill="none" stroke-width="2.6"/>
+      <!-- Moss over its back, hanging down in tongues. -->
+      <path d="M118 286c30-40 80-66 150-62 70 4 118 40 140 86-24-14-40-10-52 0-14-18-34-20-48-8-18-14-40-14-56-2-18-10-40-8-56 6-16-10-40-14-78-20z" fill="#7d8a52" stroke-width="3"/>
+      <path d="M160 270l-2 14M220 256l-2 12M290 254l2 14M350 272l4 12" stroke="#5c6a2c" stroke-width="3"/>
+    </g>
+    <!-- Lichen. -->
+    <g fill="#c9b878" stroke="#33281c" stroke-width="1.4">
+      <path d="M120 360c6-6 16-4 18 4-4 8-16 8-18-4zM380 380c6-4 14-2 14 6-4 6-12 6-14-6zM300 410c6-4 12-2 12 4-4 6-10 4-12-4z"/>
+    </g>
+    <!-- Marks scratched in: tallies, initials and an arrow. -->
+    <g fill="none" stroke="#efe6cf" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M180 330v26M190 330v26M200 330v26M210 330v26M174 348l44-12"/>
+      <path d="M250 330l8 26 8-26M276 330v26h14"/>
+      <path d="M222 384h70M276 372l16 12-16 12"/>
+    </g>
+    <g fill="none" stroke="#33281c" stroke-width="1" stroke-linecap="round" opacity="0.6">
+      <path d="M180 332v26M190 332v26M200 332v26M210 332v26M250 332l8 26 8-26M276 332v26h14M222 386h70M276 374l16 12-16 12"/>
+    </g>
+
+    <!-- A spruce sapling taking root by the stone. -->
+    <path d="M436 436V420M436 360l12 22h-6l12 22h-8l10 18h-40l10-18h-8l12-22h-6z" fill="#5c6a2c" stroke="#33281c" stroke-width="2.4" stroke-linejoin="round"/>
+    <!-- Ferns. -->
+    <g fill="none" stroke="#5c6a2c" stroke-width="2.6" stroke-linecap="round">
+      <path d="M30 470c10-30 30-46 54-52M44 446l-6-12M56 436l-4-14M70 428l-2-14M38 460l-12-4M50 446l-12-2"/>
+      <path d="M480 466c-10-30-30-46-54-52M466 442l6-12M454 432l4-14M440 426l2-14M472 456l12-4M460 444l12-2"/>
+    </g>
+    <!-- Darker spruces close by, framing the view. -->
+    <g>
+      <path d="M33 470V482h6V470z" fill="#5e4428" stroke="#33281c" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M36 170 41.7 212.9 38.9 202.1 47.4 255.7 41.7 245 53.1 298.6 44.6 287.9 58.9 341.4 47.4 330.7 64.6 384.3 50.3 373.6 70.3 427.1 53.1 416.4 76 470 -4 470 18.9 416.4 1.7 427.1 21.7 373.6 7.4 384.3 24.6 330.7 13.1 341.4 27.4 287.9 18.9 298.6 30.3 245 24.6 255.7 33.1 202.1 30.3 212.9z" fill="#6f7f45" stroke="#33281c" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M36 170 41.7 212.9 38.9 202.1 47.4 255.7 41.7 245 53.1 298.6 44.6 287.9 58.9 341.4 47.4 330.7 64.6 384.3 50.3 373.6 70.3 427.1 53.1 416.4 76 470 36 470z" fill="url(#hatch)" opacity="0.7"/>
+      <path d="M475 470V482h6V470z" fill="#5e4428" stroke="#33281c" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M478 180 483.7 221.4 480.9 211.1 489.4 262.9 483.7 252.5 495.1 304.3 486.6 293.9 500.9 345.7 489.4 335.4 506.6 387.1 492.3 376.8 512.3 428.6 495.1 418.2 518 470 438 470 460.9 418.2 443.7 428.6 463.7 376.8 449.4 387.1 466.6 335.4 455.1 345.7 469.4 293.9 460.9 304.3 472.3 252.5 466.6 262.9 475.1 211.1 472.3 221.4z" fill="#6f7f45" stroke="#33281c" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M478 180 483.7 221.4 480.9 211.1 489.4 262.9 483.7 252.5 495.1 304.3 486.6 293.9 500.9 345.7 489.4 335.4 506.6 387.1 492.3 376.8 512.3 428.6 495.1 418.2 518 470 478 470z" fill="url(#hatch)" opacity="0.7"/>
+    </g>
+  </g>
+
+  <!-- The medallion's frame. -->
+  <circle cx="256" cy="256" r="232" fill="none" stroke="#33281c" stroke-width="5"/>
+  <circle cx="256" cy="256" r="244" fill="none" stroke="#33281c" stroke-width="9"/>
+  <circle cx="256" cy="256" r="238" fill="none" stroke="#ece0c0" stroke-width="3"/>
+</svg>

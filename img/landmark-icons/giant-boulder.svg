@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <!-- Map badge: a huge boulder left in the woods by the ice, moss on its back, marks scratched into it. -->
+  <defs>
+    <clipPath id="inside"><circle cx="48" cy="48" r="42"/></clipPath>
+  </defs>
+
+  <circle cx="48" cy="48" r="45" fill="#ece0c0"/>
+  <g clip-path="url(#inside)">
+    <path d="M0 75H96V96H0z" fill="#5c6a2c"/>
+    <path d="M0 75H96" stroke="#33281c" stroke-width="2.4"/>
+  </g>
+  <!-- A spruce behind it. -->
+  <path d="M78 75V60M78 22l7 14h-4l7 14h-5l7 12H67l7-12h-5l7-14h-4z" fill="#5c6a2c" stroke="#33281c" stroke-width="2.2" stroke-linejoin="round"/>
+
+  <!-- The boulder, its moss cap, and the marks. -->
+  <g stroke="#33281c" stroke-width="2.8" stroke-linejoin="round">
+    <path d="M10 75q-2-22 12-32 10-12 28-10 18 2 22 18 6 10 2 24z" fill="#b9b2a2"/>
+    <path d="M18 46q8-12 30-13 18 0 22 14-10-4-20-2-14-4-32 1z" fill="#7d8a52"/>
+  </g>
+  <path d="M28 58v10M32 58v10M36 58v10M40 58v10M26 63h16M52 60l8 6-8 6" stroke="#33281c" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+  <circle cx="48" cy="48" r="45" fill="none" stroke="#33281c" stroke-width="4"/>
+</svg>

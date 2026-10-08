@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <!-- Map badge: a big circular saw standing out of its table, logs stacked beside it. -->
+  <defs>
+    <clipPath id="inside"><circle cx="48" cy="48" r="42"/></clipPath>
+  </defs>
+
+  <circle cx="48" cy="48" r="45" fill="#ece0c0"/>
+  <g clip-path="url(#inside)">
+    <path d="M0 75H96V96H0z" fill="#5c6a2c"/>
+    <path d="M0 75H96" stroke="#33281c" stroke-width="2.4"/>
+  </g>
+  <!-- Stacked logs, their cut ends showing. -->
+  <g stroke="#33281c" stroke-width="2.4" fill="#c9a36a">
+    <circle cx="16" cy="69" r="6"/><circle cx="28" cy="69" r="6"/><circle cx="22" cy="59" r="6"/>
+  </g>
+  <path d="M16 69h.01M28 69h.01M22 59h.01" stroke="#33281c" stroke-width="2.6" stroke-linecap="round"/>
+
+  <!-- The blade, half above the table. -->
+  <path d="M36 59.1L39.8 56.8L37.6 51.7L42 50.8L41.7 45.2L46.1 45.8L47.8 40.5L51.7 42.6L55 38.2L58 41.5L62.7 38.5L64.3 42.6L69.8 41.4L69.9 45.8L75.4 46.5L74 50.7L79 53.3L76.2 56.8L80 60.9Z" fill="#b9b2a2" stroke="#33281c" stroke-width="2.4" stroke-linejoin="round"/>
+  <circle cx="58" cy="60" r="4" fill="#6b665c" stroke="#33281c" stroke-width="2"/>
+  <path d="M46 50l6 2M64 44l2 6" stroke="#82301c" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+
+  <!-- The table and its legs. -->
+  <g stroke="#33281c" stroke-width="2.6" stroke-linejoin="round">
+    <path d="M34 60h48v6H34z" fill="#8b6a42"/>
+    <path d="M38 66v9M78 66v9" fill="none"/>
+  </g>
+  <circle cx="48" cy="48" r="45" fill="none" stroke="#33281c" stroke-width="4"/>
+</svg>
