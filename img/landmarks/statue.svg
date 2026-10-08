@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- A statue on a town square in the ruins: a rider on horseback in green bronze on a stone plinth, the face worn smooth, pigeons on the hat, a red arrow and a little house sprayed on the plinth to show the way home, cobbles and ruined fronts all round. -->
+  <defs>
+    <clipPath id="disc"><circle cx="256" cy="256" r="232"/></clipPath>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cdb98c"/>
+      <stop offset="0.45" stop-color="#e6d7b0"/>
+      <stop offset="0.7" stop-color="#f3e9cc"/>
+    </linearGradient>
+    <linearGradient id="asphalt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9d968a"/>
+      <stop offset="1" stop-color="#857e72"/>
+    </linearGradient>
+    <linearGradient id="grass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a9ab7c"/>
+      <stop offset="1" stop-color="#8b8d5e"/>
+    </linearGradient>
+    <linearGradient id="facade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#cbc2ad"/>
+      <stop offset="1" stop-color="#b3a992"/>
+    </linearGradient>
+    <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <path d="M0 0v7" stroke="#33281c" stroke-width="1.6" opacity="0.55"/>
+    </pattern>
+    <pattern id="hatch-sky" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-20)">
+      <path d="M0 0v8" stroke="#6a5842" stroke-width="1.4" opacity="0.45"/>
+    </pattern>
+    <linearGradient id="patina" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9fac8c"/>
+      <stop offset="1" stop-color="#6b7a5c"/>
+    </linearGradient>
+    <pattern id="cobbles" width="22" height="12" patternUnits="userSpaceOnUse">
+      <path d="M1 11q10-9 20 0M-10 5q10-9 20 0M12 5q10-9 20 0" fill="none" stroke="#6a6458" stroke-width="1.4" opacity="0.6"/>
+    </pattern>
+  </defs>
+
+  <g clip-path="url(#disc)">
+    <rect width="512" height="512" fill="url(#sky)"/>
+    <g stroke="#6a5842" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M268 92c10-22 36-28 52-14 10-24 46-28 60-6 18-12 44-4 48 16 14 0 24 10 22 22H268z" fill="#eadcb6"/>
+      <path d="M268 100h182v12H268z" fill="url(#hatch-sky)" stroke="none"/>
+    </g>
+    <path d="M150 110q7-7 14 0q7-7 14 0M190 92q5-5 10 0q5-5 10 0" fill="none" stroke="#33281c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Ruined blocks in the distance. -->
+    <g fill="#b9b2a2" stroke="#6a5842" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M0 330V220h40l8 10 8-14h46V330z"/>
+      <path d="M396 330V214h30l6 12 10-8h70V330z"/>
+    </g>
+    <g fill="#8a8377">
+      <path d="M12 236h10v12H12zM52 236h10v12H52zM32 260h10v12H32zM72 260h10v12H72zM12 284h10v12H12zM52 284h10v12H52z"/>
+      <path d="M440 232h10v12h-10zM480 232h10v12h-10zM460 256h10v12h-10zM440 280h10v12h-10zM480 280h10v12h-10z"/>
+    </g>
+
+    <!-- The square: cobbles. -->
+    <path d="M0 330H512V512H0z" fill="url(#asphalt)"/>
+    <path d="M0 330H512V512H0z" fill="url(#cobbles)"/>
+    <path d="M0 330H512" stroke="#33281c" stroke-width="2.5"/>
+
+    <!-- Ruined fronts closer in round the square. -->
+    <g stroke="#33281c" stroke-linejoin="round">
+      <path d="M0 340V170h60l10 16 14-8 14 12h30V340z" fill="#b9b2a2" stroke-width="3"/>
+      <path d="M392 340V182h26l10-12 10 14h26l12 10h50V340z" fill="#b9b2a2" stroke-width="3"/>
+    </g>
+    <g fill="#2a2016">
+      <path d="M20 200h18v26H20zM70 210h18v26H70zM20 256h18v26H20zM70 256h18v26H70zM104 240h16v24h-16z"/>
+      <path d="M410 206h18v26h-18zM456 206h18v26h-18zM410 256h18v26h-18zM456 256h18v26h-18z"/>
+    </g>
+
+    <!-- The plinth's shadow. -->
+    <path d="M176 412h176l40 16H200z" fill="#33281c" opacity="0.22"/>
+
+    <!-- The plinth: steps, block, cornice; the way home sprayed on it. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M168 412v-18h176v18z" fill="#a39d90" stroke-width="3.5"/>
+      <path d="M182 394v-16h148v16z" fill="#b9b2a2" stroke-width="3.5"/>
+      <path d="M196 378V270h120v108z" fill="#cbc2ad" stroke-width="3.5"/>
+      <path d="M280 270h36v108h-36z" fill="url(#hatch)" stroke="none"/>
+      <path d="M188 270v-14h136v14z" fill="#a39d90" stroke-width="3.5"/>
+      <path d="M210 290h92" stroke-width="1.6" opacity="0.6"/>
+      <path d="M212 336h50l-14-10M262 336l-14 10" fill="none" stroke="#b4432b" stroke-width="6"/>
+      <path d="M272 348v-20l14-12 14 12v20z" fill="none" stroke="#b4432b" stroke-width="5"/>
+    </g>
+
+    <!-- Horse and rider in green bronze, the rider's sword raised. -->
+    <g transform="translate(252 226) scale(5)" stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M-10 7V1M-7 7l1-6M5 7l-1-6M8 7V1" stroke-width="0.9" fill="none"/>
+      <path d="M-10 7h3M-7 7h3M4 7h3M8 7h3" stroke-width="0.7" fill="none"/>
+      <path d="M-12-3q0-3 3-3h14l4-7q2-2 4 0l1 3-3 3-1 2v5q0 2-2 2h-18q-2 0-2-2z" fill="url(#patina)" stroke-width="0.7"/>
+      <path d="M-12-2q-4 2-3 8" stroke-width="0.9" fill="none"/>
+      <path d="M8-11l2-3" stroke-width="0.6" fill="none"/>
+      <!-- Rider: leg, body, the arm and sword, the head under a hat. -->
+      <path d="M-3-5l2 4-1 4" stroke-width="0.9" fill="none"/>
+      <path d="M-4-6l1-9h4l1 9z" fill="url(#patina)" stroke-width="0.7"/>
+      <path d="M1-13l4-5M5-18l3-8" stroke-width="0.9" fill="none"/>
+      <circle cx="-1" cy="-17.5" r="2.2" fill="url(#patina)" stroke-width="0.6"/>
+      <path d="M-4-19.5h6l-1-2h-4z" fill="#6b7a5c" stroke-width="0.6"/>
+      <!-- Verdigris running down the flank. -->
+      <path d="M-6-2v4M2-2v5" stroke="#c9d6bc" stroke-width="0.8" opacity="0.6"/>
+    </g>
+    <!-- Pigeons on the hat and the horse's head. -->
+    <g fill="#8a8377" stroke="#33281c" stroke-width="1.6" stroke-linejoin="round">
+      <path d="M240 118c2-6 8-8 12-5l4-3 1 4c-2 5-8 8-14 7z"/>
+      <path d="M302 154c2-6 8-8 12-5l4-3 1 4c-2 5-8 8-14 7z"/>
+    </g>
+    <!-- Weeds in the cracks. -->
+    <g fill="none" stroke="#5c6a2c" stroke-width="2.6" stroke-linecap="round">
+      <path d="M70 470c2-12 6-20 12-26M78 472c0-12-2-20-6-26M86 470c4-8 8-14 14-16"/>
+      <path d="M420 470c2-14 6-22 12-28M430 472c0-14-2-22-8-30M440 470c4-10 10-16 16-18"/>
+    </g>
+  </g>
+
+  <!-- The medallion's frame. -->
+  <circle cx="256" cy="256" r="232" fill="none" stroke="#33281c" stroke-width="5"/>
+  <circle cx="256" cy="256" r="244" fill="none" stroke="#33281c" stroke-width="9"/>
+  <circle cx="256" cy="256" r="238" fill="none" stroke="#ece0c0" stroke-width="3"/>
+</svg>

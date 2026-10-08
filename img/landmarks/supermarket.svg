@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- A supermarket in the ruins: a long low hall under a blank red sign, its glass front smashed, the sliding doors jammed half open, shopping carts strewn across a cracked car park and a car left with its boot open. -->
+  <defs>
+    <clipPath id="disc"><circle cx="256" cy="256" r="232"/></clipPath>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cdb98c"/>
+      <stop offset="0.45" stop-color="#e6d7b0"/>
+      <stop offset="0.7" stop-color="#f3e9cc"/>
+    </linearGradient>
+    <linearGradient id="asphalt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9d968a"/>
+      <stop offset="1" stop-color="#857e72"/>
+    </linearGradient>
+    <linearGradient id="grass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a9ab7c"/>
+      <stop offset="1" stop-color="#8b8d5e"/>
+    </linearGradient>
+    <linearGradient id="facade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#cbc2ad"/>
+      <stop offset="1" stop-color="#b3a992"/>
+    </linearGradient>
+    <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <path d="M0 0v7" stroke="#33281c" stroke-width="1.6" opacity="0.55"/>
+    </pattern>
+    <pattern id="hatch-sky" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-20)">
+      <path d="M0 0v8" stroke="#6a5842" stroke-width="1.4" opacity="0.45"/>
+    </pattern>
+  </defs>
+
+  <g clip-path="url(#disc)">
+    <rect width="512" height="512" fill="url(#sky)"/>
+    <g stroke="#6a5842" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M268 92c10-22 36-28 52-14 10-24 46-28 60-6 18-12 44-4 48 16 14 0 24 10 22 22H268z" fill="#eadcb6"/>
+      <path d="M268 100h182v12H268z" fill="url(#hatch-sky)" stroke="none"/>
+    </g>
+    <path d="M150 110q7-7 14 0q7-7 14 0M190 92q5-5 10 0q5-5 10 0" fill="none" stroke="#33281c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Ruined blocks in the distance. -->
+    <g fill="#b9b2a2" stroke="#6a5842" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M0 330V220h40l8 10 8-14h46V330z"/>
+      <path d="M396 330V214h30l6 12 10-8h70V330z"/>
+    </g>
+    <g fill="#8a8377">
+      <path d="M12 236h10v12H12zM52 236h10v12H52zM32 260h10v12H32zM72 260h10v12H72zM12 284h10v12H12zM52 284h10v12H52z"/>
+      <path d="M440 232h10v12h-10zM480 232h10v12h-10zM460 256h10v12h-10zM440 280h10v12h-10zM480 280h10v12h-10z"/>
+    </g>
+
+    <!-- Cracked asphalt. -->
+    <path d="M0 330H512V512H0z" fill="url(#asphalt)"/>
+    <path d="M0 330H512" stroke="#33281c" stroke-width="2.5"/>
+    <g fill="none" stroke="#5f594f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M40 440l26 8 14 20 28 4M80 468l-4 28M330 470l24-10 22 12 28-6M376 472l6 24M200 494l26-8 26 8"/>
+    </g>
+    <!-- Parking bays. -->
+    <path d="M40 400 20 470M120 400l-8 70M200 400v70M312 400v70M392 400l8 70M472 400l20 70" stroke="#ece0c0" stroke-width="5" stroke-linecap="round" opacity="0.45"/>
+
+    <!-- The hall's shadow. -->
+    <path d="M60 372H452l30 14H90z" fill="#33281c" opacity="0.2"/>
+
+    <!-- The hall: flat roof, a long red sign band left blank, the glass front. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M60 372V236h392v136z" fill="url(#facade)" stroke-width="3.5"/>
+      <path d="M52 222h408v18H52z" fill="#a39d90" stroke-width="3"/>
+      <path d="M118 244h276v32H118z" fill="#b4432b" stroke-width="3"/>
+      <path d="M126 252h260v16H126z" fill="#c98a72" stroke="none" opacity="0.6"/>
+      <!-- A drip of rust from the sign. -->
+      <path d="M150 276v24M352 276v40" stroke="#82301c" stroke-width="5" opacity="0.35"/>
+      <!-- The glass front: dark panes, a few shards left. -->
+      <path d="M80 292h352v80H80z" fill="#2a2016" stroke-width="3"/>
+      <path d="M124 292v80M168 292v80M212 292v80M300 292v80M344 292v80M388 292v80" stroke="#8a8377" stroke-width="3"/>
+      <path d="M80 330h132M300 330h132" stroke="#8a8377" stroke-width="2.4"/>
+      <path d="M86 296l14 22 10-22zM176 334l18 14 10-14zM350 296l8 24 22-24zM396 340l14 20 14-20z" fill="#b9c4c0" stroke-width="1.6" opacity="0.7"/>
+      <!-- Sliding doors jammed half open. -->
+      <path d="M212 292h88v80h-88z" fill="#1a140d" stroke-width="3"/>
+      <path d="M212 292h30v80h-30zM276 292h24v80h-24z" fill="#5e5a52" stroke-width="2.4" opacity="0.9"/>
+      <!-- A trolley bay by the door. -->
+      <path d="M440 372v-40h24v40" fill="none" stroke-width="3"/>
+    </g>
+
+    <!-- A car left in the car park, its boot open. -->
+    <g transform="translate(110 444)" stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M-56 0v-20q0-6 6-8l10-18q2-4 6-4h40q4 0 6 4l12 18q8 2 8 8V0z" fill="#7d8a52" stroke-width="3.5"/>
+      <path d="M-34-46h28v16h-34zM2-46h22l8 16H2z" fill="#2a2016" stroke-width="2.6"/>
+      <path d="M32-28l10-26 12 4-6 22z" fill="#7d8a52" stroke-width="3"/>
+      <path d="M-44 0a10 10 0 0 0 20 0M20 0a10 10 0 0 0 20 0" fill="#2a2016" stroke-width="3"/>
+      <path d="M-30-22l14 8M0-24l20 6" stroke="#82301c" stroke-width="5" opacity="0.35"/>
+    </g>
+
+    <!-- Shopping carts strewn across the car park, one on its side. -->
+    <g transform="translate(250 430) rotate(0) scale(1.1)" fill="none" stroke="#33281c" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M-30-36h8l8 30h34l6-22H-18" stroke-width="3.5"/>
+      <path d="M-15-22h40M-12-14h34M-2-28v22M10-28v22" stroke-width="1.6"/>
+      <circle cx="-8" cy="4" r="4.5" fill="#2a2016" stroke-width="2.4"/>
+      <circle cx="18" cy="4" r="4.5" fill="#2a2016" stroke-width="2.4"/>
+    </g>
+    <g transform="translate(340 450) rotate(8) scale(1.1)" fill="none" stroke="#33281c" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M-30-36h8l8 30h34l6-22H-18" stroke-width="3.5"/>
+      <path d="M-15-22h40M-12-14h34M-2-28v22M10-28v22" stroke-width="1.6"/>
+      <circle cx="-8" cy="4" r="4.5" fill="#2a2016" stroke-width="2.4"/>
+      <circle cx="18" cy="4" r="4.5" fill="#2a2016" stroke-width="2.4"/>
+    </g>
+    <g transform="translate(420 412) rotate(-84) scale(0.9)" fill="none" stroke="#33281c" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M-30-36h8l8 30h34l6-22H-18" stroke-width="3.5"/>
+      <path d="M-15-22h40M-12-14h34M-2-28v22M10-28v22" stroke-width="1.6"/>
+      <circle cx="-8" cy="4" r="4.5" fill="#2a2016" stroke-width="2.4"/>
+      <circle cx="18" cy="4" r="4.5" fill="#2a2016" stroke-width="2.4"/>
+    </g>
+    <!-- Weeds in the cracks. -->
+    <g fill="none" stroke="#5c6a2c" stroke-width="2.6" stroke-linecap="round">
+      <path d="M70 470c2-12 6-20 12-26M78 472c0-12-2-20-6-26M86 470c4-8 8-14 14-16"/>
+      <path d="M420 470c2-14 6-22 12-28M430 472c0-14-2-22-8-30M440 470c4-10 10-16 16-18"/>
+    </g>
+  </g>
+
+  <!-- The medallion's frame. -->
+  <circle cx="256" cy="256" r="232" fill="none" stroke="#33281c" stroke-width="5"/>
+  <circle cx="256" cy="256" r="244" fill="none" stroke="#33281c" stroke-width="9"/>
+  <circle cx="256" cy="256" r="238" fill="none" stroke="#ece0c0" stroke-width="3"/>
+</svg>

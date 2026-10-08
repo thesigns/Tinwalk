@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <!-- Map badge: a wide supermarket with a blank sign over smashed windows, a shopping cart left in front. -->
+  <defs>
+    <clipPath id="inside"><circle cx="48" cy="48" r="42"/></clipPath>
+  </defs>
+
+  <circle cx="48" cy="48" r="45" fill="#ece0c0"/>
+  <g clip-path="url(#inside)">
+    <path d="M0 73H96V96H0z" fill="#a39d90"/>
+    <path d="M0 73H96" stroke="#33281c" stroke-width="2.4"/>
+  </g>
+  <!-- The building: a long flat roof, the sign band, the glass front. -->
+  <g stroke="#33281c" stroke-width="2.8" stroke-linejoin="round">
+    <path d="M10 40h76v33H10z" fill="#cbc2ad"/>
+    <path d="M8 32h80v10H8z" fill="#b4432b"/>
+    <path d="M16 50h64v23H16z" fill="#2a2016"/>
+  </g>
+  <path d="M32 50v23M48 50v23M64 50v23" stroke="#8a8377" stroke-width="2"/>
+  <path d="M20 56l6-4M36 54l8 6M56 52l4 8M70 58l6-6" stroke="#cbc2ad" stroke-width="1.6"/>
+
+  <!-- A shopping cart left in front. -->
+  <g fill="none" stroke="#33281c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M56 60h4l4 12h14l2-8H61"/>
+    <circle cx="66" cy="76" r="2" fill="#33281c"/>
+    <circle cx="76" cy="76" r="2" fill="#33281c"/>
+  </g>
+  <circle cx="48" cy="48" r="45" fill="none" stroke="#33281c" stroke-width="4"/>
+</svg>

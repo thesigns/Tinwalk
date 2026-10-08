@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <!-- Map badge: a Ferris wheel on its legs, cars hanging off the rim, a striped carousel beside it. -->
+  <defs>
+    <clipPath id="inside"><circle cx="48" cy="48" r="42"/></clipPath>
+  </defs>
+
+  <circle cx="48" cy="48" r="45" fill="#ece0c0"/>
+  <g clip-path="url(#inside)">
+    <path d="M0 73H96V96H0z" fill="#a39d90"/>
+    <path d="M0 73H96" stroke="#33281c" stroke-width="2.4"/>
+  </g>
+  <!-- The wheel's legs. -->
+  <path d="M38 36 24 73M38 36l14 37" stroke="#33281c" stroke-width="2.8" stroke-linecap="round"/>
+  <!-- The wheel. -->
+  <g fill="none" stroke="#33281c" stroke-linecap="round">
+    <circle cx="38" cy="36" r="22" stroke-width="2.8"/>
+    <path d="M38 36L60 36M38 36L53.6 51.6M38 36L38 58M38 36L22.4 51.6M38 36L16 36M38 36L22.4 20.4M38 36L38 14M38 36L53.6 20.4" stroke-width="1.4"/>
+  </g>
+  <g fill="#b4432b" stroke="#33281c" stroke-width="1.6">
+    <path d="M35 12h6v5h-6zM56 33h6v5h-6zM14 33h6v5h-6zM35 56h6v5h-6zM50 18h5v5h-5z"/>
+  </g>
+  <circle cx="38" cy="36" r="3" fill="#33281c"/>
+
+  <!-- The carousel: a striped cone over its platform. -->
+  <g stroke="#33281c" stroke-width="2.4" stroke-linejoin="round">
+    <path d="M58 58 72 46 86 58z" fill="#efe6cf"/>
+    <path d="M72 46 62 58h6zM72 46l4 12h6z" fill="#b4432b"/>
+    <path d="M72 58v15" fill="none"/>
+    <path d="M58 70h28v3H58z" fill="#8b6a42"/>
+  </g>
+  <circle cx="48" cy="48" r="45" fill="none" stroke="#33281c" stroke-width="4"/>
+</svg>

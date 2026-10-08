@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <!-- Map badge: a railway station with a clock stopped at a quarter past six, a lone carriage at the platform. -->
+  <defs>
+    <clipPath id="inside"><circle cx="48" cy="48" r="42"/></clipPath>
+  </defs>
+
+  <circle cx="48" cy="48" r="45" fill="#ece0c0"/>
+  <g clip-path="url(#inside)">
+    <path d="M0 73H96V96H0z" fill="#a39d90"/>
+    <path d="M0 73H96" stroke="#33281c" stroke-width="2.4"/>
+  </g>
+  <!-- The station: a gabled hall with the clock in its gable. -->
+  <g stroke="#33281c" stroke-width="2.8" stroke-linejoin="round">
+    <path d="M18 40h60v24H18z" fill="#a86f50"/>
+    <path d="M14 42 48 20 82 42z" fill="#6b665c"/>
+    <circle cx="48" cy="33" r="7" fill="#efe6cf"/>
+  </g>
+  <path d="M48 33v5M48 33h4" stroke="#33281c" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M24 46h8v12h-8zM64 46h8v12h-8zM42 46h12v18H42z" fill="#2a2016"/>
+
+  <!-- The carriage at the platform. -->
+  <g stroke="#33281c" stroke-width="2.6" stroke-linejoin="round">
+    <path d="M10 58h76v12H10z" fill="#7d8a52"/>
+  </g>
+  <path d="M16 61h8v5h-8zM30 61h8v5h-8zM58 61h8v5h-8zM72 61h8v5h-8z" fill="#2a2016"/>
+  <path d="M10 73h76" stroke="#33281c" stroke-width="2.4"/>
+  <circle cx="48" cy="48" r="45" fill="none" stroke="#33281c" stroke-width="4"/>
+</svg>

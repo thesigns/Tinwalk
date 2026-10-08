@@ -239,6 +239,26 @@ export const LANDMARKS = {
     biome: 'ruins',
     flavor: 'The spire fell into the churchyard. The doors were left open.',
   },
+  fairground: {
+    label: 'Fairground',
+    biome: 'ruins',
+    flavor: 'The Ferris wheel stopped with its cars still swinging. The carousel horses still smile.',
+  },
+  supermarket: {
+    label: 'Supermarket',
+    biome: 'ruins',
+    flavor: 'Every shelf was stripped in the first week. People still come back to check.',
+  },
+  statue: {
+    label: 'Statue',
+    biome: 'ruins',
+    flavor: 'Nobody remembers who the rider was. Someone painted the way home on the plinth.',
+  },
+  'train-station': {
+    label: 'Train Station',
+    biome: 'ruins',
+    flavor: 'The clock stopped at a quarter past six. The last train is still waiting at the platform.',
+  },
 };
 // Every fourth searched area may turn up a landmark, counting the areas still
 // active, so each fresh walk starts counting anew. Landmarks keep apart from
