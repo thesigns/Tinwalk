@@ -50,8 +50,9 @@
 
 :root {
   --font-stencil: "Big Shoulders Stencil", Impact, "Arial Narrow", sans-serif;
+  /* Headings and buttons are stencilled, typed-in text is typewritten, and
+     everything else is in the system's own sans. */
   --font-type: "Courier Prime", "Courier New", monospace;
-  /* Small print where a typewriter face reads too heavy: the system's own sans. */
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
   --paper: #ece0c0;
@@ -110,12 +111,14 @@ body {
   overscroll-behavior: none;
   background: var(--tin-dark);
   color: var(--ink);
-  font: 16px/1.4 var(--font-type);
+  font: 16px/1.4 var(--font-sans);
   -webkit-tap-highlight-color: transparent;
   user-select: none;
 }
 
+/* Text the player types is typewritten. */
 input {
+  font-family: var(--font-type);
   user-select: text;
 }
 
@@ -295,7 +298,7 @@ input {
 #mission-detail {
   color: var(--ink-soft);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* Alternating ink and paper segments, like on a printed map. */
@@ -729,7 +732,7 @@ button {
   margin-bottom: 4px;
   padding: 12px 18px;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.3;
   transform: rotate(-1deg);
   animation: note-in 260ms cubic-bezier(0.2, 0.9, 0.3, 1.3);
@@ -820,7 +823,8 @@ body[data-tab="shelter"] :is(#map-legend, #mission-note, #side-controls, #action
 .start-small {
   margin: 0;
   color: var(--ink-soft);
-  font: 13px/1.45 var(--font-sans);
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 /* A full-screen layer over the start screen, with a column of text. */
@@ -895,7 +899,7 @@ body[data-tab="shelter"] :is(#map-legend, #mission-note, #side-controls, #action
 .tagline {
   margin: 0 0 18px;
   font-size: 17px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .steps {
@@ -1013,14 +1017,7 @@ dialog input:focus,
   text-align: center;
 }
 
-/* The story reads better in the system's sans; only the World ID stays
-   typewritten, since it is something to copy letter by letter. */
-#new-game-screen p {
-  font-family: var(--font-sans);
-}
-
 .dialog-buttons.new-game-buttons {
-  justify-content: center;
   margin-top: 16px;
   padding-bottom: 20px;
   border-bottom: 1.5px dashed var(--ink-faint);
@@ -1044,7 +1041,7 @@ dialog input:focus,
 /* Selectable, so it can be copied and sent to friends. */
 .world-id {
   color: var(--ink);
-  font-weight: 700;
+  font-weight: 600;
   user-select: text;
 }
 
@@ -1072,13 +1069,9 @@ dialog input:focus,
   text-transform: uppercase;
 }
 
-.landmark-flavor {
-  font-style: italic;
-}
-
 .dialog-buttons {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 12px;
   margin-top: 22px;
 }
@@ -1295,7 +1288,7 @@ dialog input:focus,
 .resource-label {
   color: var(--ink-soft);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -1335,7 +1328,7 @@ dialog input:focus,
 .item-detail {
   color: var(--ink-soft);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* "Built", stamped in place of the button. */
@@ -1369,7 +1362,7 @@ dialog input:focus,
   background: var(--ink);
   color: var(--paper);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .manual-list .icon {
@@ -1474,7 +1467,7 @@ dialog input:focus,
 .hunger-time {
   justify-self: end;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   white-space: nowrap;
 }
 
@@ -1518,7 +1511,7 @@ dialog input:focus,
 
 .wound-time {
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .wound .treat {
@@ -1710,7 +1703,7 @@ dialog input:focus,
   margin: 8px 0 0;
   color: var(--ink-soft);
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* What a search turned up: a medal for the find and the enemy's stash after a fight. */
@@ -1772,7 +1765,7 @@ dialog input:focus,
   margin: 6px 0 0;
   color: var(--ink-soft);
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 #loot-stash h3 {
@@ -1817,10 +1810,6 @@ dialog input:focus,
   width: 18px;
   height: 18px;
   stroke-width: 2.4;
-}
-
-#loot-dialog .dialog-buttons {
-  justify-content: center;
 }
 
 /* An icon flying from the reward card into the status bar. */
@@ -1888,7 +1877,7 @@ dialog input:focus,
 }
 
 .duel-value small {
-  font-family: var(--font-type);
+  font-family: var(--font-sans);
   font-size: 14px;
   font-weight: 700;
 }
@@ -1931,7 +1920,7 @@ dialog input:focus,
 
 .choice-detail {
   text-align: right;
-  font-family: var(--font-type);
+  font-family: var(--font-sans);
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0;
@@ -1941,7 +1930,7 @@ dialog input:focus,
 #encounter-message {
   margin: 14px 0 0;
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* Smaller than a landmark's, to leave room for the fight below. */

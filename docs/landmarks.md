@@ -55,7 +55,7 @@ Każdy rodzaj ma własną ikonę w interfejsie, własną odznakę na mapie i wł
 ### Ekran landmarku
 
 - Tapnięcie w landmark na mapie otwiera jego ekran: dużą ilustrację, nazwę (np. „Gas Station”), drobnym drukiem, kiedy był ostatnio odwiedzony (np. „Last visited: 1d 23h ago”), i jedno zdanie o landmarku (flavor text, np. „Someone made a last stand here. The sandbags are still in place.”). Każdy rodzaj ma własne zdanie.
-- Przycisk „Remove landmark” trwale usuwa landmark z mapy, po potwierdzeniu w osobnym okienku. Miejsce zwalnia się dla nowych landmarków (zob. odstęp 600 m wyżej).
+- Przycisk „Remove” trwale usuwa landmark z mapy, po potwierdzeniu w osobnym okienku. Miejsce zwalnia się dla nowych landmarków (zob. odstęp 600 m wyżej).
 - Landmarku, przy którym czeka ocalały z trwającej misji, nie da się usunąć; ekran mówi wtedy, że ktoś tam czeka.
 - „Close” zamyka ekran.
 
