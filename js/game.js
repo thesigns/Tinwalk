@@ -311,7 +311,7 @@ const DRONE_CHANCE = 0.5;
 // Where there's one drone, there are more: the next search near where one was
 // met is likelier to meet another, and if it meets anything, it's a drone.
 const SWARM_RADIUS = 500;
-const SWARM_ENCOUNTER_CHANCE = 0.4;
+const SWARM_ENCOUNTER_CHANCE = 0.6;
 const DRONE = 'mosquidrone';
 // Shares of the backpack's resources the player loses. Running costs more
 // once the enemy has attacked.
