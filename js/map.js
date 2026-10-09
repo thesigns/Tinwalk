@@ -74,9 +74,9 @@ const COLORS = {
   heading: 'rgba(255, 250, 228, 0.85)',
   headingMiddle: 'rgba(255, 250, 228, 0.5)',
   headingFade: 'rgba(255, 250, 228, 0)',
-  // The shelter's ground: a pale veil that shows on dark forest and dust alike.
-  shelterFill: 'rgba(252, 248, 236, 0.3)',
-  shelterEdge: 'rgba(252, 248, 236, 0.65)',
+  // The shelter's ground: a bright green veil that shows on dark forest and dust alike.
+  shelterFill: 'rgba(60, 255, 40, 0.3)',
+  shelterEdge: 'rgba(60, 255, 40, 0.85)',
   // Searched areas are marked in yellow grease pencil, as on a map's
   // overlay: it stands out on the grey land, where red got lost.
   searchedFill: 'rgba(240, 200, 60, 0.1)',
@@ -719,7 +719,7 @@ export class MapView {
     ctx.restore();
   }
 
-  // The shelter: its ground under a pale veil, a stamped hut and its name on a strip of tape.
+  // The shelter: its ground under a green veil, a stamped hut and its name on a strip of tape.
   drawShelter(center, shelter) {
     const { ctx } = this;
     const { x, y } = this.toScreen(center, shelter);
