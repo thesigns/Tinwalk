@@ -780,7 +780,7 @@ button {
 }
 
 /* The map's own controls and notes only belong to the Wastes tab. */
-body[data-tab="you"] :is(#map-legend, #mission-note, #side-controls, #actions, #action-hint),
+body[data-tab="party"] :is(#map-legend, #mission-note, #side-controls, #actions, #action-hint),
 body[data-tab="shelter"] :is(#map-legend, #mission-note, #side-controls, #actions, #action-hint) {
   display: none !important;
 }

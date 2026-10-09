@@ -34,7 +34,7 @@ All code is in `js/`, loaded from `index.html` via `js/main.js`.
 
 | Module | Responsibility |
 |---|---|
-| `main.js` | Wires everything together: UI rendering, tabs (You, Shelter, Wastes) and their pages, actions (create shelter, search, fight, unload, craft, listen to the radio), dialogs, the start screen, reward animations |
+| `main.js` | Wires everything together: UI rendering, tabs (Party, Shelter, Wastes) and their pages, actions (create shelter, search, fight, unload, craft, listen to the radio), dialogs, the start screen, reward animations |
 | `game.js` | Game rules and constants (radii, loot tiers and weights, capacity, survivor meals, manuals, items, the radio, landmarks, rescue missions, enemies and the dice fight, wounds). Functions mutate the state; the caller saves |
 | `state.js` | State shape, `STATE_VERSION`, load/save to `localStorage`, export/import with validation |
 | `gps.js` | `LocationTracker`: Geolocation API, accuracy/staleness filtering, signal state, manual position for debug |

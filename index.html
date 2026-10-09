@@ -15,6 +15,7 @@
   <svg class="sprite" aria-hidden="true">
     <symbol id="i-backpack" viewBox="0 0 24 24"><path d="M9.5 5V4a2.5 2.5 0 0 1 5 0v1"/><path d="M7 21h10a2 2 0 0 0 2-2v-8a6 6 0 0 0-6-6h-2a6 6 0 0 0-6 6v8a2 2 0 0 0 2 2z"/><path d="M5 12.5c2.5 1.5 11.5 1.5 14 0"/><path d="M12 14v3"/></symbol>
     <symbol id="i-survivor" viewBox="0 0 24 24"><circle cx="12" cy="7.5" r="3.5"/><path d="M5 21v-1.5a7 7 0 0 1 14 0V21"/></symbol>
+    <symbol id="i-party" viewBox="0 0 24 24"><circle cx="9.5" cy="8" r="3.5"/><path d="M3 21v-1.5a6.5 6.5 0 0 1 13 0V21"/><path d="M16 3.5a3 3 0 0 1 0 6"/><path d="M21.5 21v-1.5a5.5 5.5 0 0 0-3.8-5.2"/></symbol>
     <symbol id="i-shelter" viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10.5h13V10"/><path d="M10 20.5V15h4v5.5"/></symbol>
     <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
     <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
@@ -22,6 +23,7 @@
     <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5.5 5.5"/></symbol>
     <symbol id="i-unload" viewBox="0 0 24 24"><path d="M4 13v7h16v-7"/><path d="M12 3v11"/><path d="m8 10 4 4 4-4"/></symbol>
     <symbol id="i-locate" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></symbol>
+    <symbol id="i-map" viewBox="0 0 24 24"><path d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20z"/><path d="M9 4v13.5M15 6.5V20"/></symbol>
     <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></symbol>
     <symbol id="i-export" viewBox="0 0 24 24"><path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></symbol>
     <symbol id="i-import" viewBox="0 0 24 24"><path d="M12 15V4"/><path d="m7 9 5-5 5 5"/><path d="M5 20h14"/></symbol>
@@ -89,21 +91,21 @@
   </div>
 
   <!-- The tabs other than Wastes: full pages over the map. -->
-  <section id="you-page" class="page paper" hidden>
+  <section id="party-page" class="page paper" hidden>
     <div class="page-content">
       <div class="panel-title">
-        <svg class="icon"><use href="#i-survivor"/></svg>
-        <h2>You</h2>
+        <svg class="icon"><use href="#i-party"/></svg>
+        <h2>Party</h2>
       </div>
-      <h3>Backpack <span id="you-load" class="count"></span></h3>
-      <ul id="you-backpack" class="item-list"></ul>
-      <p id="you-backpack-empty" class="muted">Your backpack is empty.</p>
-      <button id="you-drop" class="btn btn-ink btn-small" type="button"><svg class="icon"><use href="#i-backpack"/></svg><span>Drop things</span></button>
-      <div id="you-companion" hidden>
+      <h3>Backpack <span id="party-load" class="count"></span></h3>
+      <ul id="party-backpack" class="item-list"></ul>
+      <p id="party-backpack-empty" class="muted">Your backpack is empty.</p>
+      <button id="party-drop" class="btn btn-ink btn-small" type="button"><svg class="icon"><use href="#i-backpack"/></svg><span>Drop things</span></button>
+      <div id="party-companion" hidden>
         <h3>With you</h3>
         <div class="radio-row">
-          <p id="you-companion-text"></p>
-          <button id="you-treat" class="btn btn-ink btn-small" type="button"><svg class="icon"><use href="#i-first-aid-kit"/></svg><span>Treat</span></button>
+          <p id="party-companion-text"></p>
+          <button id="party-treat" class="btn btn-ink btn-small" type="button"><svg class="icon"><use href="#i-first-aid-kit"/></svg><span>Treat</span></button>
         </div>
       </div>
     </div>
@@ -142,9 +144,9 @@
     <div id="game-header">
       <nav id="tabs" class="tin" role="tablist" aria-label="Game">
         <button id="menu-button" class="tab tab-menu" type="button" aria-label="Menu"><svg class="icon"><use href="#i-menu"/></svg></button>
-        <button class="tab" type="button" role="tab" data-tab="you" aria-selected="false"><svg class="icon"><use href="#i-survivor"/></svg><span>You</span></button>
+        <button class="tab" type="button" role="tab" data-tab="party" aria-selected="false"><svg class="icon"><use href="#i-party"/></svg><span>Party</span></button>
         <button id="shelter-tab" class="tab" type="button" role="tab" data-tab="shelter" aria-selected="false"><svg class="icon"><use href="#i-shelter"/></svg><span>Shelter</span></button>
-        <button class="tab" type="button" role="tab" data-tab="wastes" aria-selected="true"><svg class="icon"><use href="#i-pin"/></svg><span>Wastes</span></button>
+        <button class="tab" type="button" role="tab" data-tab="wastes" aria-selected="true"><svg class="icon"><use href="#i-map"/></svg><span>Wastes</span></button>
       </nav>
       <header id="status-bar" class="tin">
         <button id="backpack-hud" class="hud-item" type="button">

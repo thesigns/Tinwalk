@@ -204,15 +204,15 @@ const ui = {
   backpackRow: $('backpack-row'),
   tabs: [...document.querySelectorAll('#tabs [data-tab]')],
   shelterTab: $('shelter-tab'),
-  pages: { you: $('you-page'), shelter: $('shelter-page') },
+  pages: { party: $('party-page'), shelter: $('shelter-page') },
   gameHeader: $('game-header'),
-  youLoad: $('you-load'),
-  youBackpack: $('you-backpack'),
-  youBackpackEmpty: $('you-backpack-empty'),
-  youCompanion: $('you-companion'),
-  youCompanionText: $('you-companion-text'),
-  youTreat: $('you-treat'),
-  youDrop: $('you-drop'),
+  partyLoad: $('party-load'),
+  partyBackpack: $('party-backpack'),
+  partyBackpackEmpty: $('party-backpack-empty'),
+  partyCompanion: $('party-companion'),
+  partyCompanionText: $('party-companion-text'),
+  partyTreat: $('party-treat'),
+  partyDrop: $('party-drop'),
   shelterNone: $('shelter-none'),
   shelterContent: $('shelter-content'),
   shelterPageName: $('shelter-page-name'),
@@ -290,7 +290,7 @@ const sound = new SoundEffects();
 const haptics = new Haptics();
 
 let started = false; // location tracking starts only after the welcome screen
-// The open tab: 'you', 'shelter' or 'wastes' (the map).
+// The open tab: 'party', 'shelter' or 'wastes' (the map).
 let tab = 'wastes';
 let inShelter = false;
 let locatingShelter = false;
@@ -370,7 +370,7 @@ function update() {
   // In debug mode the game can be played without GPS.
   ui.deniedScreen.hidden = isDebug || tracker.signal !== 'denied';
   debugPanel?.update();
-  if (tab === 'you') renderYouPage();
+  if (tab === 'party') renderPartyPage();
   // Importing or resetting a save from the start screen's settings changes this.
   const play = state.world ? 'Continue Game' : 'New Game';
   if (ui.playButton.textContent !== play) ui.playButton.textContent = play;
@@ -1192,14 +1192,14 @@ function showTab(name) {
     if (id === name) page.scrollTop = 0;
   }
   if (name === 'shelter') renderShelterPage();
-  if (name === 'you') renderYouPage();
+  if (name === 'party') renderPartyPage();
 }
 
 // What the player carries and who walks with them. Dropping things happens
 // in the backpack panel, which finds also open to make room.
-function renderYouPage() {
+function renderPartyPage() {
   const time = now();
-  ui.youLoad.textContent = `${backpackLoad(state)}/${backpackCapacity(state, time)}`;
+  ui.partyLoad.textContent = `${backpackLoad(state)}/${backpackCapacity(state, time)}`;
   const rows = [
     ...RESOURCES.filter(({ id }) => state.backpack[id] > 0).map(({ id, label }) => [id, label, `${state.backpack[id]}`]),
     ...state.backpackItems.map((item) => {
@@ -1208,22 +1208,22 @@ function renderYouPage() {
     }),
     ...state.backpackManuals.map((id) => ['manual', MANUALS[id].label, `${MANUAL_SIZE} space`]),
   ];
-  renderOnChange(ui.youBackpack, rows, () =>
+  renderOnChange(ui.partyBackpack, rows, () =>
     rows.map(([icon, label, detail]) => itemRow({ icon, label, detail, action: null, stamp: '' })),
   );
-  ui.youBackpackEmpty.hidden = rows.length > 0;
-  ui.youDrop.hidden = rows.length === 0;
+  ui.partyBackpackEmpty.hidden = rows.length > 0;
+  ui.partyDrop.hidden = rows.length === 0;
 
   const { companion } = state;
-  ui.youCompanion.hidden = !companion;
+  ui.partyCompanion.hidden = !companion;
   if (!companion) return;
   const wounded = isWounded(companion, time);
   const space = `+${companionCapacityBonus(state, time)} backpack space`;
-  ui.youCompanionText.textContent = wounded
+  ui.partyCompanionText.textContent = wounded
     ? `${companion.name} is wounded: ${space}. Heals in ${formatDuration(woundHealsAt(companion) - time)}.`
     : `${companion.name}: ${space}.`;
-  ui.youTreat.hidden = !wounded;
-  ui.youTreat.disabled = !canTreat(state, companion, time);
+  ui.partyTreat.hidden = !wounded;
+  ui.partyTreat.disabled = !canTreat(state, companion, time);
 }
 
 // Re-rendered every tick while open, so the hunger bars keep moving.
@@ -1681,8 +1681,8 @@ ui.actionButton.addEventListener('click', () => {
 ui.backpackHud.addEventListener('click', openBackpackPanel);
 ui.backpackTreat.addEventListener('click', treatCompanion);
 for (const button of ui.tabs) button.addEventListener('click', () => showTab(button.dataset.tab));
-ui.youDrop.addEventListener('click', openBackpackPanel);
-ui.youTreat.addEventListener('click', treatCompanion);
+ui.partyDrop.addEventListener('click', openBackpackPanel);
+ui.partyTreat.addEventListener('click', treatCompanion);
 // The bars stay on top of the pages, which start below them.
 new ResizeObserver(() => {
   document.documentElement.style.setProperty('--header-height', `${ui.gameHeader.offsetHeight}px`);

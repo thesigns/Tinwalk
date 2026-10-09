@@ -158,7 +158,7 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
 
 - Na górze ekranu gry są zakładki:
   - przycisk menu (ikona z trzema kreskami): wraca do ekranu startowego, a gra (także śledzenie pozycji) toczy się dalej,
-  - **You**: postać użytkownika. Na razie zawartość plecaka z obciążeniem, przycisk **Drop things** (otwiera panel plecaka) oraz ocalały, który idzie z użytkownikiem, z przyciskiem **Treat**, gdy jest ranny. W przyszłości więcej informacji o postaci.
+  - **Party**: użytkownik i osoby, które mu towarzyszą. Na razie zawartość plecaka z obciążeniem, przycisk **Drop things** (otwiera panel plecaka) oraz ocalały, który idzie z użytkownikiem, z przyciskiem **Treat**, gdy jest ranny. W przyszłości więcej informacji o postaci i towarzyszach.
   - **Shelter**: schron (opis niżej). Ikona zakładki jest zielona, gdy użytkownik jest w schronie, bo tylko wtedy działają akcje schronu.
   - **Wastes**: mapa. Po wejściu do gry otwiera się ta zakładka.
 - Pod zakładkami jest zawsze pasek stanu: zawartość plecaka (np. „Backpack 12/50”), czy idzie z nami ocalały, oraz jakość sygnału GPS. Dotknięcie plecaka otwiera panel plecaka, w którym można wyrzucić rzeczy.
