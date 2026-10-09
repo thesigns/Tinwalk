@@ -36,7 +36,6 @@ const WOBBLE_PX = 1.4;
 const WOBBLE_PERIOD_METERS = 190;
 const LABEL_FONT = '800 17px "Big Shoulders Stencil", Impact, sans-serif';
 // The shelter icon from the SVG sprite, in its 24x24 box.
-const HUT_ICON = new Path2D('M3 11.5 12 4l9 7.5M5.5 10v10.5h13V10M10 20.5V15h4v5.5');
 const LANDMARK_RADIUS_PX = 15;
 const LANDMARK_ICON_PX = 20;
 // Landmark and enemy badges.
@@ -66,7 +65,6 @@ const COLORS = {
   limeDark: '#5c9612',
   grey: '#a39d90',
   greyDark: '#6b665c',
-  tape: 'rgba(236, 226, 190, 0.94)',
   shadow: 'rgba(40, 28, 15, 0.35)',
   accuracy: 'rgba(180, 67, 43, 0.12)',
   accuracyOutline: 'rgba(180, 67, 43, 0.45)',
@@ -77,6 +75,9 @@ const COLORS = {
   // The shelter's ground: a bright green veil that shows on dark forest and dust alike.
   shelterFill: 'rgba(60, 255, 40, 0.3)',
   shelterEdge: 'rgba(60, 255, 40, 0.85)',
+  // Its name in green on a dark plate, like a town on an old game's world map.
+  shelterLabel: '#3cff28',
+  shelterPlate: 'rgba(14, 18, 12, 0.82)',
   // Searched areas are marked in yellow grease pencil, as on a map's
   // overlay: it stands out on the grey land, where red got lost.
   searchedFill: 'rgba(240, 200, 60, 0.1)',
@@ -719,7 +720,7 @@ export class MapView {
     ctx.restore();
   }
 
-  // The shelter: its ground under a green veil, a stamped hut and its name on a strip of tape.
+  // The shelter: its ground under a green veil and its name on a dark plate.
   drawShelter(center, shelter) {
     const { ctx } = this;
     const { x, y } = this.toScreen(center, shelter);
@@ -733,41 +734,23 @@ export class MapView {
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // Stamp
-    ctx.beginPath();
-    ctx.arc(x, y, 15, 0, Math.PI * 2);
-    ctx.fillStyle = COLORS.paper;
-    ctx.fill();
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = COLORS.paint;
-    ctx.stroke();
-    ctx.save();
-    ctx.translate(x - 10, y - 10.5);
-    ctx.scale(20 / 24, 20 / 24);
-    ctx.lineWidth = 2.6;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.stroke(HUT_ICON);
-    ctx.restore();
-
-    // Name on tape, above the circle so it doesn't cover the player standing inside.
+    // Name above the circle, so it doesn't cover the player standing inside.
     const label = shelter.name.toUpperCase();
     ctx.font = LABEL_FONT;
     const textWidth = ctx.measureText(label).width;
-    const labelY = y - Math.max(radius, 18) - 18;
+    const labelY = Math.round(y - radius - 20);
+    const plateX = Math.round(x - textWidth / 2 - 8) + 0.5;
+    const plateWidth = Math.round(textWidth + 16);
+    ctx.fillStyle = COLORS.shelterPlate;
+    ctx.fillRect(plateX, labelY - 12.5, plateWidth, 24);
+    ctx.strokeStyle = COLORS.shelterEdge;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(plateX, labelY - 12.5, plateWidth, 24);
     ctx.save();
-    ctx.translate(x, labelY);
-    ctx.rotate(-0.03);
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.25)';
-    ctx.shadowBlur = 3;
-    ctx.shadowOffsetY = 1;
-    ctx.fillStyle = COLORS.tape;
-    ctx.fillRect(-textWidth / 2 - 10, -13, textWidth + 20, 26);
-    ctx.shadowColor = 'transparent';
-    ctx.fillStyle = COLORS.ink;
+    ctx.fillStyle = COLORS.shelterLabel;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(label, 0, 1);
+    ctx.fillText(label, x, labelY + 1);
     ctx.restore();
   }
 
