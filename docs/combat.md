@@ -17,9 +17,21 @@ Siłę zapisuje się jak rzut kośćmi w grach fabularnych: `xdy+z`, czyli x rzu
 |-------------|--------------------------|-------|--------|----------------------|
 | Rat         | poza strefami radiacji   | 2d3   | 2–6    | 1 Junk + 1 Food      |
 | Mutated Rat | w strefach radiacji      | 1d6+2 | 3–8    | 1 Junk + 1 Isotope   |
+| Mosquidrone | wszędzie                 | 1d6   | 1–6    | 1 Junk + 1 Cell      |
 
-- Szczury są celowo słabe: to przeciwnicy na początek gry.
-- Rodzaj nowego wroga zależy od tego, czy miejsce przeszukania leży w strefie radiacji (zob. [radiation.md](radiation.md)). Zmutowany szczur zdradza więc strefę także graczowi bez licznika Geigera.
+- Szczury i Mosquidrone są celowo słabe: to przeciwnicy na początek gry.
+- Mosquidrone to przedwojenny dron do zwalczania szkodników, zbudowany jak komar. Jedna kość czyni go nieprzewidywalnym: bywa słabszy od szczura, bywa groźniejszy. Jest źródłem Cells (baterii), więc lata wszędzie, także w strefach radiacji.
+- Połowa nowych wrogów to Mosquidrone. Reszta to szczury, a w strefie radiacji zmutowane szczury (zob. [radiation.md](radiation.md)). Zmutowany szczur zdradza więc strefę także graczowi bez licznika Geigera.
+
+### Rój
+
+„Where there's one, there are more”: drony latają rojami.
+
+- Spotkanie Mosquidrone (nowego albo pozostawionego na mapie) zapamiętuje miejsce spotkania, bez względu na wynik walki.
+- Następne przeszukanie w promieniu 500 m od tego miejsca ma 40% szansy na wroga zamiast 12%, a jeśli wróg się pojawi, to zawsze Mosquidrone.
+- Rój działa tylko przy jednym, następnym przeszukaniu, także gdy wypada ono dalej niż 500 m (wtedy rój po prostu znika). Kolejny dron zapamiętuje nowe miejsce, więc rój może trwać przez kilka przeszukań z rzędu. Średnio rój daje ok. 1,7 drona (symulacja).
+- Gdy przeszukanie z miejsca, w którym stoi użytkownik, wypadłoby w roju, nad przyciskiem przeszukania widać podpowiedź „Something is whining nearby”. Gracz może więc świadomie wejść w rój po baterie albo go ominąć. Podpowiedzi o słabym sygnale i przeszukanym obszarze mają pierwszeństwo, a podpowiedź o landmarku ustępuje tej o roju.
+- Miejsce roju jest zapisywane w stanie gry.
 
 ## Broń
 

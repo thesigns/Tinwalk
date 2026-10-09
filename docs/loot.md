@@ -6,7 +6,7 @@ Przeszukanie nie daje ocalałych. Ocalałych zdobywa się tylko w misjach ratunk
 
 W grze jest pięć zasobów: **Junk**, **Food**, **Data** (dyskietki, taśmy i dyski z przedwojenną wiedzą), **Cells** (baterie) i **Isotopes**. Z Junk wytwarza się w schronie przedmioty (zob. [crafting.md](crafting.md)), Food jedzą ocaleni (zob. [survivors.md](survivors.md)), a Cells zasilają radio (zob. [landmarks.md](landmarks.md#radio)). Data na razie do niczego nie służy; w przyszłości będzie się za nie prowadzić research w schronie.
 
-Przeszukanie bez niczego daje tylko trzy podstawowe zasoby: Junk, Food i Data. Isotopes zdobywa się w strefach radiacji z licznikiem Geigera (zob. [radiation.md](radiation.md)) i ze zmutowanych szczurów. Cells przeszukania nie dają: mają pochodzić z pokonanych robotów i dronów, których jeszcze nie ma w grze, więc na razie Cells nie da się zdobyć.
+Przeszukanie bez niczego daje tylko trzy podstawowe zasoby: Junk, Food i Data. Isotopes zdobywa się w strefach radiacji z licznikiem Geigera (zob. [radiation.md](radiation.md)) i ze zmutowanych szczurów. Cells przeszukania nie dają: wypadają z pokonanych dronów (Mosquidrone, zob. [combat.md](combat.md#wrogowie)).
 
 Przeszukanie może też dać podręcznik ([crafting.md](crafting.md#podręczniki-manuals)), odkryć landmark ([landmarks.md](landmarks.md)) albo zakończyć się spotkaniem z wrogiem ([combat.md](combat.md)). Wygrana walka dokłada do zasobów skarb wroga ([combat.md](combat.md#wygrana)).
 

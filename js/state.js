@@ -4,7 +4,7 @@ import { now } from './clock.js';
 import { ENEMIES, ITEMS, LANDMARKS, MANUALS, RESOURCES, emptyResources } from './game.js';
 
 const STORAGE_KEY = 'tinwalk.state';
-export const STATE_VERSION = 14;
+export const STATE_VERSION = 15;
 export const WORLD_ID_MAX_LENGTH = 32;
 
 const INVALID_SAVE = "This file isn't a valid Tinwalk save";
@@ -122,6 +122,11 @@ const MIGRATIONS = {
     }
     save.version = 14;
   },
+  // Drones come in swarms. None has been met yet.
+  14(save) {
+    save.swarm = null;
+    save.version = 15;
+  },
 };
 
 // One bag of landmark types per biome; see drawLandmarkType() in game.js.
@@ -159,6 +164,8 @@ export function createInitialState() {
     // The rescue mission under way: { survivor, landmark: { type, lat, lon }, calledAt }
     mission: null,
     enemies: [], // enemies not beaten yet, where they were met: [{ type, lat, lon, foundAt }]
+    // Where the last drone was met, until the next search: { lat, lon } | null. See game.js.
+    swarm: null,
     backpack: emptyResources(),
     // How many of the Food units in the backpack are contaminated. Hidden from the player.
     backpackContaminatedFood: 0,
@@ -298,6 +305,7 @@ function isValidState(state) {
     isLandmarkBags(state.landmarkBags) &&
     Array.isArray(state.enemies) &&
     state.enemies.every(isEnemy) &&
+    (state.swarm === null || isPoint(state.swarm)) &&
     // A mission needs a radio, which is in the shelter.
     (state.mission === null || (isMission(state.mission) && state.shelter?.radio != null)) &&
     isResources(state.backpack) &&

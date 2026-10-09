@@ -296,9 +296,23 @@ export const ENEMIES = {
     treasure: { junk: 1, isotopes: 1 },
     flavor: 'The fallout gave it blistered skin, bone spikes and too many eyes. Stronger than a rat, and harder to read.',
   },
+  mosquidrone: {
+    label: 'Mosquidrone',
+    strength: '1d6',
+    treasure: { junk: 1, cells: 1 },
+    flavor: 'A pest-control drone that never got the order to stop. It whines in circles until something warm comes close, then dives.',
+  },
 };
 export const PLAYER_STRENGTH = '2d6';
 const ENCOUNTER_CHANCE = 0.12;
+// Drones fly everywhere, fallout included, since they are the source of Cells.
+// The other enemies are rats, mutated in the fallout.
+const DRONE_CHANCE = 0.5;
+// Where there's one drone, there are more: the next search near where one was
+// met is likelier to meet another, and if it meets anything, it's a drone.
+const SWARM_RADIUS = 500;
+const SWARM_ENCOUNTER_CHANCE = 0.4;
+const DRONE = 'mosquidrone';
 // Shares of the backpack's resources the player loses. Running costs more
 // once the enemy has attacked.
 const RUN_LOSS = 0.1;
@@ -436,17 +450,30 @@ export function search(state, position, time, random = Math.random) {
   state.searchedAreas.push({ lat: position.lat, lon: position.lon, searchedAt: time });
   visitLandmarks(state, position, time);
   const landmark = findLandmark(state, position, biomeAtPosition(position).name, time, random);
+  // A swarm lasts for one search; meeting another drone keeps it going.
+  const swarming = inSwarm(state, position);
+  state.swarm = null;
   const waiting = enemyNear(state, position);
-  if (waiting) return { landmark, encounter: { enemy: waiting } };
+  if (waiting) {
+    if (waiting.type === DRONE) state.swarm = { lat: waiting.lat, lon: waiting.lon };
+    return { landmark, encounter: { enemy: waiting } };
+  }
   const rescued = completeRescue(state, time);
   // A wounded survivor wouldn't have lasted with enemies around.
-  if (!rescued && random() < ENCOUNTER_CHANCE) {
-    const type = radiationAtPosition(state, position) > 0 ? 'mutated-rat' : 'rat';
+  if (!rescued && random() < (swarming ? SWARM_ENCOUNTER_CHANCE : ENCOUNTER_CHANCE)) {
+    const rat = radiationAtPosition(state, position) > 0 ? 'mutated-rat' : 'rat';
+    const type = swarming || random() < DRONE_CHANCE ? DRONE : rat;
     const enemy = { type, lat: position.lat, lon: position.lon, foundAt: time };
     state.enemies.push(enemy);
+    if (type === DRONE) state.swarm = { lat: position.lat, lon: position.lon };
     return { landmark, encounter: { enemy } };
   }
   return { landmark, loot: collectLoot(state, position, time, random), rescued };
+}
+
+// Whether a search here would be near the last drone met, where more may be about.
+export function inSwarm(state, position) {
+  return state.swarm !== null && distanceMeters(state.swarm, position) < SWARM_RADIUS;
 }
 
 // Landmarks that a search's area reaches count as visited, the same reach

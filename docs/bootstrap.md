@@ -231,7 +231,7 @@ Tych rzeczy nie implementujemy w prototypie.
 - Podstawowa ochrona przed oszukiwaniem, np. limit prędkości przemieszczania się.
 - Inne misje do landmarków, np. „czeka tam coś specjalnego”.
 - Łup zależny od rodzaju landmarku, np. apteka częściej daje apteczki.
-- Wrogowie-roboty i drony, z których wypadają Cells (tak jak Isotopes ze zmutowanych szczurów); to ma być główne źródło Cells.
+- Mocniejsze roboty i drony, z których wypada więcej Cells.
 - Wytwarzanie Cells w schronie:
   - mini-reaktor produkujący Cells z Reactor Fuel; Reactor Fuel wytwarza się z Isotopes (zob. [radiation.md](radiation.md)),
   - panele słoneczne.

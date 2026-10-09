@@ -37,6 +37,7 @@ import {
   freeSpace,
   hasGeigerCounter,
   hungerOf,
+  inSwarm,
   isInShelter,
   isMissionLandmark,
   isNight,
@@ -514,11 +515,17 @@ function currentAction() {
   const blocker = good ? searchBlocker(state, tracker.position, now()) : null;
   // Tells the player a search here would reach a landmark, e.g. a rescue mission's.
   const landmark = good && !blocker ? landmarkInReach(state, tracker.position, now()) : null;
+  // More drones may be about where one was just met.
+  const swarm = good && !blocker && inSwarm(state, tracker.position);
   return {
     id: 'search',
     label: 'Search area',
     enabled: good && !blocker,
-    hint: signalHint ?? SEARCH_BLOCKER_HINTS[blocker] ?? (landmark && `Near the ${LANDMARKS[landmark.type].label}`),
+    hint:
+      signalHint ??
+      SEARCH_BLOCKER_HINTS[blocker] ??
+      (swarm ? 'Something is whining nearby' : null) ??
+      (landmark && `Near the ${LANDMARKS[landmark.type].label}`),
   };
 }
 

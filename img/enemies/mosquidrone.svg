@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- A tin pest-control drone, built like a mosquito, hovering over a dusty field
+       on two blurred rotors: a glowing lens, a long needle, thin legs dangling.
+       More of its kind circle in the distance, over a line of leaning power poles. -->
+  <defs>
+    <clipPath id="disc"><circle cx="256" cy="256" r="232"/></clipPath>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cdb98c"/>
+      <stop offset="0.45" stop-color="#e6d7b0"/>
+      <stop offset="0.7" stop-color="#f3e9cc"/>
+    </linearGradient>
+    <linearGradient id="dust" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b9ad92"/>
+      <stop offset="1" stop-color="#968a72"/>
+    </linearGradient>
+    <linearGradient id="tin" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cfc8b6"/>
+      <stop offset="0.55" stop-color="#a39d90"/>
+      <stop offset="1" stop-color="#6b665c"/>
+    </linearGradient>
+    <radialGradient id="lens" cx="0.4" cy="0.38" r="0.6">
+      <stop offset="0" stop-color="#f6ecd6"/>
+      <stop offset="0.35" stop-color="#d9654a"/>
+      <stop offset="1" stop-color="#82301c"/>
+    </radialGradient>
+    <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <path d="M0 0v7" stroke="#33281c" stroke-width="1.6" opacity="0.55"/>
+    </pattern>
+    <pattern id="hatch-sky" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-20)">
+      <path d="M0 0v8" stroke="#6a5842" stroke-width="1.4" opacity="0.45"/>
+    </pattern>
+    <!-- A distant drone, a dark speck on two rotor strokes, centered on its body. -->
+    <g id="speck" fill="#4a4238" stroke="#33281c" stroke-width="2" stroke-linecap="round">
+      <ellipse rx="7" ry="5"/>
+      <path d="M-7 1c-5 1-8 3-10 6 4 0 8-1 10-4z"/>
+      <path d="M-4-4v-4M4-4v-4M-10-8h12M-2-8h12M6 2l7 5M-2 5l-2 6M3 5l2 6" fill="none"/>
+    </g>
+  </defs>
+
+  <g clip-path="url(#disc)">
+    <rect width="512" height="512" fill="url(#sky)"/>
+    <g stroke="#6a5842" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M60 110c8-18 30-24 44-12 10-20 40-22 52-4 16-8 36 2 38 18 12 0 20 8 18 18H60z" fill="#eadcb6"/>
+      <path d="M60 120h152v10H60z" fill="url(#hatch-sky)" stroke="none"/>
+    </g>
+
+    <!-- Others of its kind, circling far off. -->
+    <use href="#speck" transform="translate(402 118)"/>
+    <use href="#speck" transform="translate(438 150) scale(0.7)"/>
+    <use href="#speck" transform="translate(372 166) scale(0.55)"/>
+
+    <!-- Low hills on the horizon. -->
+    <path d="M0 320c40-20 80-28 120-22 30-20 70-26 110-14 40-16 90-18 130-4 40-12 90-10 152 8V360H0z" fill="#b9b2a2" stroke="#6a5842" stroke-width="2.5" stroke-linejoin="round"/>
+
+    <!-- Power poles leaning along a dead road, the wires sagging between them. -->
+    <g stroke="#33281c" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M72 352 80 262M64 274h32M68 288h26" fill="none" stroke-width="4"/>
+      <path d="M442 350 432 250M418 262h32M420 278h28" fill="none" stroke-width="4"/>
+      <path d="M66 274c60 30 130 34 190 30M96 274c40 22 90 28 150 26M418 262c-50 30-110 40-170 42M450 262c-60 30-130 40-190 40" fill="none" stroke="#4a4238" stroke-width="1.8"/>
+    </g>
+
+    <!-- The dusty field. -->
+    <path d="M0 352H512V512H0z" fill="url(#dust)"/>
+    <path d="M0 352H512" stroke="#33281c" stroke-width="2.5"/>
+    <g fill="none" stroke="#6a5f4c" stroke-width="2" stroke-linecap="round">
+      <path d="M30 400l26-6 18 10M400 392l30 8 22-6M120 470l30-10 24 12M330 480l26-8 30 6"/>
+    </g>
+
+    <!-- Its shadow on the dust. -->
+    <ellipse cx="262" cy="430" rx="96" ry="13" fill="#33281c" opacity="0.25"/>
+
+    <!-- Dry grass tufts and a fence post with a strand of barbed wire. -->
+    <g stroke="#33281c" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M150 462l-6-26M156 462l2-30M162 462l10-24M168 462l14-16M144 462l-14-18" fill="none" stroke="#7d6a42" stroke-width="3.5"/>
+      <path d="M330 470l-4-24M336 470l4-28M342 470l12-22M324 470l-12-16" fill="none" stroke="#7d6a42" stroke-width="3.5"/>
+      <path d="M404 440V370h14v70z" fill="#8f6c50" stroke-width="3"/>
+      <path d="M490 384H404M404 384H330" fill="none" stroke="#4a4238" stroke-width="2"/>
+      <path d="M444 378l6 12M376 378l6 12M350 378l6 12" fill="none" stroke="#4a4238" stroke-width="2"/>
+    </g>
+
+    <!-- The drone. -->
+    <g stroke="#33281c" stroke-linejoin="round" stroke-linecap="round">
+      <!-- Legs, thin and bent, each with a joint, dangling behind the body. -->
+      <g fill="none" stroke-width="4">
+        <path d="M222 278l-34 50-22 58"/>
+        <path d="M252 288l-8 62-20 56"/>
+        <path d="M286 284l30 52 34 46"/>
+        <path d="M304 270l52 30 26 50"/>
+      </g>
+      <g fill="#6b665c" stroke-width="2.5">
+        <circle cx="188" cy="328" r="5"/>
+        <circle cx="244" cy="350" r="5"/>
+        <circle cx="316" cy="336" r="5"/>
+        <circle cx="356" cy="300" r="5"/>
+      </g>
+
+      <!-- The abdomen, tapering back like a mosquito's, in banded plates. -->
+      <path d="M190 228c-44 6-82 28-108 60 38 6 82-6 116-34z" fill="#6b665c" stroke-width="3.5"/>
+      <path d="M190 228c-44 6-82 28-108 60 38 6 82-6 116-34z" fill="url(#hatch)" stroke="none" opacity="0.6"/>
+      <path d="M164 236l14 26M136 250l12 22M110 266l10 18" fill="none" stroke-width="2.5"/>
+
+      <!-- Rotor masts and hubs. -->
+      <path d="M200 190v-50M312 190v-50" fill="none" stroke-width="7"/>
+      <circle cx="200" cy="138" r="9" fill="#6b665c" stroke-width="3"/>
+      <circle cx="312" cy="138" r="9" fill="#6b665c" stroke-width="3"/>
+
+      <!-- Body: a dented tin shell with seams and rivets. -->
+      <ellipse cx="256" cy="230" rx="84" ry="62" fill="url(#tin)" stroke-width="4"/>
+      <path d="M176 246c24 34 140 38 162 0-6 28-42 46-82 46s-74-18-80-46z" fill="#5f594f" opacity="0.55" stroke="none"/>
+      <path d="M190 198c34-16 96-18 132-2" fill="none" stroke-width="2.6"/>
+      <path d="M180 232c40 10 110 12 156 0" fill="none" stroke-width="2.2" opacity="0.7"/>
+      <g fill="#33281c" stroke="none">
+        <circle cx="200" cy="208" r="2.6"/>
+        <circle cx="226" cy="200" r="2.6"/>
+        <circle cx="254" cy="197" r="2.6"/>
+        <circle cx="282" cy="198" r="2.6"/>
+        <circle cx="306" cy="204" r="2.6"/>
+      </g>
+      <!-- Rust and a dent. -->
+      <path d="M206 254c10-6 24-4 30 4-8 8-24 8-30-4z" fill="#9a6d4c" opacity="0.8" stroke="none"/>
+      <path d="M240 178c8 6 20 6 28 0" fill="none" stroke-width="2.2"/>
+
+      <!-- The needle, long and thin, a brass tip. -->
+      <path d="M326 252 452 336l-5 6-128-80z" fill="#a39d90" stroke-width="3"/>
+      <path d="M420 316 452 336l-5 6-34-20z" fill="#e0bd68" stroke-width="2.5"/>
+
+      <!-- A glowing lens for an eye, in a tin socket, and a smaller sensor below it. -->
+      <circle cx="316" cy="220" r="28" fill="#4a4238" stroke-width="4"/>
+      <circle cx="316" cy="220" r="18" fill="url(#lens)" stroke-width="3"/>
+      <circle cx="310" cy="213" r="5" fill="#f6ecd6" stroke="none"/>
+      <circle cx="296" cy="256" r="7" fill="#e0bd68" stroke-width="2.5"/>
+
+      <!-- Rotors, blurred with speed, one blade caught crisp in each. -->
+      <ellipse cx="200" cy="136" rx="58" ry="12" fill="#ece0c0" fill-opacity="0.6" stroke-width="2.5"/>
+      <ellipse cx="312" cy="136" rx="58" ry="12" fill="#ece0c0" fill-opacity="0.6" stroke-width="2.5"/>
+      <path d="M148 132l104 8M260 140l104-8" fill="none" stroke-width="3.5"/>
+      <!-- The whine. -->
+      <path d="M118 118q8-8 16 0M106 140q8-8 16 0M394 118q8-8 16 0M402 142q8-8 16 0" fill="none" stroke-width="2.6"/>
+    </g>
+  </g>
+
+  <!-- The medallion's frame. -->
+  <circle cx="256" cy="256" r="232" fill="none" stroke="#33281c" stroke-width="5"/>
+  <circle cx="256" cy="256" r="244" fill="none" stroke="#33281c" stroke-width="9"/>
+  <circle cx="256" cy="256" r="238" fill="none" stroke="#ece0c0" stroke-width="3"/>
+</svg>
