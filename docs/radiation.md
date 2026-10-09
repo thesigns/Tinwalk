@@ -55,18 +55,18 @@ Licznik działa, gdy jest w plecaku. Nie trzeba go włączać.
 
 ## Choroba (Sick)
 
-- Ocalały, który zje choć jedną skażoną jednostkę, zachoruje. Choruje tylko ocalały w schronie, bo ocalały idący z użytkownikiem nie je.
-- Choroba działa jak rana (zob. [combat.md](combat.md#rany)):
+- Ocalały, który zje choć jedną skażoną jednostkę, zachoruje. Dotyczy to też drużyny, która je z plecaka (zob. [party.md](party.md#jedzenie)).
+- Choroba:
   - mija sama po 72 godzinach,
   - chory przy każdym posiłku zjada 2 Food zamiast 1 (zob. [survivors.md](survivors.md)), które też mogą być skażone,
   - kolejne skażone jedzenie nie pogarsza stanu, ale odnawia czas choroby do 72 godzin.
 - Gdy skażonego jedzenia jest dużo, chory może chorować bez końca. To zamierzone.
-- Ocalały może być naraz ranny i chory. Czas gojenia liczy się osobno, ale kary się nie sumują: ranny i chory zjada 2 Food, a nie 3.
-- Apteczka leczy chorobę tak jak ranę. Jedno użycie leczy naraz ranę i chorobę.
+- Ocalały może być naraz ranny i chory. Rany i choroba goją się osobno (zob. [combat.md](combat.md#gojenie)).
+- Apteczka leczy chorobę. Jedno użycie leczy jedną rzecz: u rannego najpierw ranę, a chorobę dopiero wtedy, gdy ran już nie ma.
 
 ## Interfejs
 
 - Po zachorowaniu aplikacja pokazuje okno z tytułem „Ada is sick” i tekstem „Ada got sick: the food was contaminated. A first aid kit will help.” Gdy posiłki rozliczają się po otwarciu aplikacji, okno wymienia wszystkich, którzy zachorowali, a pomija tych, którzy zdążyli odejść z głodu.
-- Na plakietce ocalałego jest oznaczenie „Sick” z ikoną radiacji i czasem do wyzdrowienia, np. „heals in 50 h”, oraz przycisk **Treat**. Ranny i chory ma oznaczenie „Wounded & sick” i czas do późniejszego z wyzdrowień.
+- Na plakietce ocalałego jest oznaczenie „Sick” z ikoną radiacji i czasem do wyzdrowienia, np. „heals in 50 h”, oraz przycisk **Treat**. Ranny i chory ma kropelki krwi i oznaczenie np. „2 wounds & sick” z czasem do zagojenia następnej rany.
 - Komunikat po przeszukaniu z licznikiem, np. „You've found 1 Isotope. Your Geiger counter showed everything else here was too hot to keep.” Gdy licznik się zużyje, komunikat kończy się „…, then went dead.”
 - W trybie debug panel GPS pokazuje natężenie radiacji w miejscu użytkownika.

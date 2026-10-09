@@ -110,7 +110,8 @@ export const LISTEN_COOLDOWN_MS = 4 * 60 * 60 * 1000;
 const LISTEN_CELLS = 1;
 const CALL_CHANCE_STEP = 0.25;
 const CALL_CHANCE_PERIOD_MS = 4 * 60 * 60 * 1000;
-const MISSION_DURATION_MS = 24 * 60 * 60 * 1000;
+// Long enough to make room in a full party and come back for the survivor.
+const MISSION_DURATION_MS = 48 * 60 * 60 * 1000;
 
 // Landmarks, by the biome they are found in. Ids double as icon names.
 export const LANDMARKS = {
@@ -304,6 +305,8 @@ export const ENEMIES = {
   },
 };
 export const PLAYER_STRENGTH = '2d6';
+// Everyone in the party fights alongside the player.
+export const SURVIVOR_STRENGTH = '1d6';
 const ENCOUNTER_CHANCE = 0.12;
 // Drones fly everywhere, fallout included, since they are the source of Cells.
 // The other enemies are rats, mutated in the fallout.
@@ -313,11 +316,10 @@ const DRONE_CHANCE = 0.5;
 const SWARM_RADIUS = 500;
 const SWARM_ENCOUNTER_CHANCE = 0.6;
 const DRONE = 'mosquidrone';
-// Shares of the backpack's resources the player loses. Running costs more
-// once the enemy has attacked.
+// Shares of the backpack's resources the player loses running away. Running
+// costs more once the enemy has attacked. A lost fight costs a wound instead.
 const RUN_LOSS = 0.1;
 const RUN_LOSS_UNDER_ATTACK = 0.2;
-const DEFEAT_LOSS = 0.4;
 
 export const SHELTER_RADIUS = 100;
 // The player leaves the shelter a bit further out than they enter it, so GPS
@@ -336,19 +338,31 @@ export const SEARCH_EXPIRY_MS = 6 * 60 * 60 * 1000;
 export const SHELTER_NAME_MAX_LENGTH = 24;
 export const DEFAULT_SHELTER_NAME = 'Shelter';
 
-// Survivors in the shelter eat 1 Food a day. Without food they get hungry,
-// then starving, and leave the shelter when the last stage runs out.
+// Survivors eat 1 Food a day: from storage in the shelter, and from the
+// backpack out in the wastes. Without food they get hungry, then starving,
+// and leave when the last stage runs out.
 const MEAL_INTERVAL_MS = 24 * 60 * 60 * 1000;
 export const HUNGER_STAGES = ['satiated', 'hungry', 'starving'];
-// A wounded or sick survivor eats more, but only if there is enough food.
-const AILING_MEAL_FOOD = 2;
-// Wounds and sickness heal on their own; a first aid kit heals them right away.
-const WOUND_HEAL_MS = 72 * 60 * 60 * 1000;
+// A sick survivor eats more, but only if there is enough food.
+const SICK_MEAL_FOOD = 2;
+// Wounds heal one at a time, a day each, but only while the wounded are well
+// fed: a hungry or starving survivor doesn't heal. The player has no hunger,
+// so theirs always heal. Sickness heals on its own. A first aid kit heals one
+// wound, or the sickness, right away.
+const WOUND_HEAL_MS = 24 * 60 * 60 * 1000;
 const SICKNESS_HEAL_MS = 72 * 60 * 60 * 1000;
+// Everyone can take this many wounds. One more kills a survivor, while the
+// player only ever gets this badly hurt.
+export const MAX_WOUNDS = 4;
 
-const BACKPACK_CAPACITY = 50;
-export const SURVIVOR_CAPACITY_BONUS = 30;
-export const WOUNDED_CAPACITY_BONUS = 10;
+// What everyone in the party carries, the player included. Each wound takes
+// some of it away, as it takes one off their strength in a fight.
+const CARRY_CAPACITY = 50;
+const WOUND_CAPACITY_LOSS = 10;
+
+// The most people in the party, the player included. It will grow as the
+// player's character develops.
+const PARTY_LIMIT = 2;
 
 export function emptyResources() {
   return Object.fromEntries(RESOURCES.map(({ id }) => [id, 0]));
@@ -364,19 +378,23 @@ export function backpackLoad(state) {
   return totalResources(state.backpack) + items + state.backpackManuals.length * MANUAL_SIZE;
 }
 
-export function companionCapacityBonus(state, time) {
-  if (!state.companion) return 0;
-  return isWounded(state.companion, time) ? WOUNDED_CAPACITY_BONUS : SURVIVOR_CAPACITY_BONUS;
+// What someone can carry: less with each wound.
+export function carryCapacity(wounds) {
+  return CARRY_CAPACITY - WOUND_CAPACITY_LOSS * wounds;
 }
 
-export function backpackCapacity(state, time) {
-  return BACKPACK_CAPACITY + companionCapacityBonus(state, time);
+// The backpack space the rest of the party adds.
+export function partyCapacityBonus(state) {
+  return state.party.reduce((sum, survivor) => sum + carryCapacity(survivor.wounds), 0);
 }
 
-// The backpack may hold more than its capacity after a companion got
-// wounded; nothing falls out, but nothing more fits until it is lighter.
-export function freeSpace(state, time) {
-  return Math.max(0, backpackCapacity(state, time) - backpackLoad(state));
+export function backpackCapacity(state) {
+  return carryCapacity(state.player.wounds) + partyCapacityBonus(state);
+}
+
+// The backpack never holds more than its capacity for long: see shedLoad().
+export function freeSpace(state) {
+  return Math.max(0, backpackCapacity(state) - backpackLoad(state));
 }
 
 export function createShelter(state, { lat, lon }, name, time) {
@@ -526,16 +544,15 @@ export function removeLandmark(state, landmark) {
 }
 
 // The rest of a search after beating the enemy: { loot, rescued, treasure },
-// with loot from collectLoot(), rescued the name of the survivor found if the
-// search reached the rescue mission's landmark, or null, and treasure the
-// enemy's resources the player could carry after the loot.
+// with loot from collectLoot(), rescued as completeRescue() returns it, and
+// treasure the enemy's resources the player could carry after the loot.
 export function finishSearch(state, position, time, enemy, random = Math.random) {
   const rescued = completeRescue(state, time);
   const loot = collectLoot(state, position, time, random);
   const radioactive = radiationAtPosition(state, position) > 0;
   const treasure = emptyResources();
   for (const [id, amount] of Object.entries(ENEMIES[enemy.type].treasure)) {
-    treasure[id] = Math.min(amount, freeSpace(state, time));
+    treasure[id] = Math.min(amount, freeSpace(state));
     state.backpack[id] += treasure[id];
     if (radioactive && id === 'food') state.backpackContaminatedFood += treasure[id];
   }
@@ -597,7 +614,7 @@ export function collectLoot(state, position, time, random = Math.random) {
   const lightWornOut = light ? useItem(state.backpackItems, light) : false;
   const geigerWornOut = geiger ? useItem(state.backpackItems, geiger) : false;
   const finds = RESOURCES.filter(({ id }) => found[id] > 0).map((resource) => {
-    const carried = Math.min(found[resource.id], freeSpace(state, time));
+    const carried = Math.min(found[resource.id], freeSpace(state));
     state.backpack[resource.id] += carried;
     if (radioactive && resource.id === 'food') state.backpackContaminatedFood += carried;
     return { resource, found: found[resource.id], carried };
@@ -696,12 +713,12 @@ function hasManual(state, id) {
   return state.shelter.manuals.includes(id) || state.backpackManuals.includes(id);
 }
 
-export function canTakeManual(state, time) {
-  return freeSpace(state, time) >= MANUAL_SIZE;
+export function canTakeManual(state) {
+  return freeSpace(state) >= MANUAL_SIZE;
 }
 
-export function takeManual(state, id, time) {
-  if (!canTakeManual(state, time) || hasManual(state, id)) return false;
+export function takeManual(state, id) {
+  if (!canTakeManual(state) || hasManual(state, id)) return false;
   state.backpackManuals.push(id);
   return true;
 }
@@ -714,9 +731,20 @@ export function backpackWeapons(state) {
     .sort((a, b) => diceAverage(ITEMS[b.id].bonus) - diceAverage(ITEMS[a.id].bonus) || a.uses - b.uses);
 }
 
-// The player's strength with a weapon from the backpack, or bare-handed if it is null.
-export function playerStrength(weapon) {
-  return weapon ? addDice(PLAYER_STRENGTH, ITEMS[weapon.id].bonus) : PLAYER_STRENGTH;
+// Someone's strength in a fight, with one off for each wound, e.g. '2d6-2'.
+export function woundedStrength(strength, wounds) {
+  return wounds > 0 ? addDice(strength, `-${wounds}`) : strength;
+}
+
+// The party's strength in a fight: the player's, with a weapon from the
+// backpack or bare-handed if it is null, and everyone else's. The badly
+// wounded get in the way more than they help, so theirs can take away.
+export function partyStrength(state, weapon) {
+  return addDice(
+    woundedStrength(PLAYER_STRENGTH, state.player.wounds),
+    ...state.party.map((survivor) => woundedStrength(SURVIVOR_STRENGTH, survivor.wounds)),
+    ...(weapon ? [ITEMS[weapon.id].bonus] : []),
+  );
 }
 
 // The enemy's attack once the player has reached for a weapon. Every
@@ -728,16 +756,85 @@ export function enemyAttack(enemy, random = Math.random) {
 
 // Strikes back at the enemy's attack with a weapon from the backpack, or
 // bare-handed if it is null, which uses the weapon up a little whatever the
-// outcome. A tie goes to the enemy. Returns { won, strike, wornOut, lost }:
-// the player's roll, whether the weapon was used up and the resources lost.
-// A beaten enemy leaves the map; the caller then finishes the search.
-export function fight(state, { enemy }, attack, weapon, random = Math.random) {
-  const strike = rollDice(playerStrength(weapon), random);
+// outcome. A tie goes to the enemy. Returns { won, strike, wornOut, wounded,
+// shed }: the party's roll, whether the weapon was used up, and after a lost
+// fight who the enemy wounded (see woundSomeone()) and what fell out of the
+// backpack, which holds less now (see shedLoad()). A beaten enemy leaves the
+// map; the caller then finishes the search.
+export function fight(state, { enemy }, attack, weapon, time, random = Math.random) {
+  const strike = rollDice(partyStrength(state, weapon), random);
   const wornOut = weapon ? useItem(state.backpackItems, weapon) : false;
   const won = strike > attack;
-  if (won) state.enemies.splice(state.enemies.indexOf(enemy), 1);
-  const lost = won ? emptyResources() : loseResources(state, DEFEAT_LOSS, random);
-  return { won, strike, wornOut, lost };
+  if (won) {
+    state.enemies.splice(state.enemies.indexOf(enemy), 1);
+    return { won, strike, wornOut, wounded: null, shed: null };
+  }
+  const wounded = woundSomeone(state, time, random);
+  return { won, strike, wornOut, wounded, shed: shedLoad(state, false, random) };
+}
+
+// A lost fight wounds one of the party at random, the player included.
+// Returns { name, killed }: the name, or null for the player, and whether it
+// was one wound too many. Those killed leave the party, into the shelter's
+// history; the player only ever gets as badly hurt as MAX_WOUNDS.
+function woundSomeone(state, time, random) {
+  const people = [state.player, ...state.party];
+  const person = people[Math.floor(random() * people.length)];
+  settleHealing(state, person, time);
+  if (person === state.player) {
+    person.wounds = Math.min(MAX_WOUNDS, person.wounds + 1);
+    return { name: null, killed: false };
+  }
+  if (person.wounds < MAX_WOUNDS) {
+    person.wounds++;
+    return { name: person.name, killed: false };
+  }
+  state.party.splice(state.party.indexOf(person), 1);
+  state.shelter.departedSurvivors.push({ name: person.name, arrivedAt: person.arrivedAt, leftAt: time, reason: 'killed' });
+  return { name: person.name, killed: true };
+}
+
+// When the backpack holds more than the party can carry, after a wound or
+// when someone leaves the party, the lightest things fall out first, at
+// random among equals: resources, then items and manuals by size. In the
+// shelter they go into storage; anywhere else they are lost. Returns what fell
+// out: { resources, items, manuals }, with items and manual ids.
+export function shedLoad(state, inShelter, random = Math.random) {
+  const shed = { resources: emptyResources(), items: [], manuals: [] };
+  let contaminated = 0;
+  let excess = backpackLoad(state) - backpackCapacity(state);
+  while (excess > 0) {
+    if (totalResources(state.backpack) > 0) {
+      const unit = takeResourceUnit(state, random);
+      shed.resources[unit.id]++;
+      contaminated += unit.contaminated;
+      excess--;
+      continue;
+    }
+    const things = [
+      ...state.backpackItems.map((item) => ({ item, size: ITEMS[item.id].size })),
+      ...state.backpackManuals.map((manual) => ({ manual, size: MANUAL_SIZE })),
+    ];
+    const lightest = Math.min(...things.map(({ size }) => size));
+    const choices = things.filter(({ size }) => size === lightest);
+    const { item, manual, size } = choices[Math.floor(random() * choices.length)];
+    if (item) {
+      state.backpackItems.splice(state.backpackItems.indexOf(item), 1);
+      shed.items.push(item);
+    } else {
+      state.backpackManuals.splice(state.backpackManuals.indexOf(manual), 1);
+      shed.manuals.push(manual);
+    }
+    excess -= size;
+  }
+  if (inShelter) {
+    const { shelter } = state;
+    for (const { id } of RESOURCES) shelter.storage[id] += shed.resources[id];
+    shelter.contaminatedFood += contaminated;
+    shelter.items.push(...shed.items);
+    shelter.manuals.push(...shed.manuals.filter((id) => !shelter.manuals.includes(id)));
+  }
+  return shed;
 }
 
 // Runs from the enemy, always successfully, before or after it attacked.
@@ -762,22 +859,25 @@ function lossCount(state, share) {
 // unit, picked at random unit by unit. Items and manuals are never lost.
 function loseResources(state, share, random) {
   const lost = emptyResources();
-  let count = lossCount(state, share);
-  let remaining = totalResources(state.backpack);
-  while (count-- > 0) {
-    let roll = Math.floor(random() * remaining);
-    for (const { id } of RESOURCES) {
-      if (roll < state.backpack[id]) {
-        if (id === 'food') state.backpackContaminatedFood -= takeFood(state.backpack.food, state.backpackContaminatedFood, 1, random);
-        state.backpack[id]--;
-        lost[id]++;
-        break;
-      }
-      roll -= state.backpack[id];
-    }
-    remaining--;
-  }
+  for (let count = lossCount(state, share); count > 0; count--) lost[takeResourceUnit(state, random).id]++;
   return lost;
+}
+
+// Takes one resource unit out of the backpack, picked at random among all
+// units. Returns { id, contaminated }, where contaminated is 1 for a
+// contaminated Food unit. The caller checks that the backpack holds any.
+function takeResourceUnit(state, random) {
+  let roll = Math.floor(random() * totalResources(state.backpack));
+  for (const { id } of RESOURCES) {
+    if (roll < state.backpack[id]) {
+      const contaminated = id === 'food' ? takeFood(state.backpack.food, state.backpackContaminatedFood, 1, random) : 0;
+      state.backpackContaminatedFood -= contaminated;
+      state.backpack[id]--;
+      return { id, contaminated };
+    }
+    roll -= state.backpack[id];
+  }
+  throw new Error('The backpack holds no resources');
 }
 
 // Takes `count` units at random out of `food` units, `contaminated` of which
@@ -803,18 +903,57 @@ function useItem(list, item) {
   return true;
 }
 
-export function isWounded(survivor, time) {
-  if (survivor.woundedAt === null) return false;
-  const elapsed = time - survivor.woundedAt;
-  return elapsed >= 0 && elapsed < WOUND_HEAL_MS;
+// How much healing someone would add from `healedTo` up to `until`: all of
+// that time for the player, who has no hunger, and for a survivor only the
+// part while satiated, between their last meal and the next one being due.
+function healingUntil(state, person, until) {
+  if (person === state.player) return Math.max(0, until - person.healedTo);
+  const from = Math.max(person.healedTo, person.lastMealAt);
+  return Math.max(0, Math.min(until, person.lastMealAt + MEAL_INTERVAL_MS) - from);
 }
 
-export function woundHealsAt(survivor) {
-  return survivor.woundedAt + WOUND_HEAL_MS;
+// Heals someone's wounds up to `until`, one for each WOUND_HEAL_MS of healing.
+// Called before anything that changes what counts: a meal, a new wound or a
+// first aid kit, and on every tick.
+function settleHealing(state, person, until) {
+  if (person.wounds === 0) {
+    person.healing = 0;
+  } else {
+    person.healing += healingUntil(state, person, until);
+    while (person.wounds > 0 && person.healing >= WOUND_HEAL_MS) {
+      person.wounds--;
+      person.healing -= WOUND_HEAL_MS;
+    }
+    if (person.wounds === 0) person.healing = 0;
+  }
+  person.healedTo = Math.max(person.healedTo, until);
 }
 
-// Only survivors in the shelter eat, so only they can get sick; the
-// companion has no sickAt.
+// Heals everyone's wounds up to `time`. The caller settles meals first.
+// Returns whether a wound healed.
+export function healWounds(state, time) {
+  let healed = false;
+  for (const person of [state.player, ...state.party, ...(state.shelter?.survivors ?? [])]) {
+    const { wounds } = person;
+    settleHealing(state, person, time);
+    healed ||= person.wounds < wounds;
+  }
+  return healed;
+}
+
+// How much more healing someone's next wound needs, or null if they aren't
+// wounded. It only runs while they are satiated, see isHealing().
+export function nextWoundHealsIn(state, person, time) {
+  if (person.wounds === 0) return null;
+  return WOUND_HEAL_MS - person.healing - healingUntil(state, person, time);
+}
+
+// Whether someone's wounds are healing now: always for the player, and for a
+// survivor only while satiated.
+export function isHealing(state, person, time) {
+  return person === state.player || time - person.lastMealAt < MEAL_INTERVAL_MS;
+}
+
 export function isSick(survivor, time) {
   if (survivor.sickAt == null) return false;
   const elapsed = time - survivor.sickAt;
@@ -826,8 +965,8 @@ export function sicknessHealsAt(survivor) {
 }
 
 // Wounded or sick, so in need of a first aid kit.
-export function isAiling(survivor, time) {
-  return isWounded(survivor, time) || isSick(survivor, time);
+export function isAiling(person, time) {
+  return person.wounds > 0 || isSick(person, time);
 }
 
 // The first aid kit in a list that would be used first: the most worn one.
@@ -843,23 +982,31 @@ function mostWorn(items, id) {
     .reduce((most, item) => (!most || item.uses < most.uses ? item : most), null);
 }
 
-// Kits for the companion come from the backpack; kits for shelter survivors
-// from storage, applied by the others there, so the player needn't be home.
-export function canTreat(state, survivor, time) {
-  if (!isAiling(survivor, time)) return false;
-  const items = survivor === state.companion ? state.backpackItems : state.shelter.items;
-  return firstAidKit(items) !== null;
+// Kits for the player and the party come from the backpack; kits for shelter
+// survivors from storage, applied by the others there, so the player needn't be home.
+function kitsFor(state, person) {
+  return person === state.player || state.party.includes(person) ? state.backpackItems : state.shelter.items;
 }
 
-// Heals a survivor's wound and sickness with one use of a first aid kit.
-// Returns false if there is nothing to treat or no kit at hand.
-export function treat(state, survivor, time) {
-  if (!canTreat(state, survivor, time)) return false;
-  const items = survivor === state.companion ? state.backpackItems : state.shelter.items;
-  survivor.woundedAt = null;
-  if (survivor !== state.companion) survivor.sickAt = null;
+export function canTreat(state, person, time) {
+  return isAiling(person, time) && firstAidKit(kitsFor(state, person)) !== null;
+}
+
+// Heals one wound, or else the sickness, with one use of a first aid kit.
+// Returns 'wound' or 'sickness' for what it healed, or null if there is
+// nothing to treat or no kit at hand.
+export function treat(state, person, time) {
+  if (!canTreat(state, person, time)) return null;
+  const items = kitsFor(state, person);
   useItem(items, firstAidKit(items));
-  return true;
+  if (person.wounds > 0) {
+    settleHealing(state, person, time);
+    person.wounds--;
+    if (person.wounds === 0) person.healing = 0;
+    return 'wound';
+  }
+  person.sickAt = null;
+  return 'sickness';
 }
 
 // What a manual lets the player craft, by label.
@@ -921,13 +1068,13 @@ export function callableLandmarks(state, time) {
   return state.landmarks.filter((landmark) => !isSearched(areas, landmark));
 }
 
-// Why the player can't listen to the radio: 'mission', 'away', 'companion',
-// 'cooldown', 'cells' or 'landmarks', or null if they can. The caller checks that
-// there is a radio.
+// Why the player can't listen to the radio: 'mission', 'away', 'cooldown',
+// 'cells' or 'landmarks', or null if they can. The caller checks that there is
+// a radio. A full party doesn't keep the player from listening: they can make
+// room before they set out.
 export function listenBlocker(state, inShelter, time) {
   if (state.mission) return 'mission';
   if (!inShelter) return 'away';
-  if (state.companion) return 'companion';
   if (time < listenReadyAt(state.shelter.radio)) return 'cooldown';
   if (state.shelter.storage.cells < LISTEN_CELLS) return 'cells';
   return callableLandmarks(state, time).length === 0 ? 'landmarks' : null;
@@ -952,7 +1099,9 @@ export function listen(state, time, random = Math.random) {
   const landmarks = callableLandmarks(state, time);
   const { type, lat, lon } = landmarks[Math.floor(random() * landmarks.length)];
   const survivor = SURVIVOR_NAMES[Math.floor(random() * SURVIVOR_NAMES.length)];
-  state.mission = { survivor, landmark: { type, lat, lon }, calledAt: time };
+  // They called for help because they were hurt, some worse than others.
+  const wounds = 1 + Math.floor(random() * MAX_WOUNDS);
+  state.mission = { survivor, wounds, landmark: { type, lat, lon }, calledAt: time, foundAt: null };
   return state.mission;
 }
 
@@ -971,27 +1120,35 @@ export function expireMission(state, time) {
   return mission;
 }
 
-// Ends the mission if its landmark has just been searched. Returns the
-// rescued survivor's name, or null. They join only after takeSurvivor(). An
-// enemy near the landmark keeps the survivor pinned down until it is beaten.
+// Finds the mission's survivor if its landmark has just been searched.
+// Returns { survivor, wounds, waiting } with the survivor's name, or null. With room
+// in the party the mission ends, and they join only after takeSurvivor().
+// With a full party they go on waiting (waiting is true) until the mission
+// runs out, so the player can make room and take them along at the landmark
+// (see takeWaitingSurvivor()). An enemy near the landmark keeps the survivor
+// pinned down until it is beaten.
 function completeRescue(state, time) {
   const { mission } = state;
   if (!mission || time >= missionEndsAt(mission)) return null;
   if (!isSearched(activeSearchedAreas(state, time), mission.landmark)) return null;
   if (enemyNear(state, mission.landmark)) return null;
+  if (isPartyFull(state)) {
+    mission.foundAt ??= time;
+    return { survivor: mission.survivor, wounds: mission.wounds, waiting: true };
+  }
   state.mission = null;
   state.shelter.radio.quietSince = time;
-  return mission.survivor;
+  return { survivor: mission.survivor, wounds: mission.wounds, waiting: false };
 }
 
-export function canPack(state, item, time) {
-  return freeSpace(state, time) >= ITEMS[item.id].size;
+export function canPack(state, item) {
+  return freeSpace(state) >= ITEMS[item.id].size;
 }
 
 // Moves an item from storage into the backpack. The caller checks that the
 // player is in the shelter.
-export function packItem(state, item, time) {
-  if (!canPack(state, item, time)) return false;
+export function packItem(state, item) {
+  if (!canPack(state, item)) return false;
   state.shelter.items.splice(state.shelter.items.indexOf(item), 1);
   state.backpackItems.push(item);
   return true;
@@ -1016,23 +1173,91 @@ export function dropFromBackpack(state, { resources, items = [], manuals = [] },
   return dropped;
 }
 
-// Rescued survivors called for help because they were hurt, so they start wounded.
-export function takeSurvivor(state, name, time) {
-  state.companion = { name, woundedAt: time };
+// How many people the party can hold, the player included.
+export function partyLimit() {
+  return PARTY_LIMIT;
+}
+
+// The player and everyone with them.
+export function partySize(state) {
+  return 1 + state.party.length;
+}
+
+export function isPartyFull(state) {
+  return partySize(state) >= partyLimit();
+}
+
+// Takes a rescued survivor into the party, with the wounds they called with.
+// They have just been given something to eat. They haven't seen the shelter
+// yet, so they haven't arrived there.
+export function takeSurvivor(state, name, wounds, time) {
+  if (isPartyFull(state)) return false;
+  state.party.push({ name, arrivedAt: null, lastMealAt: time, wounds, healing: 0, healedTo: time, sickAt: null });
+  return true;
+}
+
+// The name of the mission's survivor if they were found and wait close
+// enough to the position to be taken along, or null.
+export function waitingSurvivorNear(state, position, time) {
+  const { mission } = state;
+  if (!mission || mission.foundAt === null || !position || time >= missionEndsAt(mission)) return null;
+  return distanceMeters(mission.landmark, position) <= SEARCH_RADIUS ? mission.survivor : null;
+}
+
+// Takes the found survivor along from the landmark, which ends the mission.
+export function takeWaitingSurvivor(state, position, time) {
+  const survivor = waitingSurvivorNear(state, position, time);
+  if (!survivor || !takeSurvivor(state, survivor, state.mission.wounds, time)) return false;
+  state.mission = null;
+  state.shelter.radio.quietSince = time;
+  return true;
+}
+
+// Takes a survivor from the shelter into the party. The caller checks that
+// the player is in the shelter.
+export function takeFromShelter(state, survivor) {
+  const { survivors } = state.shelter;
+  if (isPartyFull(state) || !survivors.includes(survivor)) return false;
+  survivors.splice(survivors.indexOf(survivor), 1);
+  state.party.push(survivor);
+  return true;
+}
+
+// Leaves someone from the party in the shelter, where they arrive if they
+// never have. What they carried and no longer fits goes into storage.
+// Returns what did (see shedLoad()), or null if they aren't in the party.
+// The caller checks that the player is in the shelter.
+export function leaveInShelter(state, survivor, time, random = Math.random) {
+  if (!state.party.includes(survivor)) return null;
+  state.party.splice(state.party.indexOf(survivor), 1);
+  survivor.arrivedAt ??= time;
+  state.shelter.survivors.push(survivor);
+  return shedLoad(state, true, random);
+}
+
+// Leaves someone from the party alone in the wastes, for good. What they
+// carried and no longer fits is lost. Returns what was (see shedLoad()), or
+// null if they aren't in the party.
+export function abandon(state, survivor, time, random = Math.random) {
+  if (!state.party.includes(survivor)) return null;
+  state.party.splice(state.party.indexOf(survivor), 1);
+  const { name, arrivedAt } = survivor;
+  state.shelter.departedSurvivors.push({ name, arrivedAt, leftAt: time, reason: 'abandoned' });
+  return shedLoad(state, false, random);
 }
 
 export function canUnload(state) {
-  return backpackLoad(state) > 0 || state.companion !== null;
+  return backpackLoad(state) > 0;
 }
 
-// Moves the backpack into shelter storage and the companion into the shelter,
-// where hungry survivors eat right away. Returns { items, manuals, survivor,
-// left, sickened }, where items counts resource units and items, manuals lists
-// the ids of new manuals, survivor is a name or null, left lists the names of
-// survivors who had already left for lack of food before the unload, and
-// sickened the names of those who got sick from a meal.
+// Moves the backpack into shelter storage, where hungry survivors eat right
+// away, the party's too (see settleMeals()). Returns { items, manuals, left, leftParty, sickened },
+// where items counts resource units and items, manuals lists the ids of new
+// manuals, left and leftParty the names of survivors who had already left the
+// shelter or the party for lack of food before the unload, and sickened the
+// names of those who got sick from a meal.
 export function unload(state, time, random = Math.random) {
-  const { left, sickened } = settleMeals(state, time, random);
+  const { left, leftParty, sickened } = settleMeals(state, time, true, random);
   const { shelter } = state;
   const items = totalResources(state.backpack) + state.backpackItems.length;
   for (const { id } of RESOURCES) {
@@ -1047,23 +1272,13 @@ export function unload(state, time, random = Math.random) {
   shelter.manuals.push(...manuals);
   state.backpackManuals = [];
 
-  const survivor = state.companion;
-  if (survivor) {
-    shelter.survivors.push({
-      name: survivor.name,
-      arrivedAt: time,
-      lastMealAt: time,
-      woundedAt: survivor.woundedAt,
-      sickAt: null,
-    });
-  }
-  state.companion = null;
-  sickened.push(...feedHungry(shelter, time, random));
-  return { items, manuals, survivor: survivor?.name ?? null, left, sickened: [...new Set(sickened)] };
+  // Meals settled up to now, so the hungry eat what was just brought in now.
+  sickened.push(...settleMeals(state, time, true, random).sickened);
+  return { items, manuals, left, leftParty, sickened: [...new Set(sickened)] };
 }
 
-// A shelter survivor's hunger: { stage, startedAt, endsAt }. When the last
-// stage ends, the survivor leaves.
+// A survivor's hunger: { stage, startedAt, endsAt }. When the last stage
+// ends, the survivor leaves.
 export function hungerOf(survivor, time) {
   const elapsed = Math.floor((time - survivor.lastMealAt) / MEAL_INTERVAL_MS);
   const index = Math.min(Math.max(elapsed, 0), HUNGER_STAGES.length - 1);
@@ -1071,57 +1286,97 @@ export function hungerOf(survivor, time) {
   return { stage: HUNGER_STAGES[index], startedAt, endsAt: startedAt + MEAL_INTERVAL_MS };
 }
 
-// Settles every meal and departure due up to `time`, in order. Returns
-// { meals, left, sickened }: how many meals were eaten, the names of survivors
-// who left and of those who got sick from a meal. Storage only changes while
-// the game is open, and unload() settles right before adding food, so any food
-// in storage now was already there when these meals were due: survivors ate on time.
-export function settleMeals(state, time, random = Math.random) {
+// Settles every meal and departure due up to `time`, in order. Shelter
+// survivors eat from storage; the party eats there too while the player is
+// in the shelter (partyAtHome), and from the backpack out in the wastes.
+// Returns { meals, left, leftParty, sickened }: how many meals were eaten, the
+// names of survivors who left the shelter and the party, and of those who got
+// sick from a meal.
+// Storage and the backpack only change while the game is open, and meals are
+// settled all the time while it is. So a meal that came due since the last
+// settling (state.mealsSettledAt), e.g. while the game was closed, is eaten on
+// time: the food was already there. One that came due before it went uneaten
+// for lack of food, so it is eaten now that food has turned up.
+export function settleMeals(state, time, partyAtHome, random = Math.random) {
   const { shelter } = state;
-  if (!shelter) return { meals: 0, left: [], sickened: [] };
+  const settledAt = state.mealsSettledAt;
+  state.mealsSettledAt = Math.max(settledAt, time);
+  if (!shelter) return { meals: 0, left: [], leftParty: [], sickened: [] };
+  const tables = partyAtHome
+    ? [{ eaters: [...shelter.survivors, ...state.party], pantry: storagePantry(state) }]
+    : [
+        { eaters: shelter.survivors, pantry: storagePantry(state) },
+        { eaters: state.party, pantry: backpackPantry(state) },
+      ];
   let meals = 0;
   const sickened = new Set();
-  while (shelter.storage.food > 0) {
-    const next = mostOverdue(shelter.survivors, time);
-    if (!next) break;
-    next.lastMealAt += MEAL_INTERVAL_MS;
-    if (eat(shelter, next, next.lastMealAt, random)) sickened.add(next.name);
-    meals++;
+  for (const { eaters, pantry } of tables) {
+    while (pantry.food() > 0) {
+      const next = mostOverdue(eaters, time);
+      if (!next) break;
+      const due = next.lastMealAt + MEAL_INTERVAL_MS;
+      const mealAt = due >= settledAt ? due : time;
+      // Healing counts while satiated, so it is settled before every meal.
+      settleHealing(state, next, mealAt);
+      next.lastMealAt = mealAt;
+      if (eat(pantry, next, mealAt, random)) sickened.add(next);
+      meals++;
+    }
   }
-  const deadline = MEAL_INTERVAL_MS * HUNGER_STAGES.length;
-  const leaving = shelter.survivors.filter((survivor) => time - survivor.lastMealAt >= deadline);
-  shelter.survivors = shelter.survivors.filter((survivor) => !leaving.includes(survivor));
-  // They left when their last stage ran out, which may be long before the game was opened.
-  for (const { name, arrivedAt, lastMealAt } of leaving) {
-    shelter.departedSurvivors.push({ name, arrivedAt, leftAt: lastMealAt + deadline, reason: 'starved' });
-  }
+  const left = starve(state, shelter.survivors, time);
+  const leftParty = starve(state, state.party, time);
   // Those who got sick and then left are reported as gone, not sick.
-  const stayed = [...sickened].filter((name) => shelter.survivors.some((survivor) => survivor.name === name));
-  return { meals, left: leaving.map(({ name }) => name), sickened: stayed };
+  const stayed = [...shelter.survivors, ...state.party].filter((survivor) => sickened.has(survivor));
+  return { meals, left, leftParty, sickened: stayed.map(({ name }) => name) };
 }
 
-// Hungry and starving survivors eat as soon as food arrives, the most starved
-// first. Returns the names of those who got sick from it.
-function feedHungry(shelter, time, random) {
-  const sickened = [];
-  while (shelter.storage.food > 0) {
-    const next = mostOverdue(shelter.survivors, time);
-    if (!next) break;
-    next.lastMealAt = time;
-    if (eat(shelter, next, time, random)) sickened.push(next.name);
+// Takes those whose last hunger stage ran out off the list, into the
+// shelter's history. Returns their names.
+function starve(state, survivors, time) {
+  const deadline = MEAL_INTERVAL_MS * HUNGER_STAGES.length;
+  const leaving = survivors.filter((survivor) => time - survivor.lastMealAt >= deadline);
+  for (const survivor of leaving) {
+    survivors.splice(survivors.indexOf(survivor), 1);
+    // They left when their last stage ran out, which may be long before the game was opened.
+    const { name, arrivedAt, lastMealAt } = survivor;
+    state.shelter.departedSurvivors.push({ name, arrivedAt, leftAt: lastMealAt + deadline, reason: 'starved' });
   }
-  return sickened;
+  return leaving.map(({ name }) => name);
 }
 
-// Takes a meal out of storage. A wounded or sick survivor eats more, if there
-// is more. Contaminated food makes them sick, or sick again for longer.
+// Where meals come from: { food(), take(portion, random) }, where take()
+// removes the Food and returns how many of its units were contaminated.
+function storagePantry(state) {
+  const { shelter } = state;
+  return {
+    food: () => shelter.storage.food,
+    take(portion, random) {
+      const contaminated = takeFood(shelter.storage.food, shelter.contaminatedFood, portion, random);
+      shelter.storage.food -= portion;
+      shelter.contaminatedFood -= contaminated;
+      return contaminated;
+    },
+  };
+}
+
+function backpackPantry(state) {
+  return {
+    food: () => state.backpack.food,
+    take(portion, random) {
+      const contaminated = takeFood(state.backpack.food, state.backpackContaminatedFood, portion, random);
+      state.backpack.food -= portion;
+      state.backpackContaminatedFood -= contaminated;
+      return contaminated;
+    },
+  };
+}
+
+// Takes a meal out of the pantry. A sick survivor eats more, if there is
+// more. Contaminated food makes them sick, or sick again for longer.
 // Returns true if it did.
-function eat(shelter, survivor, time, random) {
-  const portion = Math.min(isAiling(survivor, time) ? AILING_MEAL_FOOD : 1, shelter.storage.food);
-  const contaminated = takeFood(shelter.storage.food, shelter.contaminatedFood, portion, random);
-  shelter.storage.food -= portion;
-  shelter.contaminatedFood -= contaminated;
-  if (contaminated === 0) return false;
+function eat(pantry, survivor, time, random) {
+  const portion = Math.min(isSick(survivor, time) ? SICK_MEAL_FOOD : 1, pantry.food());
+  if (pantry.take(portion, random) === 0) return false;
   survivor.sickAt = time;
   return true;
 }

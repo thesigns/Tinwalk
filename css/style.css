@@ -510,15 +510,45 @@ button {
   pointer-events: auto;
 }
 
-/* Tabs: a strip of darker tin above the status bar. The menu button leaves
-   the game for the start screen, so it is only an icon. */
-#tabs {
+/* A strip of darker tin above the status bar, with the menu button and the
+   GPS signal. The menu button leaves the game for the start screen, so it is
+   only an icon. */
+#top-strip {
   display: flex;
-  padding: env(safe-area-inset-top) 4px 0;
+  align-items: center;
+  padding: env(safe-area-inset-top) 14px 0 4px;
   background:
     var(--grain),
     linear-gradient(180deg, #3a3833, var(--tin-dark));
   border-bottom: 1px solid var(--tin-edge);
+}
+
+/* The tabs: a row of tin under the top strip, four alike. */
+#tabs {
+  display: flex;
+  padding: 0 2px;
+  border-bottom: 2px solid var(--tin-edge);
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.12), 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+#tabs .tab {
+  gap: 5px;
+  padding: 0 2px;
+  font-size: 16px;
+  letter-spacing: 0.04em;
+}
+
+#tabs .tab .icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* On the narrowest phones the tab names alone have to do; the counts keep
+   their icons, which tell them apart. */
+@media (max-width: 349px) {
+  #tabs .tab:not(.tab-count) .icon {
+    display: none;
+  }
 }
 
 .tab {
@@ -572,8 +602,8 @@ button {
 .tab[aria-selected="true"]::before {
   content: "";
   position: absolute;
-  left: 10px;
-  right: 10px;
+  left: 6px;
+  right: 6px;
   bottom: 0;
   height: 3px;
   border-radius: 2px 2px 0 0;
@@ -585,42 +615,11 @@ button {
   color: var(--green-light);
 }
 
-#status-bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px 16px;
-  padding: 10px 14px;
-  border-bottom: 2px solid var(--tin-edge);
-  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.12), 0 4px 12px rgba(0, 0, 0, 0.4);
-  font-family: var(--font-stencil);
-}
-
 .hud-item {
   display: flex;
   align-items: center;
   gap: 7px;
-}
-
-/* The backpack readout opens the backpack, so it is a button that looks like the rest of the bar. */
-#backpack-hud {
-  margin: -6px;
-  padding: 6px;
-  border: 0;
-  border-radius: 4px;
-  background: none;
-  font-family: inherit;
-  cursor: pointer;
-  touch-action: manipulation;
-}
-
-#backpack-hud:active {
-  background: rgba(0, 0, 0, 0.25);
-}
-
-#backpack-hud:focus-visible {
-  outline: 3px solid var(--brass);
-  outline-offset: 0;
+  font-family: var(--font-stencil);
 }
 
 .hud-value {
@@ -630,40 +629,8 @@ button {
   line-height: 1;
 }
 
-.gauge {
-  width: 64px;
-  height: 11px;
-  border-radius: 2px;
-  background: rgba(0, 0, 0, 0.5);
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.7), 0 1px 0 rgba(255, 255, 255, 0.1);
-  overflow: hidden;
-}
-
-.gauge-fill {
-  display: block;
-  width: 0;
-  height: 100%;
-  background:
-    repeating-linear-gradient(90deg, transparent 0 5px, rgba(0, 0, 0, 0.35) 5px 6px),
-    linear-gradient(180deg, var(--brass), var(--brass-dark));
-  transition: width 300ms ease-out;
-}
-
-.gauge-fill.full {
-  background:
-    repeating-linear-gradient(90deg, transparent 0 5px, rgba(0, 0, 0, 0.35) 5px 6px),
-    linear-gradient(180deg, var(--paint-light), var(--paint));
-}
-
-.companion {
-  color: var(--brass);
-  font-size: 18px;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.companion.wounded {
+/* A full backpack stands out, since anything found now won't fit. */
+#backpack-status.full {
   color: var(--signal-bad);
 }
 
@@ -762,7 +729,7 @@ button {
   gap: 12px;
 }
 
-/* Pages: the You and Shelter tabs, on paper over the map, below the bars. */
+/* Pages: the tabs other than Wastes, on paper over the map, below the bars. */
 
 .page {
   position: fixed;
@@ -780,6 +747,7 @@ button {
 }
 
 /* The map's own controls and notes only belong to the Wastes tab. */
+body[data-tab="backpack"] :is(#map-legend, #mission-note, #side-controls, #actions, #action-hint),
 body[data-tab="party"] :is(#map-legend, #mission-note, #side-controls, #actions, #action-hint),
 body[data-tab="shelter"] :is(#map-legend, #mission-note, #side-controls, #actions, #action-hint) {
   display: none !important;
@@ -1142,19 +1110,8 @@ dialog input:focus,
   letter-spacing: 0.04em;
 }
 
-#backpack-companion {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 6px;
-}
-
-#backpack-companion p {
-  margin: 0;
-}
-
-#backpack-treat {
-  margin-left: auto;
+#backpack-party {
+  margin: 6px 0 0;
 }
 
 .btn-small {
@@ -1406,6 +1363,113 @@ dialog input:focus,
   letter-spacing: 0;
 }
 
+/* People in the party and nearby: Info opens their card, the other button
+   moves them in or out of the party. */
+.person-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.person-list li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 52px;
+  padding: 6px 6px 6px 10px;
+  border-radius: 3px;
+  background: rgba(51, 40, 28, 0.07);
+  box-shadow: inset 0 0 0 1px var(--ink-faint);
+}
+
+.person-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.person-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.person-name {
+  overflow-wrap: anywhere;
+  font-family: var(--font-stencil);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.person-detail {
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+#party-place-empty {
+  margin-top: 8px;
+}
+
+/* A drop of blood for each wound, overlapping like a smear. */
+.wound-drops {
+  display: inline-flex;
+  flex: none;
+}
+
+.wound-drops .icon {
+  width: 16px;
+  height: 16px;
+  fill: var(--paint);
+  stroke: var(--paint-edge);
+  stroke-width: 1.5;
+}
+
+.wound-drops .icon + .icon {
+  margin-left: -7px;
+}
+
+/* The player has no hunger, so their name tag shows only their wounds. */
+.survivor-badges li.player :is(.hunger-stage, .hunger-bar, .hunger-time) {
+  display: none;
+}
+
+/* Back from a person's card to the party. */
+.back-link {
+  margin: -6px 0 6px -8px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 3px;
+  background: none;
+  color: var(--ink-soft);
+  font-family: var(--font-stencil);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.back-link:active {
+  background: rgba(51, 40, 28, 0.1);
+}
+
+#person-where {
+  margin-top: 4px;
+}
+
+#person-condition {
+  margin-top: 14px;
+}
+
 /* Survivors as stamped metal name tags, each with a bar running down to the
    end of their current hunger stage. */
 .survivor-badges {
@@ -1495,7 +1559,7 @@ dialog input:focus,
   color: var(--starving-text);
 }
 
-.wound .icon {
+.wound .sick-icon {
   width: 18px;
   height: 18px;
 }

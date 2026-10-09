@@ -37,7 +37,18 @@ export function diceAverage(notation) {
   return terms(notation).reduce((sum, { sign, count, sides }) => sum + (sign * count * (sides + 1)) / 2, 0);
 }
 
-// Two notations rolled together: '2d6' and '1d3' make '2d6+1d3'.
-export function addDice(a, b) {
-  return /^\s*-/.test(b) ? `${a}${b.trim()}` : `${a}+${b.trim()}`;
+// Notations rolled together, with like dice gathered so the sum reads as
+// players write it: '2d6', '1d6' and '1d3' make '3d6+1d3'. Dice keep the
+// order they first appear in, and whole numbers come last.
+export function addDice(...notations) {
+  const gathered = new Map();
+  for (const { sign, count, sides } of notations.flatMap(terms)) {
+    const key = `${sign}:${sides}`;
+    gathered.set(key, { sign, sides, count: (gathered.get(key)?.count ?? 0) + count });
+  }
+  const dice = [...gathered.values()].filter(({ sides }) => sides > 1);
+  const number = [...gathered.values()].filter(({ sides }) => sides === 1).reduce((sum, { sign, count }) => sum + sign * count, 0);
+  const parts = dice.map(({ sign, count, sides }) => `${sign < 0 ? '-' : '+'}${count}d${sides}`);
+  if (number !== 0) parts.push(`${number < 0 ? '-' : '+'}${Math.abs(number)}`);
+  return parts.join('').replace(/^\+/, '') || '0';
 }

@@ -32,7 +32,7 @@ Wszystko w tej sekcji ma zostać zaimplementowane teraz. Rzeczy spoza tej sekcji
 #### Brak dostępu do lokalizacji
 
 - Jeśli użytkownik odmówi zgody na lokalizację, aplikacja pokazuje ekran z wyjaśnieniem, że bez lokalizacji nie da się z niej korzystać, i krótką instrukcją, jak włączyć zgodę w ustawieniach przeglądarki, oraz przycisk **Try again**.
-- Jeśli lokalizacja jest niedostępna z innego powodu (wyłączony GPS, błąd, przekroczony czas), pasek stanu pokazuje „No GPS signal”, a akcje zależne od położenia są nieaktywne.
+- Jeśli lokalizacja jest niedostępna z innego powodu (wyłączony GPS, błąd, przekroczony czas), wskaźnik GPS w prawym górnym rogu pokazuje „No GPS”, a akcje zależne od położenia są nieaktywne.
 - W trybie debug aplikacja działa bez GPS.
 
 ### Schron (Shelter)
@@ -77,7 +77,7 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
 | Isotopes | docelowo produkcja Reactor Fuel; tylko ze stref radiacji (zob. [radiation.md](radiation.md)) |
 
 - Po przeszukaniu otwiera się okno ze znaleziskiem: medal z ikoną zasobu, pod nim duży napis, np. „+3 Junk” (przy landmarku kilka mniejszych medali, zob. [loot.md](loot.md#landmarki)), i ewentualne uwagi (co się nie zmieściło, co zrobiła ciemność, latarka albo licznik Geigera). Po wygranej walce okno ma też sekcję ze skarbem wroga (zob. [combat.md](combat.md#interfejs)).
-- Okno nie znika samo: zamyka je przycisk **OK** albo odejście ponad 50 m od miejsca, w którym się pojawiło. Dopiero wtedy ikony znalezisk wlatują do plecaka na pasku stanu.
+- Okno nie znika samo: zamyka je przycisk **OK** albo odejście ponad 50 m od miejsca, w którym się pojawiło. Dopiero wtedy ikony znalezisk wlatują do zakładki **Backpack**.
 - Przeszukanie może dać podręcznik, który odblokowuje wytwarzanie przedmiotów (zob. [crafting.md](crafting.md)).
 - Po ciemku przeszukanie daje mniej, chyba że użytkownik ma latarkę (zob. [night.md](night.md)).
 - Część pustkowia jest skażona radiacją. Strefy są niewidoczne i wykrywa je licznik Geigera (zob. [radiation.md](radiation.md)).
@@ -87,29 +87,28 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
 
 ### Plecak
 
-- Plecak mieści łącznie 50 jednostek wszystkich zasobów i przedmiotów (np. 25 Junk i 25 Food). Każdy zasób zajmuje 1 jednostkę. Ile miejsca zajmuje przedmiot albo podręcznik, opisuje [crafting.md](crafting.md).
+- Plecak zdrowego użytkownika idącego samotnie mieści łącznie 50 jednostek wszystkich zasobów i przedmiotów (np. 25 Junk i 25 Food). Rany zmniejszają tę pojemność, a drużyna ją zwiększa (zob. [party.md](party.md#plecak)). Każdy zasób zajmuje 1 jednostkę. Ile miejsca zajmuje przedmiot albo podręcznik, opisuje [crafting.md](crafting.md).
 - Gdy znalezisko nie mieści się w całości, użytkownik zabiera tyle, ile się zmieści, a reszta przepada. Okno pokazuje, ile zabrał (np. „+1 Junk”), z uwagą „You found 3 Junk, but could only carry 1.”
 - Z pełnym plecakiem nadal można przeszukiwać (np. w nadziei na landmark albo żeby uratować ocalałego).
-- Dotknięcie plecaka na pasku stanu otwiera jego zawartość: ile jednostek każdego zasobu niesie użytkownik, jakie przedmioty i ile miejsca zostało.
-- Z plecaka można wyrzucać zasoby, np. żeby zrobić miejsce na inne. Użytkownik zaznacza przyciskami −/+, ile jednostek którego zasobu wyrzucić (przytrzymanie przycisku zmienia liczbę dalej), i zatwierdza przyciskiem **Drop**. Zamknięcie okna bez zatwierdzenia niczego nie wyrzuca.
+- Zakładka **Backpack** pokazuje zawartość plecaka: ile jednostek każdego zasobu niesie użytkownik, jakie przedmioty i ile miejsca zostało.
+- Z plecaka można wyrzucać zasoby, np. żeby zrobić miejsce na inne. Użytkownik zaznacza przyciskami −/+, ile jednostek którego zasobu wyrzucić (przytrzymanie przycisku zmienia liczbę dalej), i zatwierdza przyciskiem **Drop**. **Cancel** albo przejście na inną zakładkę niczego nie wyrzuca.
+- Gdy znaleziony podręcznik się nie mieści, przycisk plecaka w oknie podręcznika otwiera tę samą zawartość w okienku nad nim, żeby zrobić miejsce bez przerywania decyzji (zob. [crafting.md](crafting.md#zabieranie)).
 - Przedmioty i podręczniki wyrzuca się pojedynczo.
 - Wyrzucone zasoby i przedmioty przepadają. Wyrzucać można wszędzie, także w schronie.
 
 ### Ocaleni (Survivors)
 
 - Ocalałych zdobywa się tylko w misjach ratunkowych: radio w schronie odbiera wezwanie rannego ocalałego, który czeka przy landmarku (zob. [landmarks.md](landmarks.md)). Zwykłe przeszukanie nie daje ocalałych.
-- Użytkownik eskortuje najwyżej jednego ocalałego naraz.
 - Po ratunku użytkownik wybiera: **Take with you** albo **Leave**. Pozostawiony ocalały przepada.
-- Ocalały idący z użytkownikiem zwiększa pojemność plecaka o 30 jednostek (łącznie 80), a ranny tylko o 10 (zob. [combat.md](combat.md#rany)).
+- Ocaleni mogą iść z użytkownikiem w drużynie: walczą razem z nim, niosą część ładunku i jedzą po drodze (zob. [party.md](party.md)).
 - Ocalały ma losowe imię.
 - Ocaleni w schronie jedzą i bez jedzenia odchodzą (zob. [survivors.md](survivors.md)). Poza tym w prototypie nic nie robią.
-- Uratowany ocalały jest ranny. Ranę leczy się apteczką albo goi się sama (zob. [combat.md](combat.md#rany)).
+- Uratowany ocalały jest ranny. Rany leczy się apteczką albo goją się same (zob. [combat.md](combat.md#rany)). Ranny może być też użytkownik.
 
 ### Rozładunek (Unload)
 
 - Gdy użytkownik jest w schronie, dostępny jest przycisk **Unload**.
-- Rozładunek przenosi całą zawartość plecaka (zasoby, przedmioty i podręczniki) do magazynu schronu, a towarzyszącego ocalałego do schronu. Głodni ocaleni od razu jedzą przyniesione jedzenie.
-- Po rozładunku pojemność plecaka wraca do 50.
+- Rozładunek przenosi całą zawartość plecaka (zasoby, przedmioty i podręczniki) do magazynu schronu. Głodni ocaleni, także z drużyny, od razu jedzą przyniesione jedzenie. Drużyna zostaje bez zmian (zob. [party.md](party.md)).
 - W schronie nie można przeszukiwać.
 - W schronie można też wytwarzać przedmioty i zabierać je z magazynu do plecaka (zob. [crafting.md](crafting.md)).
 
@@ -156,12 +155,15 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
 
 ### Interfejs
 
-- Na górze ekranu gry są zakładki:
-  - przycisk menu (ikona z trzema kreskami): wraca do ekranu startowego, a gra (także śledzenie pozycji) toczy się dalej,
-  - **Party**: użytkownik i osoby, które mu towarzyszą. Na razie zawartość plecaka z obciążeniem, przycisk **Drop things** (otwiera panel plecaka) oraz ocalały, który idzie z użytkownikiem, z przyciskiem **Treat**, gdy jest ranny. W przyszłości więcej informacji o postaci i towarzyszach.
+- Na górze ekranu gry są dwa paski:
+  - górny, ciemniejszy: z lewej przycisk menu (ikona z trzema kreskami), który wraca do ekranu startowego, a gra (także śledzenie pozycji) toczy się dalej; z prawej jakość sygnału GPS,
+  - pod nim cztery jednakowe zakładki. Każda otwiera swoją stronę na całym obszarze pod paskami, a otwarta jest podkreślona.
+- Zakładki:
+  - **Backpack**: zamiast nazwy ikona plecaka i jego zawartość, np. „12/50”; liczba jest pomarańczowa, gdy plecak jest pełny. Strona pokazuje zawartość i pozwala wyrzucać rzeczy (opis wyżej).
+  - **Party**: zamiast nazwy ikona drużyny i liczba osób razem z użytkownikiem oraz limit, np. „1/2” (zob. [party.md](party.md#interfejs)).
   - **Shelter**: schron (opis niżej). Ikona zakładki jest zielona, gdy użytkownik jest w schronie, bo tylko wtedy działają akcje schronu.
   - **Wastes**: mapa. Po wejściu do gry otwiera się ta zakładka.
-- Pod zakładkami jest zawsze pasek stanu: zawartość plecaka (np. „Backpack 12/50”), czy idzie z nami ocalały, oraz jakość sygnału GPS. Dotknięcie plecaka otwiera panel plecaka, w którym można wyrzucić rzeczy.
+- Zakładki mieszczą się w jednym rzędzie na telefonach od 320 px szerokości, także z drużyną 4 osób i plecakiem „200/200”. Poniżej 350 px **Shelter** i **Wastes** tracą ikony.
 - Na zakładce **Wastes** przyciski zależą od kontekstu: **Create a Shelter**, **Search area**, **Unload**.
 - W lewym górnym rogu mapy, jedno pod drugim: słowo mówiące, gdzie stoi użytkownik (**Shelter**, **Barrens**, **Forest** albo **Ruins**), pod nim pora dnia i czas do jej zmiany, np. „Day · dark in 3 h” (zob. [night.md](night.md)), a na dole podziałka mapy. Układ jest pionowy, żeby podziałka, która wydłuża się i skraca przy przybliżaniu, nie przesuwała reszty. Dzięki temu na granicy biomów nie trzeba zgadywać z mapy, jaki łup da przeszukanie. Bez pozycji słowa nie ma. Przy słabym sygnale nie jest przygaszane, bo siłę sygnału pokazuje wskaźnik w prawym górnym rogu.
 - Zakładka **Shelter** pokazuje nazwę schronu, stan magazynu, przedmioty i podręczniki, warsztat (zob. [crafting.md](crafting.md)), radio (zob. [landmarks.md](landmarks.md#radio)) oraz ocalałych z ich etapem głodu i ranami (zob. [survivors.md](survivors.md)). Bez schronu mówi tylko, że trzeba go założyć na zakładce **Wastes**. Po odebraniu wezwania przez radio aplikacja przechodzi na mapę, żeby pokazać, gdzie iść.

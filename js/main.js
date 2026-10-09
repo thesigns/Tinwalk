@@ -12,7 +12,8 @@ import {
   RESOURCES,
   SEARCH_RADIUS,
   SHELTER_RADIUS,
-  WOUNDED_CAPACITY_BONUS,
+  SURVIVOR_STRENGTH,
+  abandon,
   activeSearchedAreas,
   backpackCapacity,
   biomeAtPosition,
@@ -25,7 +26,7 @@ import {
   canTakeManual,
   canTreat,
   canUnload,
-  companionCapacityBonus,
+  carryCapacity,
   craft,
   createShelter,
   dropFromBackpack,
@@ -36,24 +37,33 @@ import {
   finishSearch,
   freeSpace,
   hasGeigerCounter,
+  healWounds,
   hungerOf,
   inSwarm,
   isInShelter,
   isMissionLandmark,
+  isHealing,
+  isPartyFull,
+  takeWaitingSurvivor,
+  waitingSurvivorNear,
   isNight,
   isSick,
-  isWounded,
   knownRecipes,
   landmarkInReach,
   knowsRadio,
+  leaveInShelter,
   listen,
   listenBlocker,
   listenReadyAt,
   manualRecipes,
   missionEndsAt,
   nextDaylightChange,
+  nextWoundHealsIn,
   packItem,
-  playerStrength,
+  partyCapacityBonus,
+  partyLimit,
+  partySize,
+  partyStrength,
   pruneSearchedAreas,
   radiationAtPosition,
   removeLandmark,
@@ -62,13 +72,15 @@ import {
   search,
   searchBlocker,
   settleMeals,
+  shedLoad,
   sicknessHealsAt,
+  takeFromShelter,
   takeManual,
   takeSurvivor,
   totalResources,
   treat,
   unload,
-  woundHealsAt,
+  woundedStrength,
 } from './game.js';
 import { diceRange } from './dice.js';
 import { flyIcon, iconElement, prefersReducedMotion, replayAnimation, wait } from './fx.js';
@@ -141,13 +153,11 @@ const COMPASS_POINTS = [
 
 const $ = (id) => document.getElementById(id);
 const ui = {
-  backpackHud: $('backpack-hud'),
+  backpackTab: $('backpack-tab'),
   backpackIcon: $('backpack-icon'),
   backpack: $('backpack-status'),
-  backpackGauge: $('backpack-gauge'),
-  companion: $('companion-status'),
-  companionName: $('companion-name'),
-  companionIcon: document.querySelector('#companion-status use'),
+  partyTab: $('party-tab'),
+  party: $('party-status'),
   gpsHud: $('gps-hud'),
   gps: $('gps-status'),
   signalBars: [...document.querySelectorAll('.signal-bars i')],
@@ -164,6 +174,12 @@ const ui = {
   survivorDialog: $('survivor-dialog'),
   survivorName: $('survivor-name'),
   survivorNote: $('survivor-note'),
+  waitingDialog: $('waiting-dialog'),
+  waitingText: $('waiting-text'),
+  waitingNote: $('waiting-note'),
+  abandonDialog: $('abandon-dialog'),
+  abandonName: $('abandon-name'),
+  abandonText: $('abandon-text'),
   radioSection: $('radio-section'),
   radioText: $('radio-text'),
   radioListen: $('radio-listen'),
@@ -180,6 +196,7 @@ const ui = {
   encounterText: $('encounter-text'),
   enemyLabel: $('enemy-label'),
   enemyRoll: $('enemy-roll'),
+  playerLabel: $('player-label'),
   playerRoll: $('player-roll'),
   encounterChoices: $('encounter-choices'),
   encounterMessage: $('encounter-message'),
@@ -192,10 +209,13 @@ const ui = {
   manualTake: $('manual-take'),
   manualBackpack: $('manual-backpack'),
   backpackPanel: $('backpack-panel'),
+  backpackPanelBody: $('backpack-panel-body'),
+  backpackView: $('backpack-view'),
+  backpackPageBody: $('backpack-page-body'),
+  backpackPageCancel: $('backpack-page-cancel'),
+  backpackPageDrop: $('backpack-page-drop'),
   backpackPanelLoad: $('backpack-panel-load'),
-  backpackCompanion: $('backpack-companion'),
-  backpackCompanionText: $('backpack-companion-text'),
-  backpackTreat: $('backpack-treat'),
+  backpackParty: $('backpack-party'),
   backpackItems: $('backpack-items'),
   backpackEmpty: $('backpack-empty'),
   backpackDropHint: $('backpack-drop-hint'),
@@ -204,15 +224,23 @@ const ui = {
   backpackRow: $('backpack-row'),
   tabs: [...document.querySelectorAll('#tabs [data-tab]')],
   shelterTab: $('shelter-tab'),
-  pages: { party: $('party-page'), shelter: $('shelter-page') },
+  pages: { backpack: $('backpack-page'), party: $('party-page'), shelter: $('shelter-page') },
   gameHeader: $('game-header'),
-  partyLoad: $('party-load'),
-  partyBackpack: $('party-backpack'),
-  partyBackpackEmpty: $('party-backpack-empty'),
-  partyCompanion: $('party-companion'),
-  partyCompanionText: $('party-companion-text'),
-  partyTreat: $('party-treat'),
-  partyDrop: $('party-drop'),
+  partyList: $('party-list'),
+  partyCount: $('party-count'),
+  partyMembers: $('party-members'),
+  partyPlace: $('party-place'),
+  partyPlaceName: $('party-place-name'),
+  partyPlaceIcon: $('party-place-icon'),
+  partyPlacePeople: $('party-place-people'),
+  partyPlaceEmpty: $('party-place-empty'),
+  personRow: $('person-row'),
+  personCard: $('person-card'),
+  personBack: $('person-back'),
+  personName: $('person-name'),
+  personWhere: $('person-where'),
+  personStrength: $('person-strength'),
+  personCondition: $('person-condition'),
   shelterNone: $('shelter-none'),
   shelterContent: $('shelter-content'),
   shelterPageName: $('shelter-page-name'),
@@ -290,8 +318,10 @@ const sound = new SoundEffects();
 const haptics = new Haptics();
 
 let started = false; // location tracking starts only after the welcome screen
-// The open tab: 'party', 'shelter' or 'wastes' (the map).
+// The open tab: 'backpack', 'party', 'shelter' or 'wastes' (the map).
 let tab = 'wastes';
+// Whose card is open on the party page: YOU, a survivor, WAITING, or null for the list.
+let personCard = null;
 let inShelter = false;
 let locatingShelter = false;
 let searching = false;
@@ -299,8 +329,8 @@ let listening = false;
 // While loot flies into the backpack, the status bar keeps showing the old load.
 let holdBackpack = false;
 let toastTimer = null;
-// Survivors listed in the open departure dialog.
-let departed = [];
+// Survivors listed in the open departure dialog, by where they left from.
+let departed = { shelter: [], party: [] };
 // Survivors listed in the open sickness dialog.
 let sickened = [];
 // How hot the fallout is where the player stands, as the Geiger counter in
@@ -316,6 +346,10 @@ let dropping = { resources: emptyResources(), items: [], manuals: [] };
 let walkAwayCard = null;
 // Survivor name tags on the shelter page, kept between renders (see renderSurvivorBadges).
 const survivorBadges = new WeakMap();
+// The player and the mission's survivor waiting at a landmark, on the party
+// page, where everyone else is a survivor.
+const YOU = 'you';
+const WAITING = 'waiting';
 
 // A game event the player should hear and feel, e.g. 'found'.
 function feedback(name) {
@@ -371,6 +405,7 @@ function update() {
   ui.deniedScreen.hidden = isDebug || tracker.signal !== 'denied';
   debugPanel?.update();
   if (tab === 'party') renderPartyPage();
+  if (tab === 'backpack') renderBackpackPage();
   // Importing or resetting a save from the start screen's settings changes this.
   const play = state.world ? 'Continue Game' : 'New Game';
   if (ui.playButton.textContent !== play) ui.playButton.textContent = play;
@@ -381,10 +416,16 @@ function update() {
 function tick() {
   const time = now();
   const pruned = pruneSearchedAreas(state, time);
-  const { meals, left, sickened: sick } = settleMeals(state, time);
+  // The party eats at home while the player is in the shelter.
+  const { meals, left, leftParty, sickened: sick } = settleMeals(state, time, inShelter);
+  // Healing is counted up to now every tick, but it is the same however
+  // often that happens, so the save only needs it once a wound has healed.
+  const healed = healWounds(state, time);
+  const shed = leftParty.length > 0 ? shedLoad(state, inShelter) : null;
   const failed = expireMission(state, time);
-  if (pruned || meals > 0 || left.length > 0 || failed) saveState(state);
-  if (left.length > 0) showDepartures(left);
+  if (pruned || meals > 0 || healed || left.length > 0 || leftParty.length > 0 || failed) saveState(state);
+  if (left.length > 0 || leftParty.length > 0) showDepartures(left, leftParty);
+  if (shed && describeShed(shed)) showToast(`${describeShed(shed)} ${inShelter ? 'went into storage' : 'fell out of your backpack'}`, 'backpack');
   if (sick.length > 0) showSickness(sick);
   if (failed) showLostSignal(failed);
   if (tab === 'shelter') renderShelterPage();
@@ -400,19 +441,17 @@ function renderStatus() {
   const time = now();
   if (!holdBackpack) {
     const load = backpackLoad(state);
-    const capacity = backpackCapacity(state, time);
+    const capacity = backpackCapacity(state);
     ui.backpack.textContent = `${load}/${capacity}`;
-    ui.backpackGauge.style.width = `${(100 * load) / capacity}%`;
-    ui.backpackGauge.classList.toggle('full', load >= capacity);
-    ui.backpackHud.setAttribute('aria-label', `Backpack ${load}/${capacity}`);
+    ui.backpack.classList.toggle('full', load >= capacity);
+    ui.backpackTab.setAttribute('aria-label', `Backpack ${load}/${capacity}`);
   }
 
-  ui.companion.hidden = !state.companion;
-  ui.companionName.textContent = state.companion?.name ?? '';
-  const wounded = state.companion !== null && isWounded(state.companion, time);
-  ui.companion.classList.toggle('wounded', wounded);
-  ui.companionIcon.setAttribute('href', wounded ? '#i-wound' : '#i-survivor');
-  ui.companion.setAttribute('aria-label', wounded ? `${state.companion.name}, wounded` : ui.companionName.textContent);
+  // The player counts too, so a lone walker's party is 1. Names would not fit
+  // once parties grow, so the bar shows only the count and the room for more.
+  const size = partySize(state);
+  ui.party.textContent = `${size}/${partyLimit()}`;
+  ui.partyTab.setAttribute('aria-label', `Party: ${size} of ${partyLimit()}`);
 
   const { bars, label, description } = gpsStatus();
   ui.signalBars.forEach((bar, index) => bar.classList.toggle('on', index < bars));
@@ -692,11 +731,12 @@ async function searchAction() {
   holdBackpack = false;
   update();
   if (carried) {
-    replayAnimation(ui.backpackHud, 'bump');
+    replayAnimation(ui.backpackTab, 'bump');
     feedback('land');
   }
 
-  if (rescued) await offerSurvivor(rescued);
+  if (rescued?.waiting) await showWaiting(rescued.survivor);
+  else if (rescued) await offerSurvivor(rescued.survivor, rescued.wounds);
   if (loot.manual) await offerManual(loot.manual);
 }
 
@@ -814,7 +854,10 @@ async function encounter(encounter) {
   ui.encounterText.textContent = flavor;
   ui.enemyLabel.textContent = label;
   showStrength(ui.enemyRoll, strength);
-  showStrength(ui.playerRoll, weapons.length ? null : PLAYER_STRENGTH);
+  // Everyone in the party fights, so their strength is the party's.
+  const bareHanded = partyStrength(state, null);
+  ui.playerLabel.textContent = state.party.length > 0 ? 'Party' : 'You';
+  showStrength(ui.playerRoll, weapons.length ? null : bareHanded);
   ui.encounterMessage.textContent = 'Fight or run?';
   ui.encounterDone.hidden = true;
   ui.encounterDialog.showModal();
@@ -822,28 +865,28 @@ async function encounter(encounter) {
 
   const fightChoice = weapons.length
     ? { value: 'arm', label: 'Reach for a weapon', detail: '' }
-    : { value: null, label: 'Fight bare-handed', detail: PLAYER_STRENGTH };
+    : { value: null, label: 'Fight bare-handed', detail: bareHanded };
   let weapon = await choose([fightChoice, runChoice(false)]);
   if (weapon === 'run') return flee(enemy, false);
   if (weapon === 'arm') {
     ui.encounterMessage.textContent = 'What do you fight with?';
-    weapon = await choose([...weapons.map(weaponChoice), { value: null, label: 'Bare hands', detail: PLAYER_STRENGTH }]);
+    weapon = await choose([...weapons.map(weaponChoice), { value: null, label: 'Bare hands', detail: bareHanded }]);
   }
 
   const weaponLabel = weapon && ITEMS[weapon.id].label;
-  showStrength(ui.playerRoll, playerStrength(weapon));
+  showStrength(ui.playerRoll, partyStrength(state, weapon));
   const attack = enemyAttack(enemy);
   await showRoll(ui.enemyRoll, attack);
   ui.encounterMessage.textContent = `The ${label} attacks! Strike back or run?`;
   const attackChoice = { value: 'attack', label: 'Attack', detail: weapon ? `with the ${weaponLabel}` : 'bare-handed' };
   if ((await choose([attackChoice, runChoice(true)])) === 'run') return flee(enemy, true);
 
-  const { won, strike, wornOut, lost } = fight(state, encounter, attack, weapon);
+  const { won, strike, wornOut, wounded, shed } = fight(state, encounter, attack, weapon, now());
   saveAndUpdate();
   await showRoll(ui.playerRoll, strike);
 
   const wornNote = wornOut ? ` Your ${weaponLabel} is worn out.` : '';
-  const total = totalResources(lost);
+  const lostThings = shed ? describeShed(shed) : '';
   let note;
   if (won) {
     note = `You beat the ${label}.`;
@@ -852,15 +895,34 @@ async function encounter(encounter) {
     note = strike === attack
       ? `A tie goes to the ${label}, and it stays on your map.`
       : `The ${label} got the better of you and stays on your map.`;
-    if (total > 0) note += ` You lost ${describeResources(lost)}.`;
+    note += ` ${describeWound(wounded)}`;
+    if (lostThings) note += ` ${lostThings} fell out of your backpack.`;
     feedback('defeat');
   }
   ui.encounterMessage.textContent = note + wornNote;
   ui.encounterDone.hidden = false;
   ui.encounterOk.focus();
   await new Promise((resolve) => ui.encounterDialog.addEventListener('close', resolve, { once: true }));
-  if (total > 0) replayAnimation(ui.backpackHud, 'bump');
+  if (!won) replayAnimation(ui.partyTab, 'bump');
+  if (lostThings) replayAnimation(ui.backpackTab, 'bump');
   return won;
+}
+
+// Who the enemy wounded after a lost fight, as fight() tells it.
+function describeWound({ name, killed }) {
+  if (name === null) return 'It wounded you.';
+  return killed ? `It struck ${name}, who didn't make it.` : `It wounded ${name}.`;
+}
+
+// What fell out of the backpack (see shedLoad()), e.g. "2 Junk and your
+// Knife", or '' if nothing did.
+function describeShed({ resources, items, manuals }) {
+  const parts = [
+    ...RESOURCES.filter(({ id }) => resources[id] > 0).map((resource) => amountOf(resource, resources[resource.id])),
+    ...items.map((item) => `your ${ITEMS[item.id].label}`),
+    ...manuals.map((id) => `the ${MANUALS[id].label}`),
+  ];
+  return parts.length > 0 ? listNames(parts) : '';
 }
 
 // A roll yet to come: the strength it will be rolled with and its range, or
@@ -871,7 +933,8 @@ function showStrength(element, strength) {
     element.replaceChildren('?');
     return;
   }
-  const [min, max] = diceRange(strength);
+  // Wounds can take a roll below zero, written with a minus sign so it doesn't read as a dash.
+  const [min, max] = diceRange(strength).map((value) => (value < 0 ? `−${-value}` : value));
   const range = document.createElement('small');
   range.textContent = `(${min}–${max})`;
   element.replaceChildren(strength, range);
@@ -894,7 +957,7 @@ function flee(enemy, attacked) {
   saveAndUpdate();
   feedback('flee');
   const total = totalResources(lost);
-  if (total > 0) replayAnimation(ui.backpackHud, 'bump');
+  if (total > 0) replayAnimation(ui.backpackTab, 'bump');
   const dropped = total > 0 ? `You ran, dropping ${describeResources(lost)}` : 'You ran and got away';
   showToast(`${dropped}. The ${ENEMIES[enemy.type].label} stays on your map.`, enemy.type);
   return false;
@@ -908,7 +971,7 @@ function runChoice(attacked) {
 
 function weaponChoice(item) {
   const { label, uses } = ITEMS[item.id];
-  return { value: item, label, detail: `${playerStrength(item)} · ${item.uses}/${uses} uses` };
+  return { value: item, label, detail: `${partyStrength(state, item)} · ${item.uses}/${uses} uses` };
 }
 
 // Shows a button for each choice and resolves with the value of the one tapped.
@@ -949,19 +1012,30 @@ function describeCost(cost) {
   return RESOURCES.filter(({ id }) => cost[id]).map((resource) => amountOf(resource, cost[resource.id])).join(' + ');
 }
 
-async function offerSurvivor(survivor) {
+async function offerSurvivor(survivor, wounds) {
   ui.survivorName.textContent = survivor;
-  ui.survivorNote.textContent = `Wounded: +${WOUNDED_CAPACITY_BONUS} backpack space until the wound heals.`;
+  ui.survivorNote.textContent =
+    `${plural(wounds, 'wound')}: strength ${woundedStrength(SURVIVOR_STRENGTH, wounds)}, carries ${carryCapacity(wounds)}.`;
   feedback('survivor');
-  if ((await ask(ui.survivorDialog)) === 'take') {
-    takeSurvivor(state, survivor, now());
+  if ((await ask(ui.survivorDialog)) === 'take' && takeSurvivor(state, survivor, wounds, now())) {
     saveAndUpdate();
-    replayAnimation(ui.companion, 'bump');
+    replayAnimation(ui.partyTab, 'bump');
     feedback('land');
     showToast(`${survivor} is coming with you`, 'survivor');
   } else {
     showToast(`You left ${survivor} behind`, 'survivor');
   }
+}
+
+// The mission's survivor, found with no room in the party, waits at the
+// landmark until the mission runs out, so the player can make room and come back.
+async function showWaiting(survivor) {
+  ui.waitingText.textContent = `${survivor} is hurt, but alive. Your party is full, so ${survivor} will wait here.`;
+  ui.waitingNote.textContent =
+    `Make room in your party within ${formatDuration(missionEndsAt(state.mission) - now())}, ` +
+    `then take ${survivor} along here from your party page.`;
+  feedback('survivor');
+  await ask(ui.waitingDialog);
 }
 
 // Offers a found manual. If it doesn't fit, the player can open the backpack
@@ -973,7 +1047,7 @@ async function offerManual(id) {
     `Bring it to your shelter to craft: ${listNames(manualRecipes(id))}. Takes ${MANUAL_SIZE} backpack space.`;
   feedback('manual');
   for (;;) {
-    const fits = canTakeManual(state, now());
+    const fits = canTakeManual(state);
     ui.manualTake.disabled = !fits;
     ui.manualNoSpace.hidden = fits;
     const answer = ask(ui.manualDialog);
@@ -984,9 +1058,9 @@ async function offerManual(id) {
       await openBackpackPanel();
       continue;
     }
-    if (choice === 'take' && takeManual(state, id, now())) {
+    if (choice === 'take' && takeManual(state, id)) {
       saveAndUpdate();
-      replayAnimation(ui.backpackHud, 'bump');
+      replayAnimation(ui.backpackTab, 'bump');
       feedback('land');
       showToast(`You packed the ${label}`, 'manual');
     } else {
@@ -997,9 +1071,9 @@ async function offerManual(id) {
 }
 
 async function unloadAction() {
-  const { items, manuals, survivor, left, sickened: sick } = unload(state, now());
+  const { items, manuals, left, leftParty, sickened: sick } = unload(state, now());
   saveAndUpdate();
-  if (left.length > 0) showDepartures(left);
+  if (left.length > 0 || leftParty.length > 0) showDepartures(left, leftParty);
   if (sick.length > 0) showSickness(sick);
   feedback('unload');
   mapView.playRipple(state.shelter, SHELTER_RADIUS, RIPPLE_MS);
@@ -1007,21 +1081,45 @@ async function unloadAction() {
   const messages = [];
   if (items > 0) messages.push(`Unloaded ${plural(items, 'item')}`);
   for (const id of manuals) messages.push(`${MANUALS[id].label} added to the workshop`);
-  if (survivor) messages.push(`${survivor} moved into ${state.shelter.name}`);
   const note = messages.join('. ');
-  let card = { icon: 'survivor', amount: '', name: survivor, note };
-  if (items > 0) card = { icon: 'unload', amount: `+${items}`, name: 'Stored', note };
-  else if (manuals.length > 0) card = { icon: 'manual', amount: '', name: 'Workshop', note };
-  await showReward(card);
+  await showReward(
+    items > 0
+      ? { icon: 'unload', amount: `+${items}`, name: 'Stored', note }
+      : { icon: 'manual', amount: '', name: 'Workshop', note },
+  );
 }
 
-// Shows what the player carries and lets them mark things to drop.
-// Nothing is dropped until they confirm.
+// Shows the backpack in a panel over a found manual's offer, to make room for
+// it without leaving the offer. The backpack page's view moves into the panel
+// meanwhile. Nothing is dropped until the player confirms.
 async function openBackpackPanel() {
-  dropping = { resources: emptyResources(), items: [], manuals: [] };
+  ui.backpackPanelBody.append(ui.backpackView);
+  resetDropping();
   renderBackpackRows();
+  const choice = await ask(ui.backpackPanel);
+  ui.backpackPageBody.append(ui.backpackView);
+  if (choice === 'drop') dropMarked();
+}
 
-  if ((await ask(ui.backpackPanel)) !== 'drop') return;
+// The Backpack tab: what the player carries, with things marked to drop
+// until they confirm. Rows are rebuilt only when the contents change, since
+// the page re-renders every tick and the marks live on them.
+function renderBackpackPage() {
+  const contents = JSON.stringify([state.backpack, state.backpackItems, state.backpackManuals]);
+  if (ui.backpackItems.dataset.contents === contents) {
+    renderBackpackPanel();
+    return;
+  }
+  resetDropping();
+  renderBackpackRows();
+}
+
+function resetDropping() {
+  dropping = { resources: emptyResources(), items: [], manuals: [] };
+}
+
+// Drops what is marked in the backpack view.
+function dropMarked() {
   const parts = [
     ...RESOURCES.filter(({ id }) => dropping.resources[id] > 0).map((resource) => ({
       text: amountOf(resource, dropping.resources[resource.id]),
@@ -1030,10 +1128,12 @@ async function openBackpackPanel() {
     ...dropping.items.map((item) => ({ text: `your ${ITEMS[item.id].label}`, icon: item.id })),
     ...dropping.manuals.map((id) => ({ text: `the ${MANUALS[id].label}`, icon: 'manual' })),
   ];
-  if (dropFromBackpack(state, dropping) === 0) return;
+  const dropped = dropFromBackpack(state, dropping);
+  resetDropping();
+  if (dropped === 0) return;
   saveAndUpdate();
   feedback('drop');
-  replayAnimation(ui.backpackHud, 'bump');
+  replayAnimation(ui.backpackTab, 'bump');
   showToast(`You dropped ${listNames(parts.map(({ text }) => text))}`, parts.length === 1 ? parts[0].icon : 'backpack');
 }
 
@@ -1078,6 +1178,7 @@ function renderBackpackRows() {
     );
   }
   ui.backpackItems.replaceChildren(...rows);
+  ui.backpackItems.dataset.contents = JSON.stringify([state.backpack, state.backpackItems, state.backpackManuals]);
   ui.backpackEmpty.hidden = rows.length > 0;
   ui.backpackDropHint.hidden = rows.length === 0;
   renderBackpackPanel();
@@ -1112,7 +1213,7 @@ function renderBackpackPanel() {
     dropping.items.reduce((sum, item) => sum + ITEMS[item.id].size, 0) +
     dropping.manuals.length * MANUAL_SIZE;
   const markedCount = totalResources(dropping.resources) + dropping.items.length + dropping.manuals.length;
-  ui.backpackPanelLoad.textContent = `${backpackLoad(state) - markedLoad}/${backpackCapacity(state, time)}`;
+  ui.backpackPanelLoad.textContent = `${backpackLoad(state) - markedLoad}/${backpackCapacity(state)}`;
   for (const row of ui.backpackItems.children) {
     const { max, marked, count } = row.entry;
     const [drop, keep] = row.querySelectorAll('[data-step]');
@@ -1126,37 +1227,30 @@ function renderBackpackPanel() {
   ui.backpackClose.textContent = markedCount > 0 ? 'Cancel' : 'Close';
   ui.backpackDrop.textContent = `Drop ${markedCount}`;
   ui.backpackDrop.hidden = markedCount === 0;
+  ui.backpackPageDrop.textContent = `Drop ${markedCount}`;
+  ui.backpackPageDrop.hidden = markedCount === 0;
+  ui.backpackPageCancel.hidden = markedCount === 0;
 
-  const { companion } = state;
-  ui.backpackCompanion.hidden = !companion;
-  if (!companion) return;
-  const wounded = isWounded(companion, time);
-  const space = `+${companionCapacityBonus(state, time)} space`;
-  ui.backpackCompanionText.textContent = wounded
-    ? `${companion.name} is wounded: ${space}. Heals in ${formatDuration(woundHealsAt(companion) - time)}.`
-    : `${companion.name} is with you: ${space}.`;
-  ui.backpackTreat.hidden = !wounded;
-  ui.backpackTreat.disabled = !canTreat(state, companion, time);
+  // Everyone in the party carries some of the load.
+  const { party } = state;
+  ui.backpackParty.hidden = party.length === 0;
+  if (party.length === 0) return;
+  const names = listNames(party.map(({ name }) => name));
+  ui.backpackParty.textContent =
+    `${names} ${party.length === 1 ? 'is' : 'are'} with you: +${partyCapacityBonus(state)} space.`;
 }
 
-function treatCompanion() {
-  const { companion } = state;
-  if (!companion || !treat(state, companion, now())) return;
+// Treats the player or a survivor with a first aid kit: one wound, or the sickness.
+function treatPerson(person) {
+  const healed = treat(state, person, now());
+  if (!healed) return;
   saveAndUpdate();
   feedback('heal');
-  showToast(`You dressed ${companion.name}'s wound`, 'first-aid-kit');
-  // The kit may be used up, so forget it if it was marked to be dropped.
-  dropping.items = dropping.items.filter((item) => state.backpackItems.includes(item));
-  renderBackpackRows();
-}
-
-function treatSurvivor(survivor) {
-  const sick = isSick(survivor, now());
-  if (!treat(state, survivor, now())) return;
-  saveAndUpdate();
-  feedback('heal');
-  showToast(sick ? `${survivor.name} has been treated` : `${survivor.name}'s wound has been dressed`, 'first-aid-kit');
-  renderShelterPage();
+  const you = person === state.player;
+  let message = you ? 'You dressed a wound' : `${person.name}'s wound has been dressed`;
+  if (healed === 'sickness') message = `${person.name} has been treated`;
+  showToast(message, 'first-aid-kit');
+  if (tab === 'shelter') renderShelterPage();
 }
 
 // Steps once when pressed, then keeps stepping while held, until `step` returns false.
@@ -1182,7 +1276,8 @@ function holdToRepeat(button, step) {
   button.addEventListener('contextmenu', (event) => event.preventDefault());
 }
 
-// Switches between the You and Shelter pages and the map.
+// Switches between the Backpack, Party and Shelter pages and the map. The
+// backpack starts with nothing marked to drop, and the party with its list.
 function showTab(name) {
   tab = name;
   document.body.dataset.tab = name;
@@ -1192,38 +1287,233 @@ function showTab(name) {
     if (id === name) page.scrollTop = 0;
   }
   if (name === 'shelter') renderShelterPage();
-  if (name === 'party') renderPartyPage();
+  if (name === 'party') {
+    personCard = null;
+    renderPartyPage();
+  }
+  if (name === 'backpack') {
+    resetDropping();
+    renderBackpackRows();
+  }
 }
 
-// What the player carries and who walks with them. Dropping things happens
-// in the backpack panel, which finds also open to make room.
+// Who walks with the player and who else is here, or one person's card.
 function renderPartyPage() {
   const time = now();
-  ui.partyLoad.textContent = `${backpackLoad(state)}/${backpackCapacity(state, time)}`;
-  const rows = [
-    ...RESOURCES.filter(({ id }) => state.backpack[id] > 0).map(({ id, label }) => [id, label, `${state.backpack[id]}`]),
-    ...state.backpackItems.map((item) => {
-      const { label, uses, size } = ITEMS[item.id];
-      return [item.id, label, `${item.uses}/${uses} uses · ${size} space`];
-    }),
-    ...state.backpackManuals.map((id) => ['manual', MANUALS[id].label, `${MANUAL_SIZE} space`]),
-  ];
-  renderOnChange(ui.partyBackpack, rows, () =>
-    rows.map(([icon, label, detail]) => itemRow({ icon, label, detail, action: null, stamp: '' })),
-  );
-  ui.partyBackpackEmpty.hidden = rows.length > 0;
-  ui.partyDrop.hidden = rows.length === 0;
+  // Whoever's card is open may have left meanwhile, e.g. for lack of food.
+  if (personCard !== null && !isKnown(personCard, time)) personCard = null;
+  ui.partyList.hidden = personCard !== null;
+  ui.personCard.hidden = personCard === null;
+  if (personCard) renderPersonCard(personCard, time);
+  else renderPartyList(time);
+}
 
-  const { companion } = state;
-  ui.partyCompanion.hidden = !companion;
-  if (!companion) return;
-  const wounded = isWounded(companion, time);
-  const space = `+${companionCapacityBonus(state, time)} backpack space`;
-  ui.partyCompanionText.textContent = wounded
-    ? `${companion.name} is wounded: ${space}. Heals in ${formatDuration(woundHealsAt(companion) - time)}.`
-    : `${companion.name}: ${space}.`;
-  ui.partyTreat.hidden = !wounded;
-  ui.partyTreat.disabled = !canTreat(state, companion, time);
+function isKnown(person, time) {
+  if (person === YOU) return true;
+  if (person === WAITING) return waitingSurvivorNear(state, tracker.position, time) !== null;
+  return state.party.includes(person) || Boolean(state.shelter?.survivors.includes(person));
+}
+
+function renderPartyList(time) {
+  ui.partyCount.textContent = `${partySize(state)}/${partyLimit()}`;
+  renderPeople(ui.partyMembers, [
+    { person: YOU, name: 'You', wounds: state.player.wounds, detail: describePerson(YOU, time) },
+    ...state.party.map((survivor) => ({
+      person: survivor,
+      name: survivor.name,
+      wounds: survivor.wounds,
+      detail: describePerson(survivor, time),
+      // At home they stay in the shelter; out in the wastes they are left on their own.
+      action: inShelter ? 'Leave' : 'Abandon',
+      enabled: true,
+      onClick: () => leaveAction(survivor),
+    })),
+  ]);
+
+  const place = placeHere(time);
+  ui.partyPlace.hidden = !place;
+  if (!place) return;
+  ui.partyPlaceName.textContent = place.name;
+  ui.partyPlaceIcon.setAttribute('href', `#i-${place.icon}`);
+  renderPeople(ui.partyPlacePeople, place.people);
+  ui.partyPlaceEmpty.hidden = place.people.length > 0;
+}
+
+// Where the player stands, if anyone could join the party there: { name,
+// icon, people }, or null. The shelter, or the landmark where the mission's
+// survivor was found with a full party.
+function placeHere(time) {
+  const full = isPartyFull(state);
+  if (inShelter) {
+    return {
+      name: state.shelter.name,
+      icon: 'shelter',
+      people: state.shelter.survivors.map((survivor) => ({
+        person: survivor,
+        name: survivor.name,
+        wounds: survivor.wounds,
+        detail: describePerson(survivor, time),
+        action: 'Take',
+        enabled: !full,
+        onClick: () => takeAction(survivor),
+      })),
+    };
+  }
+  const waiting = waitingSurvivorNear(state, tracker.position, time);
+  if (!waiting) return null;
+  const { type } = state.mission.landmark;
+  return {
+    name: LANDMARKS[type].label,
+    icon: type,
+    people: [
+      {
+        person: WAITING,
+        name: waiting,
+        wounds: state.mission.wounds,
+        detail: describePerson(WAITING, time),
+        action: 'Take',
+        enabled: !full,
+        onClick: takeWaitingAction,
+      },
+    ],
+  };
+}
+
+// The page re-renders every tick, so its rows go through renderOnChange().
+function renderPeople(list, people) {
+  renderOnChange(
+    list,
+    people.map(({ name, wounds, detail, action, enabled }) => [name, wounds, detail, action, enabled]),
+    () => people.map(personRow),
+  );
+}
+
+function personRow({ person, name, wounds, detail, action, enabled, onClick }) {
+  const row = ui.personRow.content.firstElementChild.cloneNode(true);
+  row.querySelector('.person-name').textContent = name;
+  showWounds(row.querySelector('.wound-drops'), wounds);
+  row.querySelector('.person-detail').textContent = detail;
+  const info = row.querySelector('.person-info');
+  info.setAttribute('aria-label', `Info about ${name}`);
+  info.addEventListener('click', () => openPerson(person));
+  const button = row.querySelector('.person-action');
+  if (!action) {
+    button.remove();
+    return row;
+  }
+  button.textContent = action;
+  button.disabled = !enabled;
+  button.setAttribute('aria-label', `${action} ${name}`);
+  button.addEventListener('click', onClick);
+  return row;
+}
+
+// What matters about someone at a glance, e.g. "Strength 1d6-2 · Hungry · Sick".
+// Their wounds show as drops of blood next to the name.
+function describePerson(person, time) {
+  const strength = `Strength ${strengthOf(person)}`;
+  if (person === YOU || person === WAITING) return strength;
+  const { stage } = hungerOf(person, time);
+  return [strength, stage !== 'satiated' && HUNGER_TEXT[stage].label, isSick(person, time) && 'Sick']
+    .filter(Boolean)
+    .join(' · ');
+}
+
+// How many wounds someone on the party page has.
+function woundsOf(person) {
+  if (person === YOU) return state.player.wounds;
+  return person === WAITING ? state.mission.wounds : person.wounds;
+}
+
+// Someone's strength in a fight, one less for each wound, e.g. '2d6-1'.
+function strengthOf(person) {
+  return woundedStrength(person === YOU ? PLAYER_STRENGTH : SURVIVOR_STRENGTH, woundsOf(person));
+}
+
+// A drop of blood for each wound, overlapping, rebuilt only when the count changes.
+function showWounds(element, wounds) {
+  if (element.dataset.wounds === String(wounds)) return;
+  element.dataset.wounds = wounds;
+  element.replaceChildren(...Array.from({ length: wounds }, () => iconElement('blood')));
+  element.setAttribute('aria-label', wounds > 0 ? plural(wounds, 'wound') : '');
+}
+
+// Opens someone's card on the party page, or goes back to the list with null.
+function openPerson(person) {
+  personCard = person;
+  renderPartyPage();
+  ui.pages.party.scrollTop = 0;
+}
+
+// One person's card: their strength, and their name tag, with hunger for
+// survivors, wounds and sickness, and the Treat button. The survivor waiting
+// at a landmark hasn't joined yet, so there is no name tag for them, and the
+// player's shows only while they are wounded.
+function renderPersonCard(person, time) {
+  const you = person === YOU;
+  const waiting = person === WAITING;
+  let name = person.name;
+  let where = state.party.includes(person) ? 'In your party.' : `In ${state.shelter?.name}.`;
+  if (you) [name, where] = ['You', 'You lead the party.'];
+  if (waiting) [name, where] = [state.mission.survivor, `Waiting at the ${LANDMARKS[state.mission.landmark.type].label}.`];
+  ui.personName.textContent = name;
+  ui.personWhere.textContent = where;
+  const strength = strengthOf(person);
+  if (ui.personStrength.dataset.strength !== strength) {
+    ui.personStrength.dataset.strength = strength;
+    showStrength(ui.personStrength, strength);
+  }
+  ui.personCondition.hidden = waiting || (you && state.player.wounds === 0);
+  if (ui.personCondition.hidden) return;
+  // One name tag, updated in place so its Treat button keeps working.
+  let badge = ui.personCondition.firstElementChild;
+  if (!badge) {
+    badge = ui.survivorBadge.content.firstElementChild.cloneNode(true);
+    badge.querySelector('.treat').addEventListener('click', () => {
+      if (personCard === YOU) treatPerson(state.player);
+      else if (personCard && personCard !== WAITING) treatPerson(personCard);
+    });
+    ui.personCondition.append(badge);
+  }
+  updateSurvivorBadge(badge, you ? state.player : person, time);
+}
+
+// Leaves someone from the party: in the shelter, where they stay, or in the
+// wastes, for good, once the player confirms.
+async function leaveAction(survivor) {
+  if (inShelter) {
+    const shed = leaveInShelter(state, survivor, now());
+    if (!shed) return;
+    const stored = describeShed(shed) && `. ${describeShed(shed)} went into storage`;
+    partyChanged(`${survivor.name} stays in ${state.shelter.name}${stored}`, 'shelter', 'land');
+    return;
+  }
+  ui.abandonName.textContent = survivor.name;
+  ui.abandonText.textContent = `${survivor.name} will be left alone in the wastes and won't come back.`;
+  if ((await ask(ui.abandonDialog)) !== 'abandon') return;
+  const shed = abandon(state, survivor, now());
+  if (!shed) return;
+  const lost = describeShed(shed) && `. ${describeShed(shed)} fell out of your backpack`;
+  partyChanged(`You abandoned ${survivor.name}${lost}`, 'party', 'drop');
+}
+
+function takeAction(survivor) {
+  if (!inShelter || !takeFromShelter(state, survivor)) return;
+  partyChanged(`${survivor.name} joins your party`, 'party', 'land');
+}
+
+// The mission's survivor, found with a full party, joins once there is room.
+function takeWaitingAction() {
+  const survivor = state.mission?.survivor;
+  if (!takeWaitingSurvivor(state, tracker.position, now())) return;
+  partyChanged(`${survivor} joins your party`, 'party', 'land');
+}
+
+function partyChanged(message, icon, sound) {
+  saveAndUpdate();
+  feedback(sound);
+  replayAnimation(ui.partyTab, 'bump');
+  showToast(message, icon);
 }
 
 // Re-rendered every tick while open, so the hunger bars keep moving.
@@ -1248,7 +1538,7 @@ function renderShelterPage() {
     }),
   );
 
-  const space = freeSpace(state, time);
+  const space = freeSpace(state);
   renderOnChange(ui.shelterItems, [shelter.items, inShelter, space], () =>
     shelter.items.map((item) => {
       const { label, uses, size } = ITEMS[item.id];
@@ -1257,7 +1547,7 @@ function renderShelterPage() {
         label,
         detail: `${item.uses}/${uses} uses · ${size} space`,
         action: 'Pack',
-        enabled: inShelter && canPack(state, item, time),
+        enabled: inShelter && canPack(state, item),
         onClick: () => packAction(item),
       });
     }),
@@ -1337,8 +1627,6 @@ function radioText(blocker, time) {
     }
     case 'away':
       return 'Listen in from the shelter.';
-    case 'companion':
-      return `Bring ${state.companion.name} inside first.`;
     case 'cooldown': {
       const wait = formatDuration(listenReadyAt(radio) - time);
       // Listened since the last mission ended, so all they heard was static.
@@ -1448,10 +1736,10 @@ function craftAction(id) {
 }
 
 function packAction(item) {
-  if (!inShelter || !packItem(state, item, now())) return;
+  if (!inShelter || !packItem(state, item)) return;
   saveAndUpdate();
   feedback('land');
-  replayAnimation(ui.backpackHud, 'bump');
+  replayAnimation(ui.backpackTab, 'bump');
   showToast(`You packed your ${ITEMS[item.id].label}`, item.id);
   renderShelterPage();
 }
@@ -1462,7 +1750,7 @@ function renderSurvivorBadges(time) {
     let badge = survivorBadges.get(survivor);
     if (!badge) {
       badge = ui.survivorBadge.content.firstElementChild.cloneNode(true);
-      badge.querySelector('.treat').addEventListener('click', () => treatSurvivor(survivor));
+      badge.querySelector('.treat').addEventListener('click', () => treatPerson(survivor));
       survivorBadges.set(survivor, badge);
     }
     updateSurvivorBadge(badge, survivor, time);
@@ -1474,28 +1762,47 @@ function renderSurvivorBadges(time) {
   }
 }
 
-// A survivor's name tag, with a bar running down to the end of their current
-// hunger stage, and their wound or sickness if they have one.
-function updateSurvivorBadge(badge, survivor, time) {
-  const { stage, startedAt, endsAt } = hungerOf(survivor, time);
-  const text = HUNGER_TEXT[stage];
-  badge.dataset.stage = stage;
-  badge.querySelector('.survivor-badge-name').textContent = survivor.name;
-  badge.querySelector('.hunger-stage').textContent = text.label;
-  badge.querySelector('.hunger-fill').style.width = `${(100 * (endsAt - time)) / (endsAt - startedAt)}%`;
-  badge.querySelector('.hunger-time').textContent =
-    `${text.next(state.shelter.storage.food > 0)} ${formatDuration(endsAt - time)}`;
-  const wounded = isWounded(survivor, time);
-  const sick = isSick(survivor, time);
-  badge.querySelector('.wound').hidden = !wounded && !sick;
-  if (!wounded && !sick) return;
-  badge.querySelector('.wound use').setAttribute('href', wounded ? '#i-wound' : '#i-radiation');
-  badge.querySelector('.wound-label').textContent = wounded && sick ? 'Wounded & sick' : wounded ? 'Wounded' : 'Sick';
-  const healsAt = Math.max(wounded ? woundHealsAt(survivor) : 0, sick ? sicknessHealsAt(survivor) : 0);
-  badge.querySelector('.wound-time').textContent = `heals in ${formatDuration(healsAt - time)}`;
+// A name tag: for a survivor, with a bar running down to the end of their
+// current hunger stage; for anyone, their wounds and sickness if they have any.
+function updateSurvivorBadge(badge, person, time) {
+  const you = person === state.player;
+  const name = you ? 'You' : person.name;
+  badge.classList.toggle('player', you);
+  badge.querySelector('.survivor-badge-name').textContent = name;
+  if (!you) {
+    const { stage, startedAt, endsAt } = hungerOf(person, time);
+    const text = HUNGER_TEXT[stage];
+    badge.dataset.stage = stage;
+    badge.querySelector('.hunger-stage').textContent = text.label;
+    badge.querySelector('.hunger-fill').style.width = `${(100 * (endsAt - time)) / (endsAt - startedAt)}%`;
+    // The party eats from the backpack, except at home.
+    const fromBackpack = state.party.includes(person) && !inShelter;
+    const food = fromBackpack ? state.backpack.food : state.shelter.storage.food;
+    badge.querySelector('.hunger-time').textContent = `${text.next(food > 0)} ${formatDuration(endsAt - time)}`;
+  }
+  const { wounds } = person;
+  const sick = isSick(person, time);
+  badge.querySelector('.wound').hidden = wounds === 0 && !sick;
+  if (wounds === 0 && !sick) return;
+  showWounds(badge.querySelector('.wound-drops'), wounds);
+  // An SVG element has no hidden property, only the attribute.
+  badge.querySelector('.sick-icon').toggleAttribute('hidden', !sick);
+  let label = sick ? 'Sick' : '';
+  if (wounds > 0) label = sick ? `${plural(wounds, 'wound')} & sick` : plural(wounds, 'wound');
+  badge.querySelector('.wound-label').textContent = label;
+  let when = '';
+  // Wounds heal only while the survivor is well fed.
+  if (wounds > 0) {
+    when = isHealing(state, person, time)
+      ? `one heals in ${formatDuration(nextWoundHealsIn(state, person, time))}`
+      : 'not healing while hungry';
+  } else {
+    when = `heals in ${formatDuration(sicknessHealsAt(person) - time)}`;
+  }
+  badge.querySelector('.wound-time').textContent = when;
   const treatButton = badge.querySelector('.treat');
-  treatButton.disabled = !canTreat(state, survivor, time);
-  treatButton.setAttribute('aria-label', `Treat ${survivor.name}`);
+  treatButton.disabled = !canTreat(state, person, time);
+  treatButton.setAttribute('aria-label', `Treat ${name}`);
 }
 
 // How long ago something happened, e.g. "1d 23h ago" or "just now".
@@ -1513,12 +1820,18 @@ function formatDuration(ms) {
   return hours >= 1 ? `${Math.ceil(hours)} h` : `${Math.max(1, Math.ceil(hours * 60))} min`;
 }
 
-// Tells the player who left the shelter for lack of food, adding to the dialog if it is open.
-function showDepartures(names) {
-  departed.push(...names);
-  ui.departureTitle.textContent =
-    departed.length === 1 ? `${departed[0]} has left` : `${departed.length} survivors have left`;
-  ui.departureText.textContent = `${listNames(departed)} left ${state.shelter.name}: there was no food.`;
+// Tells the player who left the shelter or the party for lack of food,
+// adding to the dialog if it is open.
+function showDepartures(fromShelter, fromParty) {
+  departed.shelter.push(...fromShelter);
+  departed.party.push(...fromParty);
+  const all = [...departed.shelter, ...departed.party];
+  ui.departureTitle.textContent = all.length === 1 ? `${all[0]} has left` : `${all.length} survivors have left`;
+  const places = [
+    departed.shelter.length > 0 && `${listNames(departed.shelter)} left ${state.shelter.name}`,
+    departed.party.length > 0 && `${listNames(departed.party)} left your party`,
+  ].filter(Boolean);
+  ui.departureText.textContent = `${places.join(', and ')}: there was no food.`;
   if (!ui.departureDialog.open) ui.departureDialog.showModal();
   feedback('full');
 }
@@ -1678,17 +1991,19 @@ ui.actionButton.addEventListener('click', () => {
   const action = currentAction();
   if (action.enabled) ACTIONS[action.id]();
 });
-ui.backpackHud.addEventListener('click', openBackpackPanel);
-ui.backpackTreat.addEventListener('click', treatCompanion);
+ui.backpackPageDrop.addEventListener('click', dropMarked);
+ui.backpackPageCancel.addEventListener('click', () => {
+  resetDropping();
+  renderBackpackPanel();
+});
+ui.personBack.addEventListener('click', () => openPerson(null));
 for (const button of ui.tabs) button.addEventListener('click', () => showTab(button.dataset.tab));
-ui.partyDrop.addEventListener('click', openBackpackPanel);
-ui.partyTreat.addEventListener('click', treatCompanion);
 // The bars stay on top of the pages, which start below them.
 new ResizeObserver(() => {
   document.documentElement.style.setProperty('--header-height', `${ui.gameHeader.offsetHeight}px`);
 }).observe(ui.gameHeader);
 ui.radioListen.addEventListener('click', listenAction);
-ui.departureDialog.addEventListener('close', () => (departed = []));
+ui.departureDialog.addEventListener('close', () => (departed = { shelter: [], party: [] }));
 ui.sicknessDialog.addEventListener('close', () => (sickened = []));
 $('retry-location').addEventListener('click', () => tracker.start());
 $('recenter').addEventListener('click', () => mapView.recenter());

@@ -2,13 +2,15 @@
 
 Przy przeszukaniu można natknąć się na wroga. Walka to rzut kośćmi przeciw rzutowi kośćmi: wróg pokazuje swoją siłę, użytkownik ucieka albo sięga po broń, potem wróg rzuca atak, a użytkownik ucieka albo kontratakuje. Niepokonany wróg zostaje na mapie. Broń, z którą się walczy, i apteczki, którymi leczy się rany, opisuje [crafting.md](crafting.md).
 
-Zasada ogólna: kara nigdy nie blokuje chodzenia ani przeszukiwania. Użytkownik nie ma punktów życia. Skutki porażki dotyczą zasobów w plecaku.
+Zasada ogólna: kara nigdy nie blokuje chodzenia ani przeszukiwania. Użytkownik nie ma punktów życia. Skutkiem przegranej są rany (zob. [Rany](#rany)), a skutkiem ucieczki utrata zasobów z plecaka.
 
 ## Siła
 
 Siłę zapisuje się jak rzut kośćmi w grach fabularnych: `xdy+z`, czyli x rzutów kością o y ściankach plus z (z może być ujemne albo go nie być). Na przykład `2d6-2` to suma dwóch kości sześciennych minus 2. Podobnie jak talia kart siła wyznacza zakres wyników, ale rozkład nie musi być płaski: kilka kości daje wyniki skupione wokół środka (słabszy, ale przewidywalny przeciwnik), jedna kość daje każdy wynik równie często (bardziej nieprzewidywalny).
 
 - Siła użytkownika wynosi na razie 2d6 (2–12).
+- Każda rana odejmuje 1 od siły rannego, np. użytkownik z 2 ranami ma 2d6-2 (0–10) (zob. [Rany](#rany)).
+- Każdy ocalały w drużynie dodaje swoją siłę, na razie 1d6 (zob. [party.md](party.md#siła)). Jednakowe kości się sumują, np. użytkownik z towarzyszem ma 3d6 (3–18). Siła w oknie walki, w tym przy wyborze broni, to siła całej drużyny. Ciężko ranni mogą ją zmniejszać: ranny bardziej przeszkadza, niż pomaga, np. ocalały z 4 ranami ma 1d6-4 (od −3 do 2).
 - Broń do walki wręcz dodaje własne kości (zob. [Broń](#broń)).
 
 ## Wrogowie
@@ -89,7 +91,8 @@ Siłę zapisuje się jak rzut kośćmi w grach fabularnych: `xdy+z`, czyli x rzu
 
 ## Przegrana
 
-- Użytkownik gubi 40% zasobów z plecaka, bez względu na wroga, zaokrąglone w dół, ale co najmniej 1 jednostkę, tak jak przy ucieczce.
+- Wróg zadaje jedną ranę losowej osobie z drużyny, także użytkownikowi, każdemu z równą szansą (zob. [Rany](#rany)).
+- Użytkownik nie traci niczego z plecaka, chyba że po ranie plecak mieści mniej, niż w nim jest. Wtedy nadmiar wypada (zob. [Wypadanie z plecaka](#wypadanie-z-plecaka)).
 - Przeszukanie nic nie daje: nie ma zasobów ani podręcznika.
 - Wróg zostaje na mapie.
 
@@ -103,21 +106,37 @@ Siłę zapisuje się jak rzut kośćmi w grach fabularnych: `xdy+z`, czyli x rzu
 
 ## Rany
 
-- W walce nikt nie zostaje ranny. Ranny jest ocalały uratowany w misji ratunkowej: od chwili ratunku (zob. [landmarks.md](landmarks.md#ratunek)).
-- Rana dotyczy ocalałego, który idzie z użytkownikiem, ale trwa dalej także po jego przybyciu do schronu.
-- Rana goi się sama po 72 godzinach (czasu gry).
-- Ranny ocalały idący z użytkownikiem zwiększa pojemność plecaka o 10 jednostek zamiast 30.
-  - Jeśli po zranieniu zawartość plecaka przekracza pojemność, nic nie wypada, ale nic nie da się dołożyć, dopóki zawartość nie spadnie poniżej pojemności.
-- Ranny ocalały w schronie je więcej (zob. [survivors.md](survivors.md)).
-- Kolejna rana nie pogarsza stanu ocalałego, ale odnawia czas gojenia do 72 godzin.
+- Ranni mogą być wszyscy: użytkownik i ocaleni. Rany się liczy.
+- Rany zadaje wróg po przegranej walce (zob. [Przegrana](#przegrana)). Uratowany ocalały ma też rany, z którymi wzywał pomocy: losowo od 1 do 4 (zob. [landmarks.md](landmarks.md#ratunek)).
+- Każda osoba może mieć najwyżej 4 rany:
+  - ocalały, który dostaje piątą ranę, ginie. Odchodzi z drużyny i zostaje w historii schronu z powodem „killed”;
+  - użytkownik, który dostaje piątą ranę, nadal ma 4 rany. Nie ginie.
+- Każda rana:
+  - odejmuje 1 od siły rannego w walce (zob. [Siła](#siła)),
+  - zmniejsza o 10 jednostek to, co ranny może nieść. Zdrowa osoba niesie 50 jednostek, a z 4 ranami tylko 10 (zob. [party.md](party.md#plecak)). Na przykład użytkownik i ocalały, obaj z 4 ranami, mają razem plecak 10 + 10 = 20.
+- Rana nie zmienia jedzenia: ranny je 1 Food jak każdy (zob. [survivors.md](survivors.md)).
+- Rana trwa bez względu na to, czy ocalały jest w drużynie, czy w schronie.
+
+### Gojenie
+
+- Rany goją się same, po jednej: każda po 24 godzinach (czasu gry).
+- Ocalały goi się tylko wtedy, gdy jest najedzony (Satiated). Gdy jest głodny albo głoduje, gojenie stoi, a po posiłku rusza dalej od miejsca, w którym stanęło.
+- Użytkownik nie ma głodu, więc jego rany goją się zawsze.
 
 ### Leczenie
 
-- Apteczka (First aid kit) leczy ranę od razu. Jedno użycie leczy jedną ranę, a u chorego ocalałego naraz także chorobę (zob. [radiation.md](radiation.md#choroba-sick)).
+- Apteczka (First aid kit) leczy od razu jedną ranę. Gdy ranny jest też chory, jedno użycie leczy najpierw ranę, a dopiero gdy ran już nie ma, chorobę (zob. [radiation.md](radiation.md#choroba-sick)).
 - Leczy się ręcznie, przyciskiem **Treat**:
-  - ocalałego idącego z użytkownikiem apteczką z plecaka, na zakładce **Party** albo w panelu plecaka,
+  - użytkownika i ocalałego w drużynie apteczką z plecaka, na karcie osoby na stronie drużyny (zob. [party.md](party.md#interfejs)),
   - ocalałego w schronie apteczką z magazynu, na jego plakietce na zakładce **Shelter**. Tu nie trzeba być w schronie.
 - Przycisk jest nieaktywny, gdy pod ręką nie ma apteczki.
+
+### Wypadanie z plecaka
+
+- Plecak mieści tyle, ile niesie cała drużyna. Gdy ta pojemność spadnie poniżej tego, co jest w plecaku, nadmiar wypada od razu. Dzieje się tak po ranie, po śmierci ocalałego i gdy ktoś opuszcza drużynę (zostawiony w schronie, porzucony albo odchodzący z głodu).
+- Wypadają najpierw najlżejsze rzeczy, a spośród jednakowo lekkich losowo: najpierw zasoby (po 1 jednostce), potem przedmioty i podręczniki od najmniejszych.
+- Na pustkowiu to, co wypadło, przepada. W schronie trafia do magazynu.
+- Ucieczka (zob. [Ucieczka](#ucieczka-run)) nadal kosztuje 10% albo 20% zasobów, co najmniej 1 jednostkę.
 
 ## Interfejs
 
@@ -133,5 +152,6 @@ Siłę zapisuje się jak rzut kośćmi w grach fabularnych: `xdy+z`, czyli x rzu
 - Po wygranej okno ze znaleziskiem ma pod zasobami z przeszukania sekcję „The Rat's stash” z żetonami tego, co zabrano, np. „+1 Junk” i „+1 Food”. Zasób, który się nie zmieścił, ma wyblakły żeton „+0”, a uwaga pod znaleziskiem mówi „You had no room for all of its stash.” albo „You had no room for its stash.”
 - Po ucieczce komunikat mówi, co zgubiono, np. „You ran, dropping 1 Food. The Rat stays on your map.”
 - Pojawienie się rzutu ma krótką animację i dźwięk, a wynik walki własny dźwięk i wibrację (trafienie, upadek przy przegranej).
-- Ranny ocalały ma na plakietce oznaczenie „Wounded” i czas do zagojenia, np. „heals in 50 h”.
-- Pasek stanu pokazuje, że towarzyszący ocalały jest ranny.
+- Po przegranej komunikat mówi, kogo wróg zranił i co wypadło z plecaka, np. „It wounded Ada. 8 Junk fell out of your backpack.”, „It wounded you.” albo „It struck Ada, who didn't make it.”
+- Rany oznaczają kropelki krwi przy imieniu, po jednej na ranę, nachodzące na siebie: na liście drużyny, na plakietkach w schronie i na karcie osoby.
+- Plakietka rannego mówi, ile ma ran i kiedy zagoi się następna, np. „2 wounds · one heals in 14 h”, a gdy jest głodny, „not healing while hungry”.

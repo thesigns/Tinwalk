@@ -76,7 +76,6 @@ Radio działa na baterie (Cells, zob. [loot.md](loot.md)). Zbudowanie radia nie 
 - Gdy radio jest zbudowane, zakładka **Shelter** ma sekcję **Radio** z przyciskiem **Listen**.
 - Przycisk jest aktywny, gdy jednocześnie:
   - użytkownik jest w schronie,
-  - z użytkownikiem nie idzie żaden ocalały,
   - nie trwa żadna misja ratunkowa,
   - od poprzedniego nasłuchu minęły co najmniej 4 godziny,
   - w magazynie schronu jest co najmniej 1 Cell (baterie w plecaku trzeba najpierw rozładować),
@@ -105,13 +104,13 @@ Szansa zależy od czasu, który minął od końca poprzedniej misji ratunkowej (
 ### Wezwanie
 
 - Landmark jest losowany z równymi wagami spośród landmarków, które nie są przeszukane.
-- Wezwanie pochodzi od ocalałego o losowym imieniu i podaje nazwę landmarku oraz jego odległość i kierunek od schronu (jeden z 8 kierunków), np. „This is Ada… I'm hurt… Abandoned Mine… 2.4 km north-east of your shelter… please hurry…”.
+- Wezwanie pochodzi od ocalałego o losowym imieniu, rannego: ma losowo od 1 do 4 ran (zob. [combat.md](combat.md#rany)). Wezwanie podaje nazwę landmarku oraz jego odległość i kierunek od schronu (jeden z 8 kierunków), np. „This is Ada… I'm hurt… Abandoned Mine… 2.4 km north-east of your shelter… please hurry…”.
 - Kierunek i odległość odróżniają landmarki o tej samej nazwie.
 - Naraz trwa najwyżej jedna misja.
 
 ### W trakcie
 
-- Na misję jest 24 godziny od wezwania (czasu gry).
+- Na misję jest 48 godzin od wezwania (czasu gry). Tyle, żeby przy pełnej drużynie zdążyć zrobić w niej miejsce i wrócić (zob. niżej).
 - Cel misji jest na mapie zakreślony czerwonym ołówkiem. Gdy cel jest poza ekranem, czerwona strzałka przy krawędzi mapy wskazuje kierunek.
 - Pod podziałką mapy (w lewym górnym rogu) leży notka z misją: kto czeka, przy jakim landmarku, jak daleko i w którą stronę od użytkownika oraz ile czasu zostało, np. „Ada · Abandoned Mine / 1.2 km NE · 18 h left”.
 
@@ -119,13 +118,14 @@ Szansa zależy od czasu, który minął od końca poprzedniej misji ratunkowej (
 
 - Misja się udaje, gdy po przeszukaniu cel leży w przeszukanym obszarze. Wystarczy więc przeszukać obszar w promieniu ok. 200 m od landmarku. Zlane obszary mogą sięgnąć nawet dalej.
 - Takie przeszukanie nigdy nie spotyka nowego wroga: ranny nie przetrwałby w otoczeniu wrogów.
-- Wróg pozostawiony na mapie w promieniu 200 m od celu przytrzymuje ocalałego: misja nie uda się, dopóki ten wróg nie zostanie pokonany (zob. [combat.md](combat.md#wrogowie-na-mapie)). Przeszukanie przy celu zaczyna się wtedy walką z nim. Wygrana kończy ratunek w tym samym przeszukaniu, a ucieczka albo przegrana nie. Przeszukany obszar wygasa po 6 godzinach, więc na kolejną próbę zostaje zwykle dość czasu z 24 godzin misji.
+- Wróg pozostawiony na mapie w promieniu 200 m od celu przytrzymuje ocalałego: misja nie uda się, dopóki ten wróg nie zostanie pokonany (zob. [combat.md](combat.md#wrogowie-na-mapie)). Przeszukanie przy celu zaczyna się wtedy walką z nim. Wygrana kończy ratunek w tym samym przeszukaniu, a ucieczka albo przegrana nie. Przeszukany obszar wygasa po 6 godzinach, więc na kolejną próbę zostaje zwykle dość czasu z 48 godzin misji.
 - Poza tym przeszukanie daje to co zwykle: zasoby i może dać podręcznik.
-- Po zamknięciu okna ze znaleziskiem użytkownik wybiera: **Take with you** albo **Leave**. Pozostawiony ocalały przepada. Misja kończy się w obu przypadkach.
-- Uratowany ocalały jest ranny od chwili ratunku (zob. [combat.md](combat.md#rany)). Rana goi się po 72 godzinach albo od apteczki. Do tego czasu ocalały zwiększa pojemność plecaka tylko o 10 jednostek, a w schronie je 2 Food.
+- Po zamknięciu okna ze znaleziskiem użytkownik wybiera: **Take with you** albo **Leave**. Ocalały dołącza do drużyny (zob. [party.md](party.md)). Pozostawiony ocalały przepada. Misja kończy się w obu przypadkach.
+- Gdy drużyna jest pełna, ocalałego nie da się zabrać. Okno mówi, że ocalały poczeka, a misja trwa dalej. Ocalały jest już znaleziony: można go zabrać ze strony drużyny, stojąc przy landmarku, gdy w drużynie zrobi się miejsce, póki nie minie czas misji (zob. [party.md](party.md#ratunek-przy-pełnej-drużynie)).
+- Uratowany ocalały ma rany, z którymi wzywał pomocy. Okno ratunku mówi ile i co to znaczy, np. „2 wounds: strength 1d6-2, carries 30.” Rany goją się po jednej co 24 godziny, gdy ocalały jest najedzony, albo od apteczki (zob. [combat.md](combat.md#rany)).
 
 ### Porażka
 
-- Gdy minie 24 godziny, misja się kończy, a ocalały przepada. Aplikacja pokazuje komunikat, np. „The signal from the Abandoned Mine went silent”.
+- Gdy minie 48 godzin, misja się kończy, a ocalały przepada. Aplikacja pokazuje komunikat, np. „The signal from the Abandoned Mine went silent”.
 - Czas mija także przy zamkniętej aplikacji. Komunikat pojawia się po jej otwarciu.
 - Landmark zostaje na mapie i może być celem kolejnych wezwań.

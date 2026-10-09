@@ -5,7 +5,7 @@ An app that gamifies walks, with a survival/scavenging theme. The user sets up a
 ## Source of truth
 
 - `docs/bootstrap.md` is the app spec (in Polish). Its "Zakres prototypu" section is what's implemented; "Na przyszłość" lists ideas that are deliberately **not** implemented yet. Check the spec before changing game rules.
-- Rules on a specific topic live in their own files in `docs/`, linked from `bootstrap.md` (e.g. `docs/loot.md`: resources, loot by distance and biome; `docs/landmarks.md`: landmarks, the radio and rescue missions (the only source of survivors); `docs/survivors.md`: survivors in the shelter, meals and hunger; `docs/crafting.md`: manuals, recipes, items; `docs/combat.md`: enemies, the dice fight, enemies left on the map, wounds; `docs/night.md`: day and night, the flashlight; `docs/radiation.md`: invisible fallout zones, the Geiger counter, Isotopes, contaminated food and sickness). The project author prefers this to growing `bootstrap.md`.
+- Rules on a specific topic live in their own files in `docs/`, linked from `bootstrap.md` (e.g. `docs/loot.md`: resources, loot by distance and biome; `docs/landmarks.md`: landmarks, the radio and rescue missions (the only source of survivors); `docs/survivors.md`: survivors in the shelter, meals and hunger; `docs/party.md`: the party that walks with the player, its strength, meals and the party page; `docs/crafting.md`: manuals, recipes, items; `docs/combat.md`: enemies, the dice fight, enemies left on the map, wounds; `docs/night.md`: day and night, the flashlight; `docs/radiation.md`: invisible fallout zones, the Geiger counter, Isotopes, contaminated food and sickness). The project author prefers this to growing `bootstrap.md`.
 - The project author communicates in Polish; reply in Polish.
 
 ## Project rules
@@ -34,7 +34,7 @@ All code is in `js/`, loaded from `index.html` via `js/main.js`.
 
 | Module | Responsibility |
 |---|---|
-| `main.js` | Wires everything together: UI rendering, tabs (Party, Shelter, Wastes) and their pages, actions (create shelter, search, fight, unload, craft, listen to the radio), dialogs, the start screen, reward animations |
+| `main.js` | Wires everything together: UI rendering, tabs (Backpack, Party, Shelter, Wastes) and their pages, actions (create shelter, search, fight, unload, craft, listen to the radio), dialogs, the start screen, reward animations |
 | `game.js` | Game rules and constants (radii, loot tiers and weights, capacity, survivor meals, manuals, items, the radio, landmarks, rescue missions, enemies and the dice fight, wounds). Functions mutate the state; the caller saves |
 | `state.js` | State shape, `STATE_VERSION`, load/save to `localStorage`, export/import with validation |
 | `gps.js` | `LocationTracker`: Geolocation API, accuracy/staleness filtering, signal state, manual position for debug |

@@ -1,19 +1,20 @@
 # Ocaleni w schronie (Survivors)
 
-Zasady życia ocalałych, którzy trafili do schronu. Eskortowanie ocalałych do schronu opisuje [bootstrap.md](bootstrap.md), a misje ratunkowe, z których się ich zdobywa, [landmarks.md](landmarks.md).
+Zasady życia ocalałych, którzy trafili do schronu. Ocalałych w drużynie użytkownika opisuje [party.md](party.md), a misje ratunkowe, z których się ich zdobywa, [landmarks.md](landmarks.md).
 
 ## Przybycie
 
-- Ocalały trafia do schronu przy rozładunku (**Unload**).
-- Aplikacja zapamiętuje datę i godzinę przybycia każdego ocalałego. W przyszłości posłuży do liczenia, jak długo ocalali przetrwali w schronie.
-- Nowo przybyły ocalały jest najedzony.
+- Ocalały trafia do schronu, gdy użytkownik zostawi go tam z drużyny (**Leave**, zob. [party.md](party.md)).
+- Aplikacja zapamiętuje datę i godzinę pierwszego przybycia każdego ocalałego. W przyszłości posłuży do liczenia, jak długo ocalali przetrwali w schronie.
+- Przybycie nie zmienia głodu: ocalały je według tego samego licznika co w drużynie.
 
 ## Jedzenie
 
 - Każdy ocalały w schronie zjada 1 Food raz na 24 godziny.
 - Liczy się tylko jedzenie w magazynie schronu. Food w plecaku trzeba najpierw rozładować.
-- Ocalały idący z użytkownikiem nie je. Jego licznik zaczyna się dopiero po przybyciu do schronu.
-- Ranny albo chory ocalały (zob. [combat.md](combat.md#rany) i [radiation.md](radiation.md#choroba-sick)) przy każdym posiłku zjada 2 Food zamiast 1, także gdy jest naraz ranny i chory. Jeśli w magazynie jest tylko 1 Food, zjada je i też zostaje najedzony.
+- Ocalały w drużynie też je, z plecaka albo, gdy użytkownik jest w schronie, z magazynu (zob. [party.md](party.md#jedzenie)).
+- Chory ocalały (zob. [radiation.md](radiation.md#choroba-sick)) przy każdym posiłku zjada 2 Food zamiast 1. Jeśli w magazynie jest tylko 1 Food, zjada je i też zostaje najedzony. Ranny je 1 Food jak każdy, ale goi się tylko wtedy, gdy jest najedzony (zob. [combat.md](combat.md#gojenie)).
+- Posiłek, który przypadł, gdy aplikacja była zamknięta, ocalały zjada o czasie, bo jedzenie już wtedy było. Posiłek, na który zabrakło jedzenia przy otwartej aplikacji, zjada dopiero wtedy, gdy jedzenie się pojawi.
 - Część jedzenia w magazynie może być skażona, choć tego nie widać. Ocalały, który zje skażone Food, choruje (zob. [radiation.md](radiation.md#skażone-jedzenie)).
 
 ## Etapy głodu
@@ -28,12 +29,12 @@ Każdy etap trwa 24 godziny:
 
 - Bez jedzenia użytkownik ma więc 72 godziny od ostatniego posiłku ocalałego, żeby przynieść jedzenie do schronu.
 - Głodny lub głodujący ocalały zjada 1 Food, gdy tylko pojawi się ono w magazynie (czyli przy rozładunku), i znów jest najedzony na 24 godziny.
-- Gdy jedzenia nie wystarcza dla wszystkich, pierwszeństwo ma ten, kto czeka na posiłek najdłużej. Ranny zjada wtedy swoje 2 Food naraz, zanim przyjdzie kolej na następnego.
+- Gdy jedzenia nie wystarcza dla wszystkich, pierwszeństwo ma ten, kto czeka na posiłek najdłużej. Chory zjada wtedy swoje 2 Food naraz, zanim przyjdzie kolej na następnego.
 - Ocalały, który opuścił schron, przepada, ale zostaje w historii schronu (zob. niżej).
 
 ## Historia
 
-- Schron zapamiętuje ocalałych, którzy go opuścili: imię, datę przybycia, datę odejścia i powód (na razie tylko głód).
+- Schron zapamiętuje ocalałych, którzy odeszli ze schronu albo z drużyny: imię, datę przybycia (pustą u tych, którzy nigdy nie dotarli do schronu), datę odejścia i powód: głód, porzucenie na pustkowiu albo śmierć od ran.
 - Data odejścia to chwila, w której minął ostatni etap głodu, a nie chwila otwarcia aplikacji.
 - Historia nie jest jeszcze nigdzie pokazywana. Posłuży w przyszłości do statystyk, np. jak długo ocaleni przetrwali w schronie.
 
@@ -50,5 +51,5 @@ Każdy etap trwa 24 godziny:
   - głodny: „starving in 20 h”,
   - głodujący: „leaves in 5 h”.
 - Kolor paska i etapu zależy od etapu: zielony, pomarańczowy, czerwony.
-- Ranny albo chory ocalały ma na plakietce także oznaczenie rany albo choroby i przycisk **Treat** (zob. [combat.md](combat.md#rany) i [radiation.md](radiation.md#interfejs)).
+- Ranny albo chory ocalały ma na plakietce także kropelki krwi za rany albo oznaczenie choroby i przycisk **Treat** (zob. [combat.md](combat.md#interfejs) i [radiation.md](radiation.md#interfejs)).
 - Gdy któryś ocalały jest głodny, zakładka **Shelter** ma pomarańczową kropkę, a gdy któryś głoduje, czerwoną, pulsującą. Dzięki temu widać to także podczas spaceru.
