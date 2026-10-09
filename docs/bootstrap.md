@@ -76,7 +76,7 @@ Zasoby i ilość łupu są opisane w [loot.md](loot.md).
 | Cells | zasilanie radia, a docelowo innych urządzeń elektrycznych |
 | Isotopes | docelowo produkcja Reactor Fuel; tylko ze stref radiacji (zob. [radiation.md](radiation.md)) |
 
-- Po przeszukaniu otwiera się okno ze znaleziskiem: medal z ikoną zasobu, pod nim duży napis, np. „+3 Junk”, i ewentualne uwagi (co się nie zmieściło, co zrobiła ciemność, latarka albo licznik Geigera). Po wygranej walce okno ma też sekcję ze skarbem wroga (zob. [combat.md](combat.md#interfejs)).
+- Po przeszukaniu otwiera się okno ze znaleziskiem: medal z ikoną zasobu, pod nim duży napis, np. „+3 Junk” (przy landmarku kilka mniejszych medali, zob. [loot.md](loot.md#landmarki)), i ewentualne uwagi (co się nie zmieściło, co zrobiła ciemność, latarka albo licznik Geigera). Po wygranej walce okno ma też sekcję ze skarbem wroga (zob. [combat.md](combat.md#interfejs)).
 - Okno nie znika samo: zamyka je przycisk **OK** albo odejście ponad 50 m od miejsca, w którym się pojawiło. Dopiero wtedy ikony znalezisk wlatują do plecaka na pasku stanu.
 - Przeszukanie może dać podręcznik, który odblokowuje wytwarzanie przedmiotów (zob. [crafting.md](crafting.md)).
 - Po ciemku przeszukanie daje mniej, chyba że użytkownik ma latarkę (zob. [night.md](night.md)).
@@ -231,6 +231,7 @@ Tych rzeczy nie implementujemy w prototypie.
 - Podstawowa ochrona przed oszukiwaniem, np. limit prędkości przemieszczania się.
 - Inne misje do landmarków, np. „czeka tam coś specjalnego”.
 - Łup zależny od rodzaju landmarku, np. apteka częściej daje apteczki.
+- Wrogowie-roboty i drony, z których wypadają Cells (tak jak Isotopes ze zmutowanych szczurów); to ma być główne źródło Cells.
 - Wytwarzanie Cells w schronie:
   - mini-reaktor produkujący Cells z Reactor Fuel; Reactor Fuel wytwarza się z Isotopes (zob. [radiation.md](radiation.md)),
   - panele słoneczne.

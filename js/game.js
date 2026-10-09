@@ -12,6 +12,7 @@ import { biomeAt, radiationAt } from './terrain.js';
 export const RESOURCES = [
   { id: 'junk', label: 'Junk', one: 'Junk' },
   { id: 'food', label: 'Food', one: 'Food' },
+  { id: 'data', label: 'Data', one: 'Data' },
   { id: 'cells', label: 'Cells', one: 'Cell' },
   { id: 'isotopes', label: 'Isotopes', one: 'Isotope' },
 ];
@@ -26,14 +27,18 @@ const LOOT_TIERS = [
   { maxDistance: Infinity, minLoot: 4, maxLoot: 8 },
 ];
 
-// The biome where the player searches decides which resource is likely.
-// Cells are rare outside the ruins: they power the radio and nothing makes them yet.
-// Isotopes come only from fallout, with a Geiger counter (see collectLoot()).
+// The biome where the player searches decides which resource is likely: each
+// biome is known for one, so where to walk is a choice. Searches turn up no
+// Cells or Isotopes; Isotopes come only from fallout, with a Geiger counter
+// (see collectLoot()), and from enemies.
 const BIOME_LOOT_WEIGHTS = {
-  plains: { junk: 45, food: 45, cells: 10, isotopes: 0 },
-  forest: { junk: 20, food: 75, cells: 5, isotopes: 0 },
-  ruins: { junk: 60, food: 10, cells: 30, isotopes: 0 },
+  plains: { junk: 80, food: 10, data: 10, cells: 0, isotopes: 0 },
+  forest: { junk: 10, food: 80, data: 10, cells: 0, isotopes: 0 },
+  ruins: { junk: 10, food: 10, data: 80, cells: 0, isotopes: 0 },
 };
+// A landmark has a bit of everything: a search that reaches one rolls its loot
+// once as if in each biome, so it brings about three times as much.
+const LANDMARK_LOOT_BIOMES = Object.keys(BIOME_LOOT_WEIGHTS);
 
 // A Geiger counter in the backpack picks the isotopes out of a search in the
 // fallout; everything else found there is too hot to keep. Without one, food
@@ -455,7 +460,15 @@ function visitLandmarks(state, position, time) {
 
 // The landmark a search here would reach, the nearest if there are more, or null.
 export function landmarkInReach(state, position, time) {
-  const areas = [...activeSearchedAreas(state, time), { lat: position.lat, lon: position.lon, searchedAt: time }];
+  return nearestReached(state, position, [...activeSearchedAreas(state, time), { lat: position.lat, lon: position.lon, searchedAt: time }]);
+}
+
+// The landmark the search just made here reached, the nearest if there are more, or null.
+function landmarkReached(state, position, time) {
+  return nearestReached(state, position, activeSearchedAreas(state, time));
+}
+
+function nearestReached(state, position, areas) {
   let nearest = null;
   for (const landmark of state.landmarks) {
     if (!reaches(areas, position, landmark)) continue;
@@ -522,27 +535,49 @@ export function biomeAtPosition(position) {
   return biomeAt(x, y);
 }
 
-// Returns { resource, found, carried, manual, dark, flashlight, geiger },
-// where manual is a manual id or null. dark tells whether the dark cost the
-// player a unit; flashlight and geiger are { wornOut } if that item was used,
-// or null. A found manual is carried only after takeManual().
+// Returns { finds, landmark, manual, dark, flashlight, geiger }. finds lists
+// [{ resource, found, carried }], one per resource found, in the order of
+// RESOURCES; landmark is the landmark the search reached, which tripled the
+// loot, or null; manual is a manual id or null. dark tells whether the dark
+// cost the player a unit; flashlight and geiger are { wornOut } if that item
+// was used, or null. A found manual is carried only after takeManual().
 export function collectLoot(state, position, time, random = Math.random) {
   const biome = biomeAtPosition(position).name;
   const radioactive = radiationAtPosition(state, position) > 0;
   const geiger = radioactive ? mostWorn(state.backpackItems, GEIGER_COUNTER) : null;
-  const { resource, amount: found, dark, light } = geiger
-    ? { resource: ISOTOPES, amount: ISOTOPES_PER_SEARCH, dark: false, light: null }
-    : rollResource(state, position, biome, time, random);
+  const light = geiger ? null : mostWorn(state.backpackItems, FLASHLIGHT);
+  const night = !geiger && !light && isNight(position, time);
+  const landmark = landmarkReached(state, position, time);
+  const found = emptyResources();
+  let dark = false;
+  // Each roll gets the flashlight's bonus or the dark's penalty.
+  for (const lootBiome of landmark ? LANDMARK_LOOT_BIOMES : [biome]) {
+    if (geiger) {
+      found[ISOTOPES.id] += ISOTOPES_PER_SEARCH;
+      continue;
+    }
+    const { resource, amount } = rollResource(state, position, lootBiome, random);
+    let kept = amount;
+    if (light) {
+      kept += FLASHLIGHT_LOOT_BONUS;
+    } else if (night) {
+      kept = Math.max(1, amount - DARK_LOOT_PENALTY);
+      if (kept < amount) dark = true;
+    }
+    found[resource.id] += kept;
+  }
   // Used-up items are left behind, freeing their space.
   const lightWornOut = light ? useItem(state.backpackItems, light) : false;
   const geigerWornOut = geiger ? useItem(state.backpackItems, geiger) : false;
-  const carried = Math.min(found, freeSpace(state, time));
-  state.backpack[resource.id] += carried;
-  if (radioactive && resource.id === 'food') state.backpackContaminatedFood += carried;
+  const finds = RESOURCES.filter(({ id }) => found[id] > 0).map((resource) => {
+    const carried = Math.min(found[resource.id], freeSpace(state, time));
+    state.backpack[resource.id] += carried;
+    if (radioactive && resource.id === 'food') state.backpackContaminatedFood += carried;
+    return { resource, found: found[resource.id], carried };
+  });
   return {
-    resource,
-    found,
-    carried,
+    finds,
+    landmark,
     manual: rollManual(state, biome, random),
     dark,
     flashlight: light ? { wornOut: lightWornOut } : null,
@@ -550,22 +585,12 @@ export function collectLoot(state, position, time, random = Math.random) {
   };
 }
 
-// An ordinary find: { resource, amount, dark, light }, where light is the
-// flashlight that lit the search, or null.
-function rollResource(state, position, biome, time, random) {
+// An ordinary find, before the dark or a flashlight: { resource, amount }.
+function rollResource(state, position, biome, random) {
   const tier = lootTier(distanceMeters(state.shelter, position));
   const resource = pickWeighted(RESOURCES, BIOME_LOOT_WEIGHTS[biome], random);
-  let amount = tier.minLoot + Math.floor(random() * (tier.maxLoot - tier.minLoot + 1));
-  const light = mostWorn(state.backpackItems, FLASHLIGHT);
-  let dark = false;
-  if (light) {
-    amount += FLASHLIGHT_LOOT_BONUS;
-  } else if (isNight(position, time)) {
-    const dim = Math.max(1, amount - DARK_LOOT_PENALTY);
-    dark = dim < amount;
-    amount = dim;
-  }
-  return { resource, amount, dark, light };
+  const amount = tier.minLoot + Math.floor(random() * (tier.maxLoot - tier.minLoot + 1));
+  return { resource, amount };
 }
 
 // How radioactive a { lat, lon } position is, from 0 (clean) to 1. The

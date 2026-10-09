@@ -31,6 +31,7 @@
     <symbol id="i-vibrate" viewBox="0 0 24 24"><rect x="8" y="4" width="8" height="16" rx="1.5"/><path d="M4.5 9v6M19.5 9v6M2 10.5v3M22 10.5v3"/></symbol>
     <symbol id="i-junk" viewBox="0 0 24 24"><path d="M12 3.5 19.4 7.75v8.5L12 20.5l-7.4-4.25v-8.5z"/><circle cx="12" cy="12" r="3.2"/></symbol>
     <symbol id="i-food" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="6" ry="2.2"/><path d="M6 6v12c0 1.2 2.7 2.2 6 2.2s6-1 6-2.2V6"/><path d="M6 10.5c0 1.2 2.7 2.2 6 2.2s6-1 6-2.2"/></symbol>
+    <symbol id="i-data" viewBox="0 0 24 24"><path d="M5 3.5h11.5l4 4V19a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 19V5A1.5 1.5 0 0 1 5 3.5z"/><path d="M8 3.5v5h7.5v-5"/><path d="M12.5 5.3v1.4"/><path d="M7 20.5v-6h10v6"/></symbol>
     <symbol id="i-cells" viewBox="0 0 24 24"><rect x="6.5" y="5" width="11" height="16" rx="1.5"/><path d="M10 5V3h4v2"/><path d="M13 8.5 10 13h4l-3 4.5"/></symbol>
     <symbol id="i-isotopes" viewBox="0 0 24 24"><path d="M9 3.5h6M10 3.5v5.5L5.2 18.2a1.6 1.6 0 0 0 1.4 2.3h10.8a1.6 1.6 0 0 0 1.4-2.3L14 9V3.5"/><path d="M7.5 14.5h9"/><path d="M11 17.5h.01M13.5 16.8h.01"/></symbol>
     <symbol id="i-radiation" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><path fill="currentColor" stroke="none" d="M13.65 14.86L16.90 20.49A9.8 9.8 0 0 1 7.10 20.49L10.35 14.86A3.3 3.3 0 0 0 13.65 14.86zM13.65 9.14L16.90 3.51A9.8 9.8 0 0 1 21.80 12.00L15.30 12.00A3.3 3.3 0 0 0 13.65 9.14zM8.70 12.00L2.20 12.00A9.8 9.8 0 0 1 7.10 3.51L10.35 9.14A3.3 3.3 0 0 0 8.70 12.00z"/></symbol>
@@ -340,8 +341,9 @@
 
   <dialog id="loot-dialog" class="paper">
     <form method="dialog">
-      <div class="loot-medal"><svg class="icon"><use id="loot-icon" href=""/></svg></div>
-      <h2 class="loot-title"><span id="loot-amount"></span> <span id="loot-name"></span></h2>
+      <!-- The landmark searched, whose loot comes from every biome. -->
+      <p id="loot-place" hidden></p>
+      <div id="loot-finds"></div>
       <p id="loot-note"></p>
       <!-- A beaten enemy's stash, on top of what the search turned up. -->
       <div id="loot-stash" hidden>

@@ -41,7 +41,7 @@ Licznik działa, gdy jest w plecaku. Nie trzeba go włączać.
 
 ## Isotopes
 
-- To czwarty zasób, obok Junk, Food i Cells. Zajmuje 1 jednostkę w plecaku i podlega tym samym zasadom co inne zasoby (rozładunek, wyrzucanie, straty w walce).
+- To jeden z zasobów, obok Junk, Food, Data i Cells. Zajmuje 1 jednostkę w plecaku i podlega tym samym zasadom co inne zasoby (rozładunek, wyrzucanie, straty w walce).
 - Isotopes nie wypadają w zwykły sposób. Jedynym źródłem jest przeszukanie w strefie z licznikiem.
 - Na razie do niczego nie służą. W przyszłości będzie się z nich wytwarzać Reactor Fuel do produkcji Cells (zob. [bootstrap.md](bootstrap.md#na-przyszłość)).
 

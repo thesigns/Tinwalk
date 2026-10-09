@@ -4,7 +4,7 @@ import { now } from './clock.js';
 import { ENEMIES, ITEMS, LANDMARKS, MANUALS, RESOURCES, emptyResources } from './game.js';
 
 const STORAGE_KEY = 'tinwalk.state';
-export const STATE_VERSION = 13;
+export const STATE_VERSION = 14;
 export const WORLD_ID_MAX_LENGTH = 32;
 
 const INVALID_SAVE = "This file isn't a valid Tinwalk save";
@@ -114,6 +114,13 @@ const MIGRATIONS = {
   12(save) {
     save.landmarkBags = emptyLandmarkBags();
     save.version = 13;
+  },
+  // Data, a new resource found mostly in the ruins. No one has any yet.
+  13(save) {
+    for (const resources of [save.backpack, save.shelter?.storage]) {
+      if (isObject(resources)) resources.data = 0;
+    }
+    save.version = 14;
   },
 };
 

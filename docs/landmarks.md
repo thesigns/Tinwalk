@@ -50,7 +50,7 @@ Każdy rodzaj ma własną ikonę w interfejsie, własną odznakę na mapie i wł
 - Po odkryciu, jeszcze przed oknem walki i oknem ze znaleziskiem, odznaka zostaje wbita w mapę krótką animacją i otwiera się ekran landmarku (zob. niżej) z napisem „You've found a landmark!” zamiast daty ostatniej wizyty. Ten ekran zamyka się sam, gdy użytkownik odejdzie ponad 50 m od landmarku.
 - Landmark pamięta, kiedy był ostatnio odwiedzony: przy odkryciu i przy każdym przeszukaniu, którego obszar go obejmuje (ten sam zasięg, który kończy misję ratunkową).
 - Gdy przeszukanie z miejsca, w którym stoi użytkownik, objęłoby landmark, nad przyciskiem przeszukania widać podpowiedź, np. „Near the Police Station”. Ważniejsze podpowiedzi (słaby sygnał GPS, obszar już przeszukany) mają pierwszeństwo.
-- Sam landmark nic nie daje. Odkrycie jest nagrodą samą w sobie, a landmark jest celem misji ratunkowych.
+- Przeszukanie, którego obszar obejmuje landmark, daje około trzy razy więcej łupu, po trochu z każdego biomu (zob. [loot.md](loot.md#landmarki)). Dotyczy to także przeszukania, które landmark odkrywa. Landmark jest też celem misji ratunkowych.
 
 ### Ekran landmarku
 
@@ -63,12 +63,13 @@ Każdy rodzaj ma własną ikonę w interfejsie, własną odznakę na mapie i wł
 
 - Landmark to punkt. Jest przeszukany, gdy leży wewnątrz aktywnego przeszukanego obszaru (zob. [bootstrap.md](bootstrap.md#przeszukiwanie-search-area)).
 - Tuż po odkryciu landmark jest przeszukany, bo leży w środku przeszukania, które go odkryło. Przestaje być przeszukany po 6 godzinach, razem z tym obszarem.
+- Przeszukany landmark nie daje potrójnego łupu, bo w przeszukanym obszarze nie da się przeszukiwać. Kto wraca do landmarku co 6 godzin, za każdym razem dostaje go od nowa.
 
 ## Radio
 
 Radio wytwarza się w schronie z Radio Manual (zob. [crafting.md](crafting.md)). Zostaje w schronie na zawsze.
 
-Radio działa na baterie (Cells, zob. [loot.md](loot.md)). Zbudowanie radia nie daje baterii: trzeba je znaleźć na pustkowiu i rozładować w schronie.
+Radio działa na baterie (Cells, zob. [loot.md](loot.md)). Zbudowanie radia nie daje baterii: trzeba je zdobyć na pustkowiu i rozładować w schronie.
 
 ### Nasłuch
 

@@ -269,9 +269,8 @@ const ui = {
   rewardName: $('reward-name'),
   rewardNote: $('reward-note'),
   lootDialog: $('loot-dialog'),
-  lootIcon: $('loot-icon'),
-  lootAmount: $('loot-amount'),
-  lootName: $('loot-name'),
+  lootPlace: $('loot-place'),
+  lootFinds: $('loot-finds'),
   lootNote: $('loot-note'),
   lootStash: $('loot-stash'),
   lootStashTitle: $('loot-stash-title'),
@@ -698,12 +697,12 @@ async function searchAction() {
 // until the player taps OK or walks on. Then the finds fly into the backpack.
 // Returns whether anything went into it.
 async function showLoot(loot, stash, position) {
-  const { resource, carried } = loot;
-  ui.lootIcon.setAttribute('href', `#i-${resource.id}`);
-  ui.lootIcon.parentElement.dataset.icon = carried > 0 ? resource.id : '';
-  ui.lootAmount.textContent = carried > 0 ? `+${carried}` : '0';
-  ui.lootName.textContent = carried === 1 ? resource.one : resource.label;
-  ui.lootDialog.classList.toggle('empty', carried === 0);
+  const { finds, landmark } = loot;
+  const carried = finds.reduce((sum, find) => sum + find.carried, 0);
+  ui.lootPlace.hidden = !landmark;
+  ui.lootPlace.textContent = landmark ? LANDMARKS[landmark.type].label : '';
+  ui.lootFinds.classList.toggle('several', finds.length > 1);
+  ui.lootFinds.replaceChildren(...finds.map(findMedal));
   ui.lootNote.textContent = lootNote(loot, stash);
   ui.lootNote.hidden = !ui.lootNote.textContent;
   ui.lootStash.hidden = !stash;
@@ -720,22 +719,44 @@ async function showLoot(loot, stash, position) {
   const closed = ask(ui.lootDialog);
   // Where each find sits once the card has settled, for it to fly from after it closes.
   await Promise.race([Promise.all(ui.lootDialog.getAnimations().map((animation) => animation.finished)), closed]);
-  const finds = [...ui.lootDialog.querySelectorAll('[data-icon]')]
+  const flying = [...ui.lootDialog.querySelectorAll('[data-icon]')]
     .filter((element) => element.dataset.icon)
     .map((element) => ({ icon: element.dataset.icon, rect: element.getBoundingClientRect() }))
     .filter(({ rect }) => rect.width > 0);
   await closed;
   walkAwayCard = null;
-  await Promise.all(finds.map(({ icon, rect }) => flyIcon(icon, rect, ui.backpackIcon)));
+  await Promise.all(flying.map(({ icon, rect }) => flyIcon(icon, rect, ui.backpackIcon)));
   return carried > 0 || (stash !== null && totalResources(stash.took) > 0);
+}
+
+// One resource a search turned up: a medal and how much went into the backpack.
+function findMedal({ resource, carried }) {
+  const find = document.createElement('div');
+  find.className = 'loot-find';
+  find.classList.toggle('none', carried === 0);
+  const medal = document.createElement('div');
+  medal.className = 'loot-medal';
+  medal.dataset.icon = carried > 0 ? resource.id : '';
+  medal.append(iconElement(resource.id));
+  const title = document.createElement('h2');
+  title.className = 'loot-title';
+  const amount = document.createElement('span');
+  amount.className = 'loot-amount';
+  amount.textContent = carried > 0 ? `+${carried}` : '0';
+  title.append(amount, ` ${carried === 1 ? resource.one : resource.label}`);
+  find.append(medal, title);
+  return find;
 }
 
 // What else the player should know about a search: what didn't fit, and what
 // the dark, a flashlight or a Geiger counter did.
-function lootNote({ resource, found, carried, dark, flashlight, geiger }, stash) {
+function lootNote({ finds, dark, flashlight, geiger }, stash) {
   const notes = [];
-  if (carried === 0) notes.push(`You found ${amountOf(resource, found)}, but your backpack is full.`);
-  else if (carried < found) notes.push(`You found ${amountOf(resource, found)}, but could only carry ${carried}.`);
+  const found = Object.fromEntries(finds.map((find) => [find.resource.id, find.found]));
+  const total = finds.reduce((sum, find) => sum + find.found, 0);
+  const carried = finds.reduce((sum, find) => sum + find.carried, 0);
+  if (carried === 0) notes.push(`You found ${describeResources(found)}, but your backpack is full.`);
+  else if (carried < total) notes.push(`You found ${describeResources(found)}, but could only carry ${carried}.`);
   if (geiger) {
     const dead = geiger.wornOut ? ', then went dead' : '';
     notes.push(`Your ${ITEMS['geiger-counter'].label} showed everything else here was too hot to keep${dead}.`);

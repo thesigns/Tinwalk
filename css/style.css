@@ -1737,12 +1737,12 @@ dialog input:focus,
   animation: wiggle 600ms 400ms ease-in-out;
 }
 
-/* Nothing fitted in the backpack. */
-#loot-dialog.empty .loot-medal {
+/* Nothing of this resource fitted in the backpack. */
+.loot-find.none .loot-medal {
   color: #b9b2a2;
 }
 
-#loot-dialog.empty[open] .loot-medal {
+#loot-dialog[open] .loot-find.none .loot-medal {
   animation:
     portrait-in 420ms 80ms both cubic-bezier(0.2, 0.9, 0.3, 1.5),
     shake 400ms 500ms;
@@ -1752,12 +1752,50 @@ dialog input:focus,
   font-size: 40px;
 }
 
-#loot-amount {
+.loot-amount {
   color: var(--paint);
 }
 
-#loot-dialog.empty #loot-amount {
+.loot-find.none .loot-amount {
   color: var(--ink-soft);
+}
+
+/* A landmark's loot: one smaller medal per resource, side by side. */
+#loot-place {
+  margin: 0 0 12px;
+  font-family: var(--font-stencil);
+  font-size: 22px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+#loot-finds.several {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+}
+
+#loot-finds.several .loot-medal {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 12px;
+}
+
+#loot-finds.several .loot-medal .icon {
+  width: 36px;
+  height: 36px;
+}
+
+#loot-finds.several .loot-title {
+  font-size: 24px;
+}
+
+#loot-finds.several .loot-find:nth-child(2) .loot-medal {
+  animation-delay: 160ms, 580ms;
+}
+
+#loot-finds.several .loot-find:nth-child(3) .loot-medal {
+  animation-delay: 240ms, 660ms;
 }
 
 #loot-note {
