@@ -74,7 +74,6 @@
   --paint-edge: #5a1e10;
   --paint-text: #f6ecd6;
 
-  /* The player's pin turns green where they can search. */
   --green-light: #82b453;
   --green: #5c8a33;
   --green-dark: #3a5f1d;
@@ -259,11 +258,6 @@ input {
 #fallout .icon {
   width: 24px;
   height: 24px;
-}
-
-/* Like the pin, it fades without a good signal: the position may be off. */
-#location.uncertain {
-  opacity: 0.5;
 }
 
 /* A scrap of paper with the rescue mission, jotted down from the radio. */

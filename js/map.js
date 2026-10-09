@@ -3,7 +3,7 @@
 // (pinch, mouse wheel) and reports single taps via onEnemyTap or onLandmarkTap
 // when they hit an enemy or a landmark, and via onTap otherwise.
 
-import { SEARCH_INFLUENCE, SEARCH_RADIUS, searchWeight } from './game.js';
+import { SEARCH_INFLUENCE, searchWeight } from './game.js';
 import { fromMercator, mercatorUnitsPerMeter, toMercator } from './geo.js';
 import { fromWorld, hasWorld, toWorld, WORLD_UNIT_METERS } from './terrain.js';
 import { TerrainTiles } from './terrain-tiles.js';
@@ -40,6 +40,8 @@ const LANDMARK_RADIUS_PX = 15;
 const LANDMARK_ICON_PX = 20;
 // Landmark and enemy badges.
 const BADGE_PX = 46;
+// The player's dot: its radius.
+const PLAYER_DOT_PX = 4;
 // The cone showing where the phone points: its reach, and half its width.
 const HEADING_LENGTH_PX = 64;
 const HEADING_SPREAD = (28 * Math.PI) / 180;
@@ -57,14 +59,8 @@ const COLORS = {
   grid: 'rgba(225, 232, 240, 0.22)',
   ink: '#33281c',
   paint: '#b4432b',
-  paintLight: '#d9654a',
-  paintDark: '#82301c',
-  // The pin where a search is possible: a bright lime, so it stands out on the
-  // map's greys and dark forest at a glance.
-  limeLight: '#cdf545',
-  limeDark: '#5c9612',
-  grey: '#a39d90',
-  greyDark: '#6b665c',
+  // The player: a small bright red dot, like the party on an old game's world map.
+  player: '#e8261c',
   shadow: 'rgba(40, 28, 15, 0.35)',
   accuracy: 'rgba(180, 67, 43, 0.12)',
   accuracyOutline: 'rgba(180, 67, 43, 0.45)',
@@ -230,7 +226,7 @@ export class MapView {
 
   // scene: {
   //   center: { lat, lon } | null,
-  //   player: { position, good, canSearch } | null,
+  //   player: { position, heading } | null,
   //   shelter: { lat, lon, name, radius } | null,
   //   searchedAreas: [{ lat, lon, searchedAt }],
   //   landmarks: [{ type, lat, lon }],
@@ -509,8 +505,8 @@ export class MapView {
     return covered;
   }
 
-  // Searched areas are crossed out in grease pencil: they merge into blobs with a
-  // wobbly outline and hatching, and each search point gets an X.
+  // Searched areas are marked in grease pencil: they merge into blobs with a
+  // wobbly outline and hatching. The area is what counts, not where each search stood.
   drawSearchedAreas(center, areas) {
     if (areas.length === 0) return;
     const { ctx, width, height } = this;
@@ -566,17 +562,6 @@ export class MapView {
       ctx.lineWidth = lineWidth;
       ctx.stroke(wobbled);
     }
-
-    const arm = Math.min(9, (0.35 * SEARCH_RADIUS) / metersPerPixel);
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    for (const { x, y } of points) {
-      ctx.moveTo(x - arm, y - arm);
-      ctx.lineTo(x + arm, y + arm);
-      ctx.moveTo(x + arm, y - arm);
-      ctx.lineTo(x - arm, y + arm);
-    }
-    ctx.stroke();
   }
 
   // The marker (a landmark or an enemy) whose badge is under a screen point,
@@ -754,12 +739,11 @@ export class MapView {
     ctx.restore();
   }
 
-  // The player: a pin stuck into the map, with the GPS accuracy around it.
-  // Green where the player can search, red where they can't, grey without a good signal.
-  drawPlayer(center, { position, good, canSearch, heading }) {
+  // The player: a small red dot, with the GPS accuracy around it. It doesn't
+  // fade with a weak signal: the signal meter in the corner already tells.
+  drawPlayer(center, { position, heading }) {
     const { ctx } = this;
     const { x, y } = this.toScreen(center, position);
-    ctx.globalAlpha = good ? 1 : 0.5;
 
     const accuracy = position.accuracy / this.metersPerPixel;
     if (accuracy > 8) {
@@ -787,37 +771,14 @@ export class MapView {
       ctx.fill();
     }
 
-    // The pin's shadow, right under its point.
+    // A dark edge keeps the dot readable on rust-brown ruins and red badges.
     ctx.beginPath();
-    ctx.ellipse(x, y, 7, 3, 0, 0, Math.PI * 2);
-    ctx.fillStyle = COLORS.shadow;
-    ctx.fill();
-
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.bezierCurveTo(x - 3, y - 7, x - 11, y - 14, x - 11, y - 23);
-    ctx.arc(x, y - 23, 11, Math.PI, 0);
-    ctx.bezierCurveTo(x + 11, y - 14, x + 3, y - 7, x, y);
-    const gradient = ctx.createLinearGradient(x - 11, y - 34, x + 11, y);
-    const [light, dark] = !good
-      ? [COLORS.grey, COLORS.greyDark]
-      : canSearch
-        ? [COLORS.limeLight, COLORS.limeDark]
-        : [COLORS.paintLight, COLORS.paintDark];
-    gradient.addColorStop(0, light);
-    gradient.addColorStop(1, dark);
-    ctx.fillStyle = gradient;
+    ctx.arc(x, y, PLAYER_DOT_PX, 0, Math.PI * 2);
+    ctx.fillStyle = COLORS.player;
     ctx.fill();
     ctx.strokeStyle = COLORS.ink;
     ctx.lineWidth = 1.5;
     ctx.stroke();
-
-    ctx.beginPath();
-    ctx.arc(x, y - 23, 4.2, 0, Math.PI * 2);
-    ctx.fillStyle = COLORS.paper;
-    ctx.fill();
-
-    ctx.globalAlpha = 1;
   }
 
   // Picks a round scale bar length and reports it when it changes.

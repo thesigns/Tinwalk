@@ -426,7 +426,6 @@ function renderStatus() {
   if (position) {
     ui.locationLabel.textContent = inShelter ? 'Shelter' : biomeAtPosition(position).label;
     ui.locationDaylight.textContent = describeDaylight(position, time);
-    ui.location.classList.toggle('uncertain', !tracker.hasGoodSignal);
   }
 
   const level = position && hasGeigerCounter(state) ? radiationAtPosition(state, position) : 0;
@@ -553,11 +552,9 @@ function worstHunger() {
 
 function renderMap() {
   const { position } = tracker;
-  const action = currentAction();
-  const canSearch = action.id === 'search' && action.enabled;
   mapView.render({
     center: position ?? state.shelter ?? (isDebug ? DEBUG_START : null),
-    player: position ? { position, good: tracker.hasGoodSignal, canSearch, heading: heading.heading } : null,
+    player: position ? { position, heading: heading.heading } : null,
     shelter: state.shelter && { ...state.shelter, radius: SHELTER_RADIUS },
     searchedAreas: activeSearchedAreas(state, now()),
     landmarks: state.landmarks,
